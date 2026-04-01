@@ -1,15 +1,5 @@
 <template>
-  <div class="app-layout" :class="{ 'is-macos': isMacOS }">
-    <!-- Title Bar (non-macOS only) -->
-    <TitleBar v-if="!isMacOS" />
-
-    <!-- Top Menu Bar -->
-    <AppMenuBar
-      :is-macos="isMacOS"
-      @menu-action="handleMenuAction"
-      @open-settings="handleOpenSettings"
-    />
-
+  <div class="app-layout">
     <!-- Page Content -->
     <div class="page-content">
       <router-view />
@@ -21,20 +11,12 @@
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useMessage, useDialog } from 'naive-ui'
-import TitleBar from './TitleBar.vue'
-import AppMenuBar from './AppMenuBar.vue'
-import { useSettingsStore } from '../stores/settings'
 import { useConnectionStore } from '../stores/connection'
 
 const router = useRouter()
 const message = useMessage()
 const dialog = useDialog()
-const settingsStore = useSettingsStore()
 const connectionStore = useConnectionStore()
-
-const isMacOS = computed(() => {
-  return window.electronAPI?.platform === 'darwin'
-})
 
 const handleMenuAction = (action: string) => {
   switch (action) {

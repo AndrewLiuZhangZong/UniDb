@@ -9,13 +9,15 @@ let serverPort: number = 3000
 const VITE_DEV_SERVER_URL = process.env.VITE_DEV_SERVER_URL || 'http://localhost:5173'
 
 const createWindow = () => {
+  // Determine if we should use native frame
+  const isMac = process.platform === 'darwin'
+
   mainWindow = new BrowserWindow({
     width: 1400,
     height: 900,
     minWidth: 1200,
     minHeight: 700,
-    frame: true,
-    titleBarStyle: 'hiddenInset',
+    frame: true, // Use native frame on all platforms for proper macOS traffic lights
     webPreferences: {
       preload: join(__dirname, 'preload.js'),
       nodeIntegration: false,

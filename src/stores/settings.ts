@@ -3,6 +3,7 @@ import { ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 const STORAGE_KEY = 'unidb-settings'
+const THEME_KEY = 'unidb-theme'
 
 export interface AppSettings {
   language: string
@@ -48,6 +49,8 @@ export const useSettingsStore = defineStore('settings', () => {
   function saveSettings() {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(settings.value))
+      // Also sync theme to separate key for CSS
+      localStorage.setItem(THEME_KEY, settings.value.theme)
     } catch (e) {
       console.error('Failed to save settings:', e)
     }

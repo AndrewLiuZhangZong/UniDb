@@ -1,5 +1,10 @@
 <template>
   <div class="home-container" :class="{ 'light-theme': !isDarkTheme }">
+    <!-- Top Bar with Actions -->
+    <div class="top-bar" :class="{ 'light-mode': !isDarkTheme }">
+      <AppMenuBar />
+    </div>
+
     <!-- Main Layout -->
     <n-layout has-sider class="main-layout" :has-sider="true">
       <!-- Sidebar -->
@@ -214,6 +219,7 @@ import {
 import ConnectionTree from '../components/ConnectionTree.vue'
 import ConnectionDialog from '../components/ConnectionDialog.vue'
 import DbTypeIcon from '../components/DbTypeIcon.vue'
+import AppMenuBar from '../components/AppMenuBar.vue'
 import { useConnectionStore } from '../stores/connection'
 import { useSettingsStore } from '../stores/settings'
 
@@ -227,12 +233,6 @@ const settingsStore = useSettingsStore()
 const showConnectionDialog = ref(false)
 const editingConnection = ref<any>(null)
 const activeConnection = ref<any>(null)
-
-// Detect if running on macOS
-const isMacOS = computed(() => {
-  // @ts-ignore
-  return window.electronAPI?.platform === 'darwin'
-})
 
 // Current theme
 const isDarkTheme = computed(() => settingsStore.settings.theme === 'dark')
@@ -434,6 +434,11 @@ onUnmounted(() => {
   display: flex;
   flex-direction: column;
   overflow: hidden;
+}
+
+.top-bar {
+  height: 28px;
+  flex-shrink: 0;
 }
 
 .main-layout {

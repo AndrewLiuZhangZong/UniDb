@@ -234,11 +234,22 @@ const handleEditConnectionEvent = (e: Event) => {
   editingConnection.value = (e as CustomEvent<any>).detail
   showConnectionDialog.value = true
 }
+const handleOpenSettings = (e: Event) => {
+  showSettings.value = true
+}
+const handleGoHome = () => {
+  activeConnection.value = null
+  isConnected.value = false
+  selectedItem.value = null
+  selectedItemType.value = ''
+}
 
 onMounted(() => {
   window.addEventListener('menu-action', handleMenuEvent)
   window.addEventListener('open-connection-dialog', handleOpenConnectionDialog)
   window.addEventListener('edit-connection', handleEditConnectionEvent)
+  window.addEventListener('open-settings', handleOpenSettings)
+  window.addEventListener('go-home', handleGoHome)
   // @ts-ignore
   if (window.electronAPI?.onMenuAction) window.electronAPI.onMenuAction(handleMenuAction)
 })
@@ -246,6 +257,8 @@ onUnmounted(() => {
   window.removeEventListener('menu-action', handleMenuEvent)
   window.removeEventListener('open-connection-dialog', handleOpenConnectionDialog)
   window.removeEventListener('edit-connection', handleEditConnectionEvent)
+  window.removeEventListener('open-settings', handleOpenSettings)
+  window.removeEventListener('go-home', handleGoHome)
 })
 </script>
 

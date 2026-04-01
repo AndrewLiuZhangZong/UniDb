@@ -30,46 +30,99 @@ export class MongoDBAdapter implements DatabaseAdapter {
   }
 
   async query(queryStr: string): Promise<any> {
-    if (!this.db) {
-      throw new Error('Not connected to database')
-    }
+    if (!this.db) throw new Error('Not connected to database')
 
     try {
-      const parsed = this.parseMongoQuery(queryStr)
-      const collection = this.db.collection(parsed.collection)
-      
-      if (parsed.operation === 'find') {
-        return await collection.find(parsed.query).limit(1000).toArray()
-      } else if (parsed.operation === 'aggregate') {
-        return await collection.aggregate(parsed.pipeline).toArray()
+      // Command format: op:dbName.colName:arg1:arg2...
+      const colonIdx = queryStr.indexOf(':')
+      if (colonIdx !== -1) {
+        const op = queryStr.substring(0, colonIdx)
+        const rest = queryStr.substring(colonIdx + 1)
+        return await this.executeCommand(op, rest)
       }
-      
-      throw new Error(`Unsupported operation: ${parsed.operation}`)
+
+      // Legacy: db.collection.find(...) / db.collection.aggregate(...)
+      const findMatch = queryStr.match(/db\.(\w+)\.find\((.*)\)/s)
+      if (findMatch) {
+        const col = this.resolveCollection(findMatch[1])
+        const filter = findMatch[2]?.trim() ? JSON.parse(findMatch[2]) : {}
+        return await col.find(filter).limit(200).toArray()
+      }
+      const aggMatch = queryStr.match(/db\.(\w+)\.aggregate\((.*)\)/s)
+      if (aggMatch) {
+        const col = this.resolveCollection(aggMatch[1])
+        return await col.aggregate(JSON.parse(aggMatch[2])).toArray()
+      }
+
+      throw new Error('Invalid MongoDB query syntax')
     } catch (error) {
       throw new Error(`Query execution failed: ${(error as Error).message}`)
     }
   }
 
-  private parseMongoQuery(queryStr: string): any {
-    const findMatch = queryStr.match(/db\.(\w+)\.find\((.*)\)/)
-    if (findMatch) {
-      return {
-        collection: findMatch[1],
-        operation: 'find',
-        query: findMatch[2] ? JSON.parse(findMatch[2]) : {}
-      }
+  private resolveCollection(colName: string) {
+    return this.db!.collection(colName)
+  }
+
+  private resolveDbAndCol(target: string): { db: import('mongodb').Db; col: string } {
+    const dot = target.indexOf('.')
+    if (dot !== -1) {
+      const dbName = target.substring(0, dot)
+      const colName = target.substring(dot + 1)
+      return { db: this.client!.db(dbName), col: colName }
+    }
+    return { db: this.db!, col: target }
+  }
+
+  private async executeCommand(op: string, rest: string): Promise<any> {
+    // split rest by first colon to get target (db.col) and remaining args
+    const parts = rest.split(':')
+    const target = parts[0]
+    const { db, col } = this.resolveDbAndCol(target)
+    const collection = db.collection(col)
+
+    if (op === 'find') {
+      const filter = parts[1]?.trim() ? JSON.parse(parts[1]) : {}
+      const skip = parseInt(parts[2] || '0') || 0
+      const limit = parseInt(parts[3] || '50') || 50
+      return await collection.find(filter).skip(skip).limit(limit).toArray()
     }
 
-    const aggregateMatch = queryStr.match(/db\.(\w+)\.aggregate\((.*)\)/)
-    if (aggregateMatch) {
-      return {
-        collection: aggregateMatch[1],
-        operation: 'aggregate',
-        pipeline: JSON.parse(aggregateMatch[2])
-      }
+    if (op === 'aggregate') {
+      const pipeline = JSON.parse(parts[1] || '[]')
+      return await collection.aggregate(pipeline).toArray()
     }
 
-    throw new Error('Invalid MongoDB query syntax')
+    if (op === 'insertOne') {
+      const doc = JSON.parse(parts[1])
+      const result = await collection.insertOne(doc)
+      return { insertedId: result.insertedId }
+    }
+
+    if (op === 'updateOne') {
+      const filter = JSON.parse(parts[1])
+      const update = JSON.parse(parts[2])
+      const result = await collection.updateOne(filter, update)
+      return { matchedCount: result.matchedCount, modifiedCount: result.modifiedCount }
+    }
+
+    if (op === 'deleteOne') {
+      const filter = JSON.parse(parts[1])
+      const result = await collection.deleteOne(filter)
+      return { deletedCount: result.deletedCount }
+    }
+
+    if (op === 'createCollection') {
+      await db.createCollection(col)
+      return { ok: 1 }
+    }
+
+    if (op === 'dropCollection') {
+      await db.dropCollection(col)
+      return { ok: 1 }
+    }
+
+    throw new Error(`Unsupported MongoDB operation: ${op}`)
   }
 
   async testConnection(): Promise<boolean> {

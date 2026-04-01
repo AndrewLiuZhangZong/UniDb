@@ -38,7 +38,7 @@
 
       <!-- Tab: Indexes -->
       <div v-else-if="activeTab === 'indexes'" class="tab-content">
-        <TableIndexes :table="selectedItem" />
+        <TableIndexes :table="selectedItem" :connection="connection" />
       </div>
     </template>
 
@@ -48,13 +48,14 @@
 <script setup lang="ts">
 import { ref, computed, watch, defineComponent, h } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { NIcon, NButton, NTag, NInput, NSelect, NDataTable, NSpace, NEmpty, NTooltip, useMessage, useDialog } from 'naive-ui'
+import { NIcon, NButton, NTag, NInput, NSelect, NDataTable, NSpace, NEmpty, NTooltip, NSpin, NAlert, NModal, NCard, useMessage, useDialog } from 'naive-ui'
 import {
   GridOutline, ListOutline, CodeSlashOutline, CreateOutline, TrashOutline,
   AddOutline, SaveOutline, RefreshOutline, DownloadOutline, SearchOutline,
-  ChevronBackOutline, ChevronForwardOutline, FilterOutline
+  ChevronBackOutline, ChevronForwardOutline, FilterOutline, WarningOutline, CloseOutline
 } from '@vicons/ionicons5'
 import { useSettingsStore } from '../../../stores/settings'
+import { mysqlMeta } from '../../../api/meta'
 
 const { t } = useI18n()
 const message = useMessage()
@@ -91,29 +92,42 @@ const SqlEditor = defineComponent({
     const resultData = ref<any[]>([])
     const resultCols = ref<any[]>([])
     const resultTime = ref(0)
+    const resultError = ref('')
     const activeResultTab = ref('result')
 
     const runQuery = async () => {
-      if (!sql.value.trim()) return
+      if (!sql.value.trim() || !p.connection?.id) return
       running.value = true
-      await new Promise(r => setTimeout(r, 400))
-      resultCols.value = [
-        { title: 'id', key: 'id', width: 80 },
-        { title: 'username', key: 'username', width: 140 },
-        { title: 'email', key: 'email', width: 200 },
-        { title: 'role', key: 'role', width: 100 },
-        { title: 'created_at', key: 'created_at', width: 160 }
-      ]
-      resultData.value = Array.from({ length: 8 }, (_, i) => ({
-        id: i + 1,
-        username: `user_${i + 1}`,
-        email: `user${i + 1}@example.com`,
-        role: i === 0 ? 'admin' : 'user',
-        created_at: '2024-01-0' + (i + 1) + ' 10:00:00'
-      }))
-      resultTime.value = Math.floor(Math.random() * 80) + 10
-      running.value = false
-      message.success(`查询成功，${resultData.value.length} 行，耗时 ${resultTime.value}ms`)
+      resultError.value = ''
+      resultData.value = []
+      resultCols.value = []
+      try {
+        const res = await mysqlMeta.execute(p.connection.id, sql.value)
+        resultTime.value = res.executionTime || 0
+        if (res.error) {
+          resultError.value = res.error
+          message.error(`执行失败: ${res.error}`)
+        } else {
+          const rows: any[] = Array.isArray(res.data) ? res.data : (res.data?.rows || [])
+          resultData.value = rows
+          if (rows.length) {
+            resultCols.value = Object.keys(rows[0]).map(k => ({
+              title: k, key: k, width: 140, ellipsis: { tooltip: true },
+              render: (row: any) => {
+                const v = row[k]
+                if (v === null || v === undefined) return h('span', { style: 'color:rgba(255,255,255,0.25);font-style:italic' }, 'NULL')
+                return h('span', null, String(v))
+              }
+            }))
+          }
+          message.success(`执行成功，${rows.length} 行，耗时 ${resultTime.value}ms`)
+        }
+      } catch (e: any) {
+        resultError.value = e?.response?.data?.error || e.message || '执行失败'
+        message.error(`执行失败: ${resultError.value}`)
+      } finally {
+        running.value = false
+      }
     }
 
     return () => h('div', { class: ['sql-editor-wrap', !isDark.value && 'light-mode'] }, [
@@ -145,194 +159,513 @@ const SqlEditor = defineComponent({
           ]),
           resultData.value.length ? h('span', { class: 'result-meta' }, `${resultData.value.length} 行 · ${resultTime.value}ms`) : null
         ]),
-        resultData.value.length
-          ? h(NDataTable, { columns: resultCols.value, data: resultData.value, size: 'small', maxHeight: 220, class: 'result-table', striped: true })
-          : h('div', { class: 'result-empty' }, [
-              h(NEmpty, { description: '执行查询后显示结果', size: 'small' })
-            ])
+        resultError.value
+          ? h(NAlert, { type: 'error', style: 'margin:8px;font-size:12px' }, { default: () => resultError.value })
+          : resultData.value.length
+            ? h(NDataTable, { columns: resultCols.value, data: resultData.value, size: 'small', maxHeight: 220, class: 'result-table', striped: true, scrollX: resultCols.value.length * 140 })
+            : h('div', { class: 'result-empty' }, [h(NEmpty, { description: '执行查询后显示结果', size: 'small' })])
       ])
     ])
   }
 })
 
-// Table Browse
+// Table Browse — full row CRUD
 const TableBrowse = defineComponent({
   props: { table: Object, connection: Object },
   setup(p) {
     const isDark = computed(() => settingsStore.settings.theme === 'dark')
     const loading = ref(false)
+    const saving = ref(false)
+    const error = ref('')
     const page = ref(1)
     const pageSize = ref(50)
     const total = ref(0)
-    const filterText = ref('')
     const rows = ref<any[]>([])
+    const fields = ref<any[]>([]) // raw field defs from API
     const cols = ref<any[]>([])
 
-    const loadRows = async () => {
-      if (!p.table) return
-      loading.value = true
-      await new Promise(r => setTimeout(r, 300))
-      // Generate mock columns from table def
-      cols.value = p.table.columns?.map((c: any) => ({
-        title: c.name,
-        key: c.name,
-        width: c.name === 'id' ? 70 : c.type?.startsWith('VARCHAR') ? 160 : 120,
-        ellipsis: { tooltip: true },
-        render: (row: any) => {
-          const v = row[c.name]
-          if (c.isPrimary) return h('span', { style: 'color:#f0a020;font-family:monospace' }, String(v))
-          if (c.type?.includes('TIMESTAMP') || c.type?.includes('DATE')) return h('span', { style: 'color:#60a5fa;font-size:11px' }, String(v))
-          return h('span', null, String(v ?? 'NULL'))
-        }
-      })) || []
-      total.value = p.table.rows || 0
-      rows.value = Array.from({ length: Math.min(pageSize.value, 20) }, (_, i) => {
-        const row: any = {}
-        p.table.columns?.forEach((c: any) => {
-          if (c.name === 'id') row[c.name] = (page.value - 1) * pageSize.value + i + 1
-          else if (c.name === 'username') row[c.name] = `user_${i + 1}`
-          else if (c.name === 'email') row[c.name] = `user${i + 1}@mail.com`
-          else if (c.name === 'role') row[c.name] = i === 0 ? 'admin' : 'user'
-          else if (c.name === 'status') row[c.name] = ['pending','paid','shipped'][i % 3]
-          else if (c.type?.includes('INT')) row[c.name] = Math.floor(Math.random() * 1000)
-          else if (c.type?.includes('DECIMAL')) row[c.name] = (Math.random() * 500).toFixed(2)
-          else if (c.type?.includes('TIMESTAMP')) row[c.name] = '2024-0' + (i % 9 + 1) + '-01 10:00:00'
-          else row[c.name] = `value_${i}`
-        })
-        return row
-      })
-      loading.value = false
+    // editing state
+    const editingRow = ref<any>(null)   // original row being edited
+    const editingData = ref<any>({})    // mutable copy
+    const showEditModal = ref(false)
+    const showInsertModal = ref(false)
+    const insertData = ref<any>({})
+
+    const dbName = () => p.table?._db || p.connection?.config?.database
+    const tblFull = () => {
+      const db = dbName()
+      return db ? `\`${db}\`.\`${p.table?.name}\`` : `\`${p.table?.name}\``
     }
 
-    watch(() => p.table, loadRows, { immediate: true })
+    const loadRows = async () => {
+      if (!p.table || !p.connection?.id) return
+      loading.value = true; error.value = ''
+      try {
+        const res = await mysqlMeta.tableData(p.connection.id, p.table.name, dbName(), page.value, pageSize.value)
+        total.value = res.total || 0
+        rows.value = res.rows || []
+        fields.value = res.fields || []
+        buildCols(res.fields || [])
+      } catch (e: any) {
+        error.value = e?.response?.data?.error || e.message
+        message.error('加载失败: ' + error.value)
+      } finally { loading.value = false }
+    }
+
+    const buildCols = (flds: any[]) => {
+      const dataCols = (flds.length ? flds : (rows.value.length ? Object.keys(rows.value[0]).map(k => ({ name: k })) : [])).map((f: any) => ({
+        title: f.name, key: f.name,
+        width: f.name === 'id' ? 70 : 140,
+        ellipsis: { tooltip: true },
+        render: (row: any) => {
+          const v = row[f.name]
+          if (v === null || v === undefined) return h('span', { class: 'null-val' }, 'NULL')
+          if (f.name === 'id') return h('span', { class: 'id-val' }, String(v))
+          return h('span', null, String(v))
+        }
+      }))
+      // action column
+      const actCol = {
+        title: '操作', key: '__actions', width: 90, fixed: 'right' as const,
+        render: (row: any) => h('div', { class: 'row-actions' }, [
+          h(NButton, { text: true, size: 'tiny', onClick: () => { editingRow.value = row; editingData.value = { ...row }; showEditModal.value = true } }, {
+            icon: () => h(NIcon, null, { default: () => h(CreateOutline) })
+          }),
+          h(NButton, { text: true, size: 'tiny', type: 'error', onClick: () => confirmDeleteRow(row) }, {
+            icon: () => h(NIcon, null, { default: () => h(TrashOutline) })
+          })
+        ])
+      }
+      cols.value = [...dataCols, actCol]
+    }
+
+    const confirmDeleteRow = (row: any) => {
+      const pk = findPK(row)
+      dialog.warning({
+        title: '删除行', content: `确定删除此行？${pk ? `（${pk.col} = ${pk.val}）` : ''}`,
+        positiveText: '删除', negativeText: '取消',
+        onPositiveClick: () => deleteRow(row)
+      })
+    }
+
+    const findPK = (row: any) => {
+      if (row.id !== undefined) return { col: 'id', val: row.id }
+      const pkField = fields.value.find((f: any) => f.name === 'id' || f.key === 'PRI')
+      if (pkField) return { col: pkField.name, val: row[pkField.name] }
+      const first = Object.keys(row)[0]
+      return first ? { col: first, val: row[first] } : null
+    }
+
+    const buildWhereClause = (row: any) => {
+      const pk = findPK(row)
+      if (!pk) return ''
+      return `WHERE \`${pk.col}\` = ${typeof pk.val === 'string' ? `'${pk.val.replace(/'/g, "''")}'` : pk.val}`
+    }
+
+    const deleteRow = async (row: any) => {
+      const where = buildWhereClause(row)
+      if (!where) { message.error('无法确定主键，无法删除'); return }
+      saving.value = true
+      try {
+        const sql = `DELETE FROM ${tblFull()} ${where} LIMIT 1`
+        const res = await mysqlMeta.execute(p.connection!.id, sql)
+        if (res.error) throw new Error(res.error)
+        message.success('已删除')
+        rows.value = rows.value.filter(r => r !== row)
+        total.value = Math.max(0, total.value - 1)
+      } catch (e: any) { message.error('删除失败: ' + (e?.response?.data?.error || e.message)) }
+      finally { saving.value = false }
+    }
+
+    const saveEdit = async () => {
+      const where = buildWhereClause(editingRow.value)
+      if (!where) { message.error('无法确定主键，无法更新'); return }
+      const setClauses = Object.keys(editingData.value)
+        .filter(k => editingData.value[k] !== editingRow.value[k])
+        .map(k => {
+          const v = editingData.value[k]
+          return `\`${k}\` = ${v === null || v === '' ? 'NULL' : `'${String(v).replace(/'/g, "''")}'`}`
+        })
+      if (!setClauses.length) { showEditModal.value = false; return }
+      saving.value = true
+      try {
+        const sql = `UPDATE ${tblFull()} SET ${setClauses.join(', ')} ${where}`
+        const res = await mysqlMeta.execute(p.connection!.id, sql)
+        if (res.error) throw new Error(res.error)
+        Object.assign(editingRow.value, editingData.value)
+        showEditModal.value = false
+        message.success('已更新')
+      } catch (e: any) { message.error('更新失败: ' + (e?.response?.data?.error || e.message)) }
+      finally { saving.value = false }
+    }
+
+    const openInsert = () => {
+      insertData.value = {}
+      fields.value.forEach((f: any) => { insertData.value[f.name] = '' })
+      showInsertModal.value = true
+    }
+
+    const saveInsert = async () => {
+      const flds = Object.keys(insertData.value).filter(k => insertData.value[k] !== '' && insertData.value[k] !== null)
+      if (!flds.length) { message.warning('请至少填写一个字段'); return }
+      const colPart = flds.map(k => `\`${k}\``).join(', ')
+      const valPart = flds.map(k => `'${String(insertData.value[k]).replace(/'/g, "''")}'`).join(', ')
+      saving.value = true
+      try {
+        const sql = `INSERT INTO ${tblFull()} (${colPart}) VALUES (${valPart})`
+        const res = await mysqlMeta.execute(p.connection!.id, sql)
+        if (res.error) throw new Error(res.error)
+        showInsertModal.value = false
+        message.success('插入成功')
+        loadRows()
+      } catch (e: any) { message.error('插入失败: ' + (e?.response?.data?.error || e.message)) }
+      finally { saving.value = false }
+    }
+
+    const exportCSV = () => {
+      if (!rows.value.length) { message.warning('无数据可导出'); return }
+      const header = Object.keys(rows.value[0]).join(',')
+      const body = rows.value.map(r => Object.values(r).map(v => `"${String(v ?? '').replace(/"/g, '""')}"`).join(',')).join('\n')
+      const a = Object.assign(document.createElement('a'), {
+        href: URL.createObjectURL(new Blob([header + '\n' + body], { type: 'text/csv' })),
+        download: `${p.table?.name || 'data'}.csv`
+      })
+      a.click()
+      message.success('已导出 CSV')
+    }
+
+    watch(() => [p.table?.name, p.table?._db], () => { page.value = 1; loadRows() }, { immediate: true })
+
+    const modalFields = computed(() => fields.value.length ? fields.value : (rows.value.length ? Object.keys(rows.value[0]).map(k => ({ name: k })) : []))
 
     return () => h('div', { class: ['table-browse', !isDark.value && 'light-mode'] }, [
       // Toolbar
       h('div', { class: 'browse-toolbar' }, [
-        h(NInput, { size: 'small', placeholder: '过滤...', value: filterText.value, onInput: (v: string) => { filterText.value = v }, clearable: true, style: 'width:200px' }, {
-          prefix: () => h(NIcon, { size: 12 }, { default: () => h(SearchOutline) })
-        }),
+        h('span', { class: 'browse-title' }, `${p.table?.name || ''}  ·  ${total.value.toLocaleString()} 行`),
         h('div', { style: 'flex:1' }),
-        h(NButton, { size: 'small', onClick: loadRows }, { default: () => '刷新', icon: () => h(NIcon, null, { default: () => h(RefreshOutline) }) }),
-        h(NButton, { size: 'small' }, { default: () => '新增行', icon: () => h(NIcon, null, { default: () => h(AddOutline) }) }),
-        h(NButton, { size: 'small' }, { default: () => '导出', icon: () => h(NIcon, null, { default: () => h(DownloadOutline) }) })
+        h(NButton, { size: 'small', type: 'primary', onClick: openInsert },
+          { default: () => '新增行', icon: () => h(NIcon, null, { default: () => h(AddOutline) }) }),
+        h(NButton, { size: 'small', onClick: loadRows, loading: loading.value },
+          { default: () => '刷新', icon: () => h(NIcon, null, { default: () => h(RefreshOutline) }) }),
+        h(NButton, { size: 'small', onClick: exportCSV },
+          { default: () => '导出 CSV', icon: () => h(NIcon, null, { default: () => h(DownloadOutline) }) }),
       ]),
-      // Table
+      error.value ? h(NAlert, { type: 'error', title: '加载失败', style: 'margin:8px 12px;font-size:12px' }, { default: () => error.value }) : null,
       h(NDataTable, {
-        columns: cols.value,
-        data: rows.value,
-        loading: loading.value,
-        size: 'small',
-        maxHeight: 'calc(100vh - 280px)',
-        striped: true,
-        class: 'data-table',
-        rowKey: (r: any) => r.id,
-        pagination: false
+        columns: cols.value, data: rows.value, loading: loading.value,
+        size: 'small', maxHeight: 'calc(100vh - 285px)', striped: true,
+        pagination: false, scrollX: (cols.value.length) * 140
       }),
-      // Pagination bar
       h('div', { class: 'browse-pagination' }, [
-        h('span', { class: 'pg-info' }, `共 ${total.value.toLocaleString()} 行`),
+        h('span', { class: 'pg-info' }, `共 ${total.value.toLocaleString()} 行 · 每页 ${pageSize.value}`),
         h('div', { style: 'flex:1' }),
-        h(NButton, { text: true, size: 'tiny', onClick: () => { if (page.value > 1) { page.value--; loadRows() } } }, {
-          icon: () => h(NIcon, null, { default: () => h(ChevronBackOutline) })
-        }),
+        h(NButton, { text: true, size: 'tiny', disabled: page.value <= 1, onClick: () => { page.value--; loadRows() } },
+          { icon: () => h(NIcon, null, { default: () => h(ChevronBackOutline) }) }),
         h('span', { class: 'pg-num' }, `第 ${page.value} 页`),
-        h(NButton, { text: true, size: 'tiny', onClick: () => { page.value++; loadRows() } }, {
-          icon: () => h(NIcon, null, { default: () => h(ChevronForwardOutline) })
-        }),
-      ])
+        h(NButton, { text: true, size: 'tiny', disabled: rows.value.length < pageSize.value, onClick: () => { page.value++; loadRows() } },
+          { icon: () => h(NIcon, null, { default: () => h(ChevronForwardOutline) }) }),
+      ]),
+
+      // ── Edit Modal ──
+      h(NModal, { show: showEditModal.value, 'onUpdate:show': (v: boolean) => { showEditModal.value = v } }, {
+        default: () => h(NCard, {
+          title: `编辑行 — ${p.table?.name}`, style: 'width:520px;max-height:80vh;overflow-y:auto',
+          bordered: false, size: 'small',
+          headerExtra: () => h(NButton, { text: true, onClick: () => { showEditModal.value = false } }, { icon: () => h(NIcon, null, { default: () => h(CloseOutline) }) })
+        }, {
+          default: () => h('div', { class: 'form-grid' }, [
+            ...modalFields.value.map((f: any) =>
+              h('div', { class: 'form-row', key: f.name }, [
+                h('label', { class: 'form-label' }, f.name),
+                h(NInput, {
+                  value: editingData.value[f.name] == null ? '' : String(editingData.value[f.name]),
+                  onUpdateValue: (v: string) => { editingData.value[f.name] = v },
+                  size: 'small', placeholder: 'NULL'
+                })
+              ])
+            ),
+            h('div', { class: 'form-actions' }, [
+              h(NButton, { type: 'primary', loading: saving.value, onClick: saveEdit }, { default: () => '保存' }),
+              h(NButton, { onClick: () => { showEditModal.value = false } }, { default: () => '取消' })
+            ])
+          ])
+        })
+      }),
+
+      // ── Insert Modal ──
+      h(NModal, { show: showInsertModal.value, 'onUpdate:show': (v: boolean) => { showInsertModal.value = v } }, {
+        default: () => h(NCard, {
+          title: `新增行 — ${p.table?.name}`, style: 'width:520px;max-height:80vh;overflow-y:auto',
+          bordered: false, size: 'small',
+          headerExtra: () => h(NButton, { text: true, onClick: () => { showInsertModal.value = false } }, { icon: () => h(NIcon, null, { default: () => h(CloseOutline) }) })
+        }, {
+          default: () => h('div', { class: 'form-grid' }, [
+            ...modalFields.value.map((f: any) =>
+              h('div', { class: 'form-row', key: f.name }, [
+                h('label', { class: 'form-label' }, f.name),
+                h(NInput, {
+                  value: insertData.value[f.name] ?? '',
+                  onUpdateValue: (v: string) => { insertData.value[f.name] = v },
+                  size: 'small', placeholder: '留空则为 NULL'
+                })
+              ])
+            ),
+            h('div', { class: 'form-actions' }, [
+              h(NButton, { type: 'primary', loading: saving.value, onClick: saveInsert }, { default: () => '插入' }),
+              h(NButton, { onClick: () => { showInsertModal.value = false } }, { default: () => '取消' })
+            ])
+          ])
+        })
+      })
     ])
   }
 })
 
-// Table Schema editor
+// Table Schema editor — with ADD/MODIFY/DROP COLUMN
 const TableSchema = defineComponent({
   props: { table: Object, connection: Object },
   setup(p) {
     const isDark = computed(() => settingsStore.settings.theme === 'dark')
-    const cols = computed(() => p.table?.columns || [])
-    const editingIdx = ref<number | null>(null)
+    const cols = ref<any[]>([])
+    const loading = ref(false)
+    const saving = ref(false)
+    const error = ref('')
 
-    const dropColumn = (name: string) => {
+    // modal state
+    const showColModal = ref(false)
+    const colModalMode = ref<'add' | 'modify'>('add')
+    const colForm = ref({ name: '', type: 'VARCHAR(255)', notNull: false, defaultValue: '', comment: '', after: '' })
+    const editingCol = ref<any>(null)
+
+    const dbName = () => p.table?._db || p.connection?.config?.database
+    const tblFull = () => {
+      const db = dbName()
+      return db ? `\`${db}\`.\`${p.table?.name}\`` : `\`${p.table?.name}\``
+    }
+
+    const loadCols = async () => {
+      if (!p.table || !p.connection?.id) return
+      loading.value = true; error.value = ''
+      try {
+        const res = await mysqlMeta.columns(p.connection.id, p.table.name, dbName())
+        cols.value = res.columns || []
+      } catch (e: any) {
+        error.value = e?.response?.data?.error || e.message
+        message.error('加载表结构失败: ' + error.value)
+      } finally { loading.value = false }
+    }
+
+    const openAdd = () => {
+      colModalMode.value = 'add'
+      colForm.value = { name: '', type: 'VARCHAR(255)', notNull: false, defaultValue: '', comment: '', after: '' }
+      showColModal.value = true
+    }
+
+    const openModify = (col: any) => {
+      colModalMode.value = 'modify'
+      editingCol.value = col
+      colForm.value = { name: col.name, type: col.type, notNull: col.notNull, defaultValue: col.defaultValue ?? '', comment: col.comment ?? '', after: '' }
+      showColModal.value = true
+    }
+
+    const buildColDef = () => {
+      const f = colForm.value
+      let def = `\`${f.name}\` ${f.type}`
+      if (f.notNull) def += ' NOT NULL'
+      if (f.defaultValue !== '') def += ` DEFAULT '${f.defaultValue.replace(/'/g, "''")}'`
+      if (f.comment) def += ` COMMENT '${f.comment.replace(/'/g, "''")}'`
+      return def
+    }
+
+    const saveColModal = async () => {
+      if (!colForm.value.name.trim()) { message.warning('字段名不能为空'); return }
+      saving.value = true
+      try {
+        let sql = ''
+        if (colModalMode.value === 'add') {
+          sql = `ALTER TABLE ${tblFull()} ADD COLUMN ${buildColDef()}`
+          if (colForm.value.after) sql += ` AFTER \`${colForm.value.after}\``
+        } else {
+          sql = `ALTER TABLE ${tblFull()} MODIFY COLUMN ${buildColDef()}`
+        }
+        const res = await mysqlMeta.execute(p.connection!.id, sql)
+        if (res.error) throw new Error(res.error)
+        showColModal.value = false
+        message.success(colModalMode.value === 'add' ? '字段已添加' : '字段已修改')
+        loadCols()
+      } catch (e: any) { message.error('操作失败: ' + (e?.response?.data?.error || e.message)) }
+      finally { saving.value = false }
+    }
+
+    const dropColumn = (col: any) => {
+      if (col.isPrimary) { message.warning('不能删除主键字段'); return }
       dialog.warning({
-        title: '删除字段',
-        content: `确定要删除字段 "${name}" 吗？此操作不可撤销。`,
+        title: '删除字段', content: `确定删除字段 "${col.name}"？此操作不可撤销！`,
         positiveText: '确定删除', negativeText: '取消',
-        onPositiveClick: () => message.success(`已删除字段 ${name}`)
+        onPositiveClick: async () => {
+          saving.value = true
+          try {
+            const sql = `ALTER TABLE ${tblFull()} DROP COLUMN \`${col.name}\``
+            const res = await mysqlMeta.execute(p.connection!.id, sql)
+            if (res.error) throw new Error(res.error)
+            cols.value = cols.value.filter(c => c.name !== col.name)
+            message.success(`已删除字段 ${col.name}`)
+          } catch (e: any) { message.error('删除失败: ' + (e?.response?.data?.error || e.message)) }
+          finally { saving.value = false }
+        }
       })
     }
 
+    const typeOptions = ['INT', 'BIGINT', 'TINYINT', 'SMALLINT', 'FLOAT', 'DOUBLE', 'DECIMAL(10,2)',
+      'VARCHAR(50)', 'VARCHAR(100)', 'VARCHAR(255)', 'TEXT', 'LONGTEXT',
+      'DATE', 'DATETIME', 'TIMESTAMP', 'JSON', 'BOOLEAN'].map(v => ({ label: v, value: v }))
+
+    watch(() => [p.table?.name, p.table?._db], loadCols, { immediate: true })
+
     return () => h('div', { class: ['table-schema', !isDark.value && 'light-mode'] }, [
       h('div', { class: 'schema-toolbar' }, [
-        h('span', { class: 'schema-title' }, `${p.table?.name} · ${cols.value.length} 个字段`),
+        h('span', { class: 'schema-title' }, loading.value ? '加载中...' : `${p.table?.name} · ${cols.value.length} 个字段`),
         h('div', { style: 'flex:1' }),
-        h(NButton, { size: 'small', type: 'primary' }, { default: () => '添加字段', icon: () => h(NIcon, null, { default: () => h(AddOutline) }) }),
-        h(NButton, { size: 'small' }, { default: () => '保存更改', icon: () => h(NIcon, null, { default: () => h(SaveOutline) }) })
+        h(NButton, { size: 'small', type: 'primary', onClick: openAdd },
+          { default: () => '添加字段', icon: () => h(NIcon, null, { default: () => h(AddOutline) }) }),
+        h(NButton, { size: 'small', onClick: loadCols, loading: loading.value },
+          { default: () => '刷新', icon: () => h(NIcon, null, { default: () => h(RefreshOutline) }) }),
       ]),
-      // Column list
-      h('div', { class: 'schema-cols' }, [
-        h('div', { class: 'schema-col-header' }, [
-          h('span', { class: 'col-h pk' }, 'PK'),
-          h('span', { class: 'col-h name' }, '字段名'),
-          h('span', { class: 'col-h type' }, '类型'),
-          h('span', { class: 'col-h nn' }, 'NOT NULL'),
-          h('span', { class: 'col-h ai' }, 'AUTO_INCREMENT'),
-          h('span', { class: 'col-h comment' }, '注释'),
-          h('span', { class: 'col-h actions' }, '操作')
-        ]),
-        ...cols.value.map((col: any, i: number) =>
-          h('div', { class: ['schema-col-row', col.isPrimary && 'is-pk', editingIdx.value === i && 'is-editing'], key: col.name }, [
-            h('span', { class: 'col-h pk' }, col.isPrimary ? '🔑' : ''),
-            h('span', { class: 'col-h name col-name-val' }, col.name),
-            h('span', { class: 'col-h type' }, [h('code', { class: 'type-badge' }, col.type)]),
-            h('span', { class: 'col-h nn' }, h('span', { class: col.notNull ? 'nn-yes' : 'nn-no' }, col.notNull ? '✓' : '—')),
-            h('span', { class: 'col-h ai' }, h('span', { class: col.autoIncrement ? 'nn-yes' : 'nn-no' }, col.autoIncrement ? '✓' : '—')),
-            h('span', { class: 'col-h comment' }, h('span', { class: 'comment-text' }, col.comment || '—')),
-            h('span', { class: 'col-h actions' }, [
-              h(NButton, { text: true, size: 'tiny', onClick: () => { editingIdx.value = i; message.info('编辑字段: ' + col.name) } }, { icon: () => h(NIcon, null, { default: () => h(CreateOutline) }) }),
-              h(NButton, { text: true, size: 'tiny', onClick: () => dropColumn(col.name) }, { icon: () => h(NIcon, null, { default: () => h(TrashOutline) }) })
+      error.value ? h(NAlert, { type: 'error', title: '错误', style: 'margin:8px 12px;font-size:12px' }, { default: () => error.value }) : null,
+      loading.value
+        ? h('div', { style: 'display:flex;align-items:center;justify-content:center;height:120px' }, [h(NSpin, { size: 'medium' })])
+        : h('div', { class: 'schema-cols' }, [
+            h('div', { class: 'schema-col-header' }, [
+              h('span', { class: 'col-h pk' }, 'PK'),
+              h('span', { class: 'col-h name' }, '字段名'),
+              h('span', { class: 'col-h type' }, '类型'),
+              h('span', { class: 'col-h nn' }, 'NOT NULL'),
+              h('span', { class: 'col-h ai' }, 'AUTO INC'),
+              h('span', { class: 'col-h def' }, '默认值'),
+              h('span', { class: 'col-h comment' }, '注释'),
+              h('span', { class: 'col-h actions' }, '操作'),
+            ]),
+            cols.value.length === 0 ? h('div', { style: 'padding:20px;text-align:center;color:rgba(255,255,255,0.3)' }, '无字段') : null,
+            ...cols.value.map((col: any) =>
+              h('div', { class: ['schema-col-row', col.isPrimary && 'is-pk'], key: col.name }, [
+                h('span', { class: 'col-h pk' }, col.isPrimary ? '🔑' : ''),
+                h('span', { class: 'col-h name col-name-val' }, col.name),
+                h('span', { class: 'col-h type' }, [h('code', { class: 'type-badge' }, col.type)]),
+                h('span', { class: 'col-h nn' }, h('span', { class: col.notNull ? 'nn-yes' : 'nn-no' }, col.notNull ? '✓' : '—')),
+                h('span', { class: 'col-h ai' }, h('span', { class: col.autoIncrement ? 'nn-yes' : 'nn-no' }, col.autoIncrement ? '✓' : '—')),
+                h('span', { class: 'col-h def' }, h('code', { class: 'def-val' }, col.defaultValue != null ? String(col.defaultValue) : '—')),
+                h('span', { class: 'col-h comment' }, h('span', { class: 'comment-text' }, col.comment || '—')),
+                h('span', { class: 'col-h actions' }, [
+                  h(NButton, { text: true, size: 'tiny', onClick: () => openModify(col) },
+                    { icon: () => h(NIcon, null, { default: () => h(CreateOutline) }) }),
+                  col.isPrimary ? null : h(NButton, { text: true, size: 'tiny', type: 'error', onClick: () => dropColumn(col) },
+                    { icon: () => h(NIcon, null, { default: () => h(TrashOutline) }) })
+                ]),
+              ])
+            )
+          ]),
+
+      // ── Column Modal ──
+      h(NModal, { show: showColModal.value, 'onUpdate:show': (v: boolean) => { showColModal.value = v } }, {
+        default: () => h(NCard, {
+          title: colModalMode.value === 'add' ? '添加字段' : `修改字段 — ${editingCol.value?.name}`,
+          style: 'width:460px', bordered: false, size: 'small',
+          headerExtra: () => h(NButton, { text: true, onClick: () => { showColModal.value = false } }, { icon: () => h(NIcon, null, { default: () => h(CloseOutline) }) })
+        }, {
+          default: () => h('div', { class: 'form-grid' }, [
+            h('div', { class: 'form-row' }, [
+              h('label', { class: 'form-label' }, '字段名'),
+              h(NInput, { value: colForm.value.name, onUpdateValue: (v: string) => { colForm.value.name = v }, size: 'small', disabled: colModalMode.value === 'modify' })
+            ]),
+            h('div', { class: 'form-row' }, [
+              h('label', { class: 'form-label' }, '类型'),
+              h(NSelect, { value: colForm.value.type, options: typeOptions, onUpdateValue: (v: string) => { colForm.value.type = v }, size: 'small', filterable: true, tag: true })
+            ]),
+            h('div', { class: 'form-row' }, [
+              h('label', { class: 'form-label' }, '默认值'),
+              h(NInput, { value: colForm.value.defaultValue, onUpdateValue: (v: string) => { colForm.value.defaultValue = v }, size: 'small', placeholder: '留空则无默认值' })
+            ]),
+            h('div', { class: 'form-row' }, [
+              h('label', { class: 'form-label' }, '注释'),
+              h(NInput, { value: colForm.value.comment, onUpdateValue: (v: string) => { colForm.value.comment = v }, size: 'small', placeholder: '字段注释（可选）' })
+            ]),
+            colModalMode.value === 'add' ? h('div', { class: 'form-row' }, [
+              h('label', { class: 'form-label' }, '位于字段后'),
+              h(NSelect, {
+                value: colForm.value.after, onUpdateValue: (v: string) => { colForm.value.after = v },
+                options: [{ label: '（末尾）', value: '' }, ...cols.value.map((c: any) => ({ label: c.name, value: c.name }))],
+                size: 'small', clearable: true
+              })
+            ]) : null,
+            h('div', { class: 'form-actions' }, [
+              h(NButton, { type: 'primary', loading: saving.value, onClick: saveColModal }, { default: () => colModalMode.value === 'add' ? '添加' : '保存' }),
+              h(NButton, { onClick: () => { showColModal.value = false } }, { default: () => '取消' })
             ])
           ])
-        )
-      ])
+        })
+      })
     ])
   }
 })
 
 // Table Indexes
 const TableIndexes = defineComponent({
-  props: { table: Object },
+  props: { table: Object, connection: Object },
   setup(p) {
     const isDark = computed(() => settingsStore.settings.theme === 'dark')
-    const indexes = computed(() => p.table?.indexes || [])
+    const indexes = ref<any[]>([])
+    const loading = ref(false)
+    const error = ref('')
+
+    const loadIndexes = async () => {
+      if (!p.table || !p.connection?.id) return
+      loading.value = true
+      error.value = ''
+      try {
+        const dbName = p.table._db || p.connection?.config?.database
+        const res = await mysqlMeta.indexes(p.connection.id, p.table.name, dbName)
+        indexes.value = res.indexes || []
+      } catch (e: any) {
+        error.value = e?.response?.data?.error || e.message || '加载索引失败'
+        message.error(`加载索引失败: ${error.value}`)
+      } finally {
+        loading.value = false
+      }
+    }
+
+    watch(() => [p.table?.name, p.table?._db], loadIndexes, { immediate: true })
+
     return () => h('div', { class: ['table-indexes', !isDark.value && 'light-mode'] }, [
       h('div', { class: 'idx-toolbar' }, [
-        h('span', { class: 'idx-title' }, `${p.table?.name} · ${indexes.value.length} 个索引`),
+        h('span', { class: 'idx-title' }, loading.value ? '加载中...' : `${p.table?.name} · ${indexes.value.length} 个索引`),
         h('div', { style: 'flex:1' }),
-        h(NButton, { size: 'small', type: 'primary' }, { default: () => '新建索引', icon: () => h(NIcon, null, { default: () => h(AddOutline) }) })
+        h(NButton, { size: 'small', onClick: loadIndexes, loading: loading.value }, { default: () => '刷新', icon: () => h(NIcon, null, { default: () => h(RefreshOutline) }) }),
       ]),
-      h('div', { class: 'idx-list' }, [
-        h('div', { class: 'idx-header' }, [
-          h('span', { class: 'idx-h name' }, '索引名'),
-          h('span', { class: 'idx-h type' }, '类型'),
-          h('span', { class: 'idx-h unique' }, 'UNIQUE'),
-          h('span', { class: 'idx-h cols' }, '字段'),
-          h('span', { class: 'idx-h actions' }, '操作')
-        ]),
-        ...indexes.value.map((idx: any) =>
-          h('div', { class: 'idx-row', key: idx.name }, [
-            h('span', { class: 'idx-h name' }, [
-              idx.name === 'PRIMARY' ? h('span', { class: 'pk-badge' }, 'PRIMARY') : h('code', null, idx.name)
+      error.value
+        ? h(NAlert, { type: 'error', title: '接口错误', style: 'margin:8px 12px;font-size:12px' }, { default: () => error.value })
+        : null,
+      loading.value
+        ? h('div', { style: 'display:flex;align-items:center;justify-content:center;height:120px' }, [h(NSpin, { size: 'medium' })])
+        : h('div', { class: 'idx-list' }, [
+            h('div', { class: 'idx-header' }, [
+              h('span', { class: 'idx-h name' }, '索引名'),
+              h('span', { class: 'idx-h type' }, '类型'),
+              h('span', { class: 'idx-h unique' }, 'UNIQUE'),
+              h('span', { class: 'idx-h cols' }, '字段'),
             ]),
-            h('span', { class: 'idx-h type' }, [h('code', { class: 'type-sm' }, idx.type)]),
-            h('span', { class: 'idx-h unique' }, h('span', { class: idx.unique ? 'nn-yes' : '' }, idx.unique ? '✓' : '—')),
-            h('span', { class: 'idx-h cols' }, [h('code', { class: 'col-badge' }, idx.columns.join(', '))]),
-            h('span', { class: 'idx-h actions' }, idx.name !== 'PRIMARY' ? [
-              h(NButton, { text: true, size: 'tiny' }, { icon: () => h(NIcon, null, { default: () => h(TrashOutline) }) })
-            ] : [])
+            indexes.value.length === 0
+              ? h('div', { style: 'padding:24px;text-align:center;color:rgba(255,255,255,0.3);font-size:13px' }, '暂无索引')
+              : indexes.value.map((idx: any) =>
+                  h('div', { class: 'idx-row', key: idx.name }, [
+                    h('span', { class: 'idx-h name' }, [
+                      idx.name === 'PRIMARY' ? h('span', { class: 'pk-badge' }, 'PRIMARY') : h('code', null, idx.name)
+                    ]),
+                    h('span', { class: 'idx-h type' }, [h('code', { class: 'type-sm' }, idx.type || 'BTREE')]),
+                    h('span', { class: 'idx-h unique' }, h('span', { class: idx.unique ? 'nn-yes' : '' }, idx.unique ? '✓' : '—')),
+                    h('span', { class: 'idx-h cols' }, [h('code', { class: 'col-badge' }, Array.isArray(idx.columns) ? idx.columns.join(', ') : idx.columns)]),
+                  ])
+                )
           ])
-        )
-      ])
     ])
   }
 })
@@ -439,7 +772,7 @@ const TableIndexes = defineComponent({
 .schema-cols { flex: 1; overflow-y: auto; padding: 0 8px 8px; }
 .schema-col-header, .schema-col-row {
   display: grid;
-  grid-template-columns: 32px 160px 200px 90px 120px 1fr 70px;
+  grid-template-columns: 32px 160px 200px 70px 70px 120px 1fr;
   align-items: center; gap: 4px; padding: 6px 8px;
   border-radius: 4px;
 }
@@ -458,6 +791,25 @@ const TableIndexes = defineComponent({
 .table-schema.light-mode .nn-no { color: rgba(0,0,0,0.2); }
 .comment-text { font-size: 11px; color: rgba(255,255,255,0.4); }
 .table-schema.light-mode .comment-text { color: rgba(0,0,0,0.4); }
+.def-val { font-size: 11px; color: rgba(255,255,255,0.45); background: rgba(255,255,255,0.06); padding: 1px 5px; border-radius: 3px; font-family: monospace; }
+.browse-title { font-size: 13px; font-weight: 500; color: rgba(255,255,255,0.7); }
+.table-browse.light-mode .browse-title { color: rgba(0,0,0,0.7); }
+
+/* ── Row action buttons ── */
+.row-actions { display: flex; gap: 2px; justify-content: center; }
+.null-val { color: rgba(255,255,255,0.25); font-style: italic; font-size: 11px; }
+.id-val { color: #f0a020; font-family: monospace; font-size: 11px; }
+
+/* ── Form modal ── */
+.form-grid { display: flex; flex-direction: column; gap: 12px; padding: 4px 0; }
+.form-row { display: flex; align-items: center; gap: 12px; }
+.form-label { font-size: 13px; color: rgba(255,255,255,0.7); min-width: 80px; flex-shrink: 0; }
+.form-actions { display: flex; gap: 8px; justify-content: flex-end; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.06); margin-top: 4px; }
+
+/* schema actions col */
+.schema-col-header, .schema-col-row {
+  grid-template-columns: 32px 160px 200px 70px 70px 120px 1fr 70px !important;
+}
 
 /* ── Indexes ── */
 .table-indexes { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
@@ -471,7 +823,7 @@ const TableIndexes = defineComponent({
 
 .idx-list { flex: 1; overflow-y: auto; padding: 0 8px 8px; }
 .idx-header, .idx-row {
-  display: grid; grid-template-columns: 220px 80px 70px 1fr 60px;
+  display: grid; grid-template-columns: 220px 80px 70px 1fr;
   align-items: center; gap: 4px; padding: 7px 8px; border-radius: 4px;
 }
 .idx-header { font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.3); text-transform: uppercase; }

@@ -47,6 +47,7 @@
             class="tree-item"
             :class="{ active: sel?.name === tbl.name }"
             @click="select(tbl, 'table')"
+            @contextmenu.prevent="openCtx($event, tbl)"
           >
             <n-icon class="item-icon tbl-c"><GridOutline /></n-icon>
             <span class="item-name">{{ tbl.name }}</span>
@@ -64,18 +65,22 @@
         </div>
       </div>
     </div>
+    <n-dropdown trigger="manual" :show="ctxShow" :x="ctxX" :y="ctxY"
+      :options="ctxOptions" @select="handleCtx" @clickoutside="ctxShow = false" />
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { NIcon, NButton, NInput, NTag } from 'naive-ui'
+import { NIcon, NButton, NInput, NTag, NDropdown, useMessage, useDialog } from 'naive-ui'
 import { RefreshOutline, ChevronForwardOutline, GridOutline, ServerOutline, SearchOutline, TerminalOutline } from '@vicons/ionicons5'
 import { useSettingsStore } from '../../../stores/settings'
 import { clickhouseMeta } from '../../../api/meta'
 
 const { t } = useI18n()
+const message = useMessage()
+const dialog = useDialog()
 const settingsStore = useSettingsStore()
 const isDarkTheme = computed(() => settingsStore.settings.theme === 'dark')
 const props = defineProps<{ connection: any }>()
@@ -88,12 +93,46 @@ const activeDb = ref('default')
 const databases = ref<any[]>([])
 const tables = ref<any[]>([])
 const exp = ref({ dbs: true, tables: true })
+const ctxShow = ref(false)
+const ctxX = ref(0)
+const ctxY = ref(0)
+const ctxItem = ref<any>(null)
 
 const filteredTables = computed(() =>
   searchText.value ? tables.value.filter(t => t.name.toLowerCase().includes(searchText.value.toLowerCase())) : tables.value
 )
 
 const toggle = (k: keyof typeof exp.value) => { exp.value[k] = !exp.value[k] }
+
+const ctxOptions = [
+  { label: '数据浏览', key: 'browse' },
+  { label: '表结构', key: 'schema' },
+  { type: 'divider', key: 'd1' },
+  { label: '删除表', key: 'drop' }
+]
+const openCtx = (e: MouseEvent, item: any) => { ctxItem.value = item; ctxShow.value = true; ctxX.value = e.clientX; ctxY.value = e.clientY }
+const handleCtx = (key: string) => {
+  ctxShow.value = false
+  if (key === 'browse') select(ctxItem.value, 'table')
+  else if (key === 'schema') select(ctxItem.value, 'schema')
+  else if (key === 'drop') dropTable(ctxItem.value)
+}
+const dropTable = (tbl: any) => {
+  dialog.warning({
+    title: '删除表', content: `确定删除表 "${tbl.name}"？ClickHouse 此操作不可撤销！`,
+    positiveText: '确定删除', negativeText: '取消',
+    onPositiveClick: async () => {
+      try {
+        const db = activeDb.value || 'default'
+        const res = await clickhouseMeta.execute(props.connection.id, `DROP TABLE \`${db}\`.\`${tbl.name}\``)
+        if ((res as any).error) throw new Error((res as any).error)
+        tables.value = tables.value.filter(t => t.name !== tbl.name)
+        message.success(`已删除表 ${tbl.name}`)
+      } catch (e: any) { message.error('删除失败: ' + (e?.response?.data?.error || e.message)) }
+    }
+  })
+}
+
 const selectDb = async (name: string) => {
   activeDb.value = name
   tables.value = []

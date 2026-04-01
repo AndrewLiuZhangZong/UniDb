@@ -15,13 +15,11 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { useRouter } from 'vue-router'
 import { useMessage, useDialog } from 'naive-ui'
 import TitleBar from './TitleBar.vue'
 import AppMenuBar from './AppMenuBar.vue'
 import { useConnectionStore } from '../stores/connection'
 
-const router = useRouter()
 const message = useMessage()
 const dialog = useDialog()
 const connectionStore = useConnectionStore()
@@ -111,25 +109,28 @@ const handleMenuAction = (action: string) => {
       break
     case 'openConsole':
     case 'openConsolePanel':
-      router.push('/logs')
+      window.dispatchEvent(new CustomEvent('open-settings', { detail: 'logs' }))
+      break
+    case 'home':
+      window.dispatchEvent(new CustomEvent('go-home'))
       break
     case 'toggleSidebar':
       window.dispatchEvent(new CustomEvent('toggle-sidebar'))
       break
     case 'zoomIn':
-      message.info('Zoom in')
+      window.electronAPI?.zoomIn?.() || (document.body.style.zoom = String(parseFloat(document.body.style.zoom || '1') + 0.1))
       break
     case 'zoomOut':
-      message.info('Zoom out')
+      window.electronAPI?.zoomOut?.() || (document.body.style.zoom = String(Math.max(0.5, parseFloat(document.body.style.zoom || '1') - 0.1)))
       break
     case 'resetZoom':
-      message.info('Reset zoom')
+      window.electronAPI?.resetZoom?.() || (document.body.style.zoom = '1')
       break
     case 'toggleFullscreen':
       window.electronAPI?.toggleFullscreen?.()
       break
     case 'settings':
-      router.push('/settings')
+      window.dispatchEvent(new CustomEvent('open-settings', { detail: 'general' }))
       break
     case 'documentation':
       window.open('https://unidb.com/docs', '_blank')

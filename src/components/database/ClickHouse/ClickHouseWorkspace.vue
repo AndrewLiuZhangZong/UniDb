@@ -21,8 +21,9 @@
             <span class="result-label"><n-icon :size="13"><GridOutline /></n-icon> 结果集</span>
             <span v-if="resultData.length" class="result-meta">{{ resultData.length }} 行 · {{ resultTime }}ms</span>
           </div>
-          <n-data-table v-if="resultData.length" :columns="resultCols" :data="resultData"
-            size="small" :max-height="220" striped />
+          <n-alert v-if="resultError" type="error" :title="resultError" style="margin:8px;font-size:12px" />
+          <n-data-table v-else-if="resultData.length" :columns="resultCols" :data="resultData"
+            size="small" :max-height="220" striped :scroll-x="resultCols.length * 140" />
           <div v-else class="result-empty">
             <n-empty description="执行查询后显示结果" size="small" />
           </div>
@@ -44,25 +45,25 @@
       <!-- Browse -->
       <div v-if="activeTab === 'browse'" class="tab-content">
         <div class="browse-toolbar">
-          <n-input v-model:value="filterText" size="small" placeholder="过滤..." clearable style="width:200px">
-            <template #prefix><n-icon :size="12"><SearchOutline /></n-icon></template>
-          </n-input>
+          <span class="browse-info">{{ selectedItem?.name }} · {{ browseRows.length }} 行</span>
           <div class="spacer" />
-          <n-button size="small" @click="loadTableData">
-            <template #icon><n-icon><RefreshOutline /></n-icon></template>
-            刷新
+          <n-button size="small" :loading="browseLoading" @click="loadTableData">
+            <template #icon><n-icon><RefreshOutline /></n-icon></template>刷新
           </n-button>
-          <n-button size="small">
-            <template #icon><n-icon><DownloadOutline /></n-icon></template>
-            导出
+          <n-button size="small" @click="exportCSV">
+            <template #icon><n-icon><DownloadOutline /></n-icon></template>导出 CSV
           </n-button>
+          <n-tag type="warning" size="small" style="font-size:11px">只读模式 · 不支持 UPDATE/DELETE</n-tag>
         </div>
+        <n-alert v-if="browseError" type="error" :title="browseError" style="margin:8px;font-size:12px" />
         <n-data-table :columns="browseColumns" :data="browseRows" :loading="browseLoading"
-          size="small" :max-height="'calc(100vh - 280px)'" striped />
+          size="small" :max-height="'calc(100vh - 285px)'" striped :scroll-x="browseColumns.length * 140" />
         <div class="pagination-bar">
-          <span class="pg-info">MergeTree · {{ selectedItem?.name }}</span>
+          <span class="pg-info">{{ selectedItem?.engine || 'MergeTree' }} · ORDER BY {{ selectedItem?.orderBy || '—' }}</span>
           <div class="spacer" />
-          <n-text depth="3" style="font-size:11px;">ORDER BY {{ selectedItem?.orderBy }}</n-text>
+          <n-button text size="tiny" :disabled="browsePage <= 1" @click="browsePage--; loadTableData()">‹</n-button>
+          <span style="font-size:11px;color:rgba(255,255,255,0.4);padding:0 6px">第 {{ browsePage }} 页</span>
+          <n-button text size="tiny" :disabled="browseRows.length < 50" @click="browsePage++; loadTableData()">›</n-button>
         </div>
       </div>
 
@@ -117,8 +118,9 @@
               <span class="result-label"><n-icon :size="13"><GridOutline /></n-icon> 结果集</span>
               <span v-if="resultData.length" class="result-meta">{{ resultData.length }} 行 · {{ resultTime }}ms</span>
             </div>
-            <n-data-table v-if="resultData.length" :columns="resultCols" :data="resultData"
-              size="small" :max-height="180" striped />
+            <n-alert v-if="resultError" type="error" :title="resultError" style="margin:8px;font-size:12px" />
+            <n-data-table v-else-if="resultData.length" :columns="resultCols" :data="resultData"
+              size="small" :max-height="180" striped :scroll-x="resultCols.length * 140" />
             <div v-else class="result-empty"><n-empty description="执行查询后显示结果" size="small" /></div>
           </div>
         </div>
@@ -129,15 +131,14 @@
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
-import { useI18n } from 'vue-i18n'
-import { NButton, NIcon, NInput, NDataTable, NTag, NText, NEmpty, useMessage } from 'naive-ui'
+import { NButton, NIcon, NInput, NDataTable, NTag, NText, NEmpty, NAlert, NSpin, useMessage } from 'naive-ui'
 import {
   PlayCircleOutline, GridOutline, ListOutline, CodeSlashOutline,
   SearchOutline, RefreshOutline, DownloadOutline
 } from '@vicons/ionicons5'
 import { useSettingsStore } from '../../../stores/settings'
+import { clickhouseMeta } from '../../../api/meta'
 
-const { t } = useI18n()
 const message = useMessage()
 const settingsStore = useSettingsStore()
 const isDarkTheme = computed(() => settingsStore.settings.theme === 'dark')
@@ -155,62 +156,98 @@ const tabs = [
   { key: 'sql', label: 'SQL 查询', icon: CodeSlashOutline }
 ]
 
-const sql = ref('SELECT * FROM events LIMIT 100;')
+const sql = ref('SELECT 1;')
 const running = ref(false)
 const resultData = ref<any[]>([])
 const resultCols = ref<any[]>([])
 const resultTime = ref(0)
-const filterText = ref('')
+const resultError = ref('')
 const browseLoading = ref(false)
+const browseError = ref('')
 const browseRows = ref<any[]>([])
 const browseColumns = ref<any[]>([])
+const browsePage = ref(1)
+const browseTotal = ref(0)
 
 const runQuery = async () => {
-  if (!sql.value.trim()) return
+  if (!sql.value.trim() || !props.connection?.id) return
   running.value = true
-  await new Promise(r => setTimeout(r, 350))
-  resultCols.value = [
-    { title: 'event_type', key: 'event_type', width: 140 },
-    { title: 'timestamp', key: 'timestamp', width: 160 },
-    { title: 'user_id', key: 'user_id', width: 100 }
-  ]
-  resultData.value = Array.from({ length: 10 }, (_, i) => ({
-    event_type: ['click','view','purchase'][i % 3],
-    timestamp: `2024-0${(i % 9) + 1}-01 10:${String(i * 5).padStart(2,'0')}:00`,
-    user_id: 1000 + i
-  }))
-  resultTime.value = Math.floor(Math.random() * 50) + 5
-  running.value = false
+  resultError.value = ''
+  resultData.value = []
+  resultCols.value = []
+  try {
+    const res = await clickhouseMeta.execute(props.connection.id, sql.value)
+    resultTime.value = res.executionTime || 0
+    if (res.error) {
+      resultError.value = res.error
+      message.error(`执行失败: ${res.error}`)
+    } else {
+      const rows: any[] = Array.isArray(res.data) ? res.data : (res.data?.rows || [])
+      resultData.value = rows
+      if (rows.length) {
+        resultCols.value = Object.keys(rows[0]).map(k => ({
+          title: k, key: k, width: 140, ellipsis: { tooltip: true }
+        }))
+      }
+      message.success(`执行成功，${rows.length} 行，耗时 ${resultTime.value}ms`)
+    }
+  } catch (e: any) {
+    resultError.value = e?.response?.data?.error || e.message || '执行失败'
+    message.error(`执行失败: ${resultError.value}`)
+  } finally {
+    running.value = false
+  }
 }
 
-const formatSql = () => { message.info('格式化 SQL') }
-
 const loadTableData = async () => {
-  if (!props.selectedItem) return
+  if (!props.selectedItem || !props.connection?.id) return
   browseLoading.value = true
-  await new Promise(r => setTimeout(r, 300))
-  const cols = props.selectedItem.columns || []
-  browseColumns.value = cols.map((c: any) => ({
-    title: c.name, key: c.name, width: c.name.length < 10 ? 100 : 160, ellipsis: { tooltip: true }
-  }))
-  browseRows.value = Array.from({ length: 15 }, (_, i) => {
-    const row: any = {}
-    cols.forEach((c: any) => {
-      if (c.type.includes('UInt')) row[c.name] = 1000 + i
-      else if (c.type.includes('String')) row[c.name] = `value_${i}`
-      else if (c.type.includes('Date')) row[c.name] = `2024-0${(i % 9) + 1}-01`
-      else if (c.type.includes('Float')) row[c.name] = (Math.random() * 100).toFixed(2)
-      else row[c.name] = `data_${i}`
-    })
-    return row
+  browseError.value = ''
+  const db = props.selectedItem._db || props.connection?.config?.database
+  const tbl = props.selectedItem.name
+  const offset = (browsePage.value - 1) * 50
+  const query = db
+    ? `SELECT * FROM \`${db}\`.\`${tbl}\` LIMIT 50 OFFSET ${offset}`
+    : `SELECT * FROM \`${tbl}\` LIMIT 50 OFFSET ${offset}`
+  try {
+    const res = await clickhouseMeta.execute(props.connection.id, query)
+    const rows: any[] = Array.isArray(res.data) ? res.data : (res.data?.rows || [])
+    browseRows.value = rows
+    if (rows.length) {
+      browseColumns.value = Object.keys(rows[0]).map(k => ({
+        title: k, key: k, width: 140, ellipsis: { tooltip: true }
+      }))
+    } else if (props.selectedItem.columns?.length) {
+      browseColumns.value = props.selectedItem.columns.map((c: any) => ({ title: c.name, key: c.name, width: 140 }))
+    }
+  } catch (e: any) {
+    browseError.value = e?.response?.data?.error || e.message || '加载失败'
+    message.error(`加载表数据失败: ${browseError.value}`)
+  } finally {
+    browseLoading.value = false
+  }
+}
+
+const exportCSV = () => {
+  if (!browseRows.value.length) { message.warning('无数据可导出'); return }
+  const header = Object.keys(browseRows.value[0]).join(',')
+  const body = browseRows.value.map(r => Object.values(r).map(v => `"${String(v ?? '').replace(/"/g, '""')}"`).join(',')).join('\n')
+  const a = Object.assign(document.createElement('a'), {
+    href: URL.createObjectURL(new Blob([header + '\n' + body], { type: 'text/csv' })),
+    download: `${props.selectedItem?.name || 'data'}.csv`
   })
-  browseLoading.value = false
+  a.click()
+  message.success('已导出 CSV')
 }
 
 watch(() => props.selectedItem, () => {
   activeTab.value = 'browse'
+  browsePage.value = 1
   if (props.selectedItem) {
-    sql.value = `SELECT * FROM \`${props.selectedItem.name}\` LIMIT 100;`
+    const db = props.selectedItem._db || props.connection?.config?.database
+    sql.value = db
+      ? `SELECT * FROM \`${db}\`.\`${props.selectedItem.name}\` LIMIT 100;`
+      : `SELECT * FROM \`${props.selectedItem.name}\` LIMIT 100;`
     loadTableData()
   }
 }, { immediate: true })
@@ -245,6 +282,8 @@ watch(() => props.selectedItem, () => {
 
 .browse-toolbar { display: flex; align-items: center; gap: 8px; padding: 8px 12px; flex-shrink: 0; border-bottom: 1px solid rgba(255,255,255,0.06); }
 .ch-workspace.light-mode .browse-toolbar { border-bottom-color: rgba(0,0,0,0.06); }
+.browse-info { font-size: 12px; font-weight: 500; color: rgba(255,255,255,0.6); }
+.ch-workspace.light-mode .browse-info { color: rgba(0,0,0,0.6); }
 .pagination-bar { display: flex; align-items: center; gap: 8px; padding: 6px 12px; border-top: 1px solid rgba(255,255,255,0.06); height: 36px; flex-shrink: 0; font-size: 12px; }
 .pg-info { color: rgba(255,255,255,0.4); }
 .ch-workspace.light-mode .pg-info { color: rgba(0,0,0,0.4); }

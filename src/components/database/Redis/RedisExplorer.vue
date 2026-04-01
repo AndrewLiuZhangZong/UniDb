@@ -144,15 +144,37 @@ const select = (item: any, type: string) => {
   emit('select-item', { ...item, _connectionId: props.connection.id }, type)
 }
 
-const handleCtx = (key: string) => {
+const handleCtx = async (key: string) => {
   ctxShow.value = false
-  if (key === 'view') select(ctxItem.value, 'key')
-  else if (key === 'del') {
+  if (key === 'view') {
+    select(ctxItem.value, 'key')
+  } else if (key === 'del') {
     redisMeta.deleteKey(props.connection.id, ctxItem.value.key).then(() => {
       message.success('已删除 ' + ctxItem.value.key)
       keys.value = keys.value.filter(k => k.key !== ctxItem.value.key)
     }).catch(e => message.error(e.message))
-  } else message.info(key)
+  } else if (key === 'ttl') {
+    const newTTL = window.prompt(`设置 TTL（秒，-1 表示永久）:\n当前: ${ctxItem.value.ttl ?? -1}`)
+    if (newTTL === null) return
+    const ttlNum = parseInt(newTTL)
+    if (isNaN(ttlNum)) { message.error('请输入有效数字'); return }
+    try {
+      const cmd = ttlNum < 0 ? `PERSIST ${ctxItem.value.key}` : `EXPIRE ${ctxItem.value.key} ${ttlNum}`
+      await redisMeta.execute(props.connection.id, cmd)
+      const k = keys.value.find(k => k.key === ctxItem.value.key)
+      if (k) k.ttl = ttlNum
+      message.success('TTL 已更新')
+    } catch (e: any) { message.error(e.message) }
+  } else if (key === 'rename') {
+    const newKey = window.prompt(`重命名 Key:\n当前: ${ctxItem.value.key}`)
+    if (!newKey || newKey === ctxItem.value.key) return
+    try {
+      await redisMeta.execute(props.connection.id, `RENAME ${ctxItem.value.key} ${newKey}`)
+      const k = keys.value.find(k => k.key === ctxItem.value.key)
+      if (k) k.key = newKey
+      message.success('已重命名')
+    } catch (e: any) { message.error(e.message) }
+  }
 }
 
 const searchKeys = async () => {

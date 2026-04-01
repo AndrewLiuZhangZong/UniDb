@@ -34,7 +34,7 @@
           <n-icon class="sec-icon tbl-c"><GridOutline /></n-icon>
           <span class="sec-label">{{ t('explorer.tables') }}</span>
           <span class="badge">{{ filteredTables.length }}</span>
-          <n-button text size="tiny" class="sec-action" @click.stop="$emit('action', 'createTable')" title="新建表">
+          <n-button text size="tiny" class="sec-action" @click.stop="openCreateTable" title="新建表">
             <template #icon><n-icon><AddOutline /></n-icon></template>
           </n-button>
         </div>
@@ -97,22 +97,43 @@
       @select="handleCtx"
       @clickoutside="ctx.show = false"
     />
+
+    <!-- Create Table Modal -->
+    <n-modal v-model:show="showCreateTable">
+      <n-card title="新建表" style="width:600px" :bordered="false" size="small">
+        <template #header-extra>
+          <n-button text @click="showCreateTable = false"><template #icon><n-icon><CloseOutline /></n-icon></template></n-button>
+        </template>
+        <p style="font-size:12px;color:rgba(150,150,150,0.8);margin:0 0 8px">编辑 CREATE TABLE 语句：</p>
+        <n-input
+          v-model:value="createTableSQL"
+          type="textarea"
+          :autosize="{ minRows: 8, maxRows: 16 }"
+          style="font-family:monospace;font-size:12px"
+        />
+        <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:12px">
+          <n-button @click="showCreateTable = false">取消</n-button>
+          <n-button type="primary" :loading="createTableSaving" @click="executeCreateTable">执行</n-button>
+        </div>
+      </n-card>
+    </n-modal>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { NIcon, NButton, NInput, NDropdown, NSelect, useMessage } from 'naive-ui'
+import { NIcon, NButton, NInput, NDropdown, NSelect, NModal, NCard, useMessage, useDialog } from 'naive-ui'
 import {
   RefreshOutline, ChevronForwardOutline, GridOutline, EyeOutline,
-  AddOutline, SearchOutline, TerminalOutline, WarningOutline
+  AddOutline, SearchOutline, TerminalOutline, WarningOutline, CloseOutline
 } from '@vicons/ionicons5'
 import { useSettingsStore } from '../../../stores/settings'
 import { mysqlMeta } from '../../../api/meta'
 
 const { t } = useI18n()
 const message = useMessage()
+const dialog = useDialog()
 const settingsStore = useSettingsStore()
 const isDarkTheme = computed(() => settingsStore.settings.theme === 'dark')
 
@@ -134,6 +155,9 @@ const views = ref<any[]>([])
 const error = ref('')
 const exp = ref({ tables: true, views: false })
 const ctx = ref({ show: false, x: 0, y: 0, item: null as any, type: '' })
+const showCreateTable = ref(false)
+const createTableSQL = ref('')
+const createTableSaving = ref(false)
 
 const filteredTables = computed(() =>
   searchText.value ? tables.value.filter(t => t.name.toLowerCase().includes(searchText.value.toLowerCase())) : tables.value
@@ -156,9 +180,10 @@ const openCtx = (e: MouseEvent, item: any, type: string) => {
 
 const ctxOptions = computed(() => [
   { label: '查看数据', key: 'browse' },
-  { label: 'SQL 查询', key: 'query' },
   { label: '表结构', key: 'schema' },
+  { label: 'SQL 查询', key: 'query' },
   { type: 'divider', key: 'd1' },
+  { label: '清空表数据', key: 'truncate' },
   { label: '删除表', key: 'drop' }
 ])
 
@@ -167,7 +192,60 @@ const handleCtx = (key: string) => {
   if (key === 'browse') select(ctx.value.item, 'table')
   else if (key === 'query') select(ctx.value.item, 'query')
   else if (key === 'schema') select(ctx.value.item, 'schema')
-  else message.info(key)
+  else if (key === 'drop') dropTable(ctx.value.item)
+  else if (key === 'truncate') truncateTable(ctx.value.item)
+}
+
+const dropTable = (tbl: any) => {
+  dialog.warning({
+    title: '删除表', content: `确定删除表 "${tbl.name}"？所有数据将永久丢失！`,
+    positiveText: '确定删除', negativeText: '取消',
+    onPositiveClick: async () => {
+      try {
+        const db = activeDb.value
+        const sql = db ? `DROP TABLE \`${db}\`.\`${tbl.name}\`` : `DROP TABLE \`${tbl.name}\``
+        const res = await mysqlMeta.execute(props.connection.id, sql)
+        if ((res as any).error) throw new Error((res as any).error)
+        tables.value = tables.value.filter(t => t.name !== tbl.name)
+        message.success(`已删除表 ${tbl.name}`)
+      } catch (e: any) { message.error('删除失败: ' + (e?.response?.data?.error || e.message)) }
+    }
+  })
+}
+
+const truncateTable = (tbl: any) => {
+  dialog.warning({
+    title: '清空表数据', content: `确定清空表 "${tbl.name}" 的所有数据？此操作不可撤销！`,
+    positiveText: '确定清空', negativeText: '取消',
+    onPositiveClick: async () => {
+      try {
+        const db = activeDb.value
+        const sql = db ? `TRUNCATE TABLE \`${db}\`.\`${tbl.name}\`` : `TRUNCATE TABLE \`${tbl.name}\``
+        const res = await mysqlMeta.execute(props.connection.id, sql)
+        if ((res as any).error) throw new Error((res as any).error)
+        message.success(`已清空表 ${tbl.name}`)
+      } catch (e: any) { message.error('操作失败: ' + (e?.response?.data?.error || e.message)) }
+    }
+  })
+}
+
+const openCreateTable = () => {
+  const db = activeDb.value ? `\`${activeDb.value}\`.` : ''
+  createTableSQL.value = `CREATE TABLE ${db}\`new_table\` (\n  \`id\` INT NOT NULL AUTO_INCREMENT,\n  \`name\` VARCHAR(255) NOT NULL,\n  \`created_at\` DATETIME DEFAULT CURRENT_TIMESTAMP,\n  PRIMARY KEY (\`id\`)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`
+  showCreateTable.value = true
+}
+
+const executeCreateTable = async () => {
+  if (!createTableSQL.value.trim()) return
+  createTableSaving.value = true
+  try {
+    const res = await mysqlMeta.execute(props.connection.id, createTableSQL.value)
+    if ((res as any).error) throw new Error((res as any).error)
+    showCreateTable.value = false
+    message.success('表创建成功')
+    loadTablesAndViews()
+  } catch (e: any) { message.error('创建失败: ' + (e?.response?.data?.error || e.message)) }
+  finally { createTableSaving.value = false }
 }
 
 const loadDatabases = async () => {

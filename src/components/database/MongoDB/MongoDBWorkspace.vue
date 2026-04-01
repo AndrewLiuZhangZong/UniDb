@@ -29,9 +29,10 @@
             </div>
             <span v-if="resultDocs.length" class="result-meta">{{ resultDocs.length }} 文档 · {{ resultTime }}ms</span>
           </div>
-          <div v-if="viewMode === 'table'" class="doc-table-wrap">
+          <n-alert v-if="runError" type="error" :title="runError" style="margin:8px;font-size:12px" />
+          <div v-else-if="viewMode === 'table'" class="doc-table-wrap">
             <n-data-table v-if="resultDocs.length" :columns="resultCols" :data="resultDocs"
-              size="small" :max-height="200" striped />
+              size="small" :max-height="200" striped :scroll-x="resultCols.length * 140" />
             <div v-else class="result-empty"><n-empty description="执行查询后显示结果" size="small" /></div>
           </div>
           <div v-else class="json-view-wrap">
@@ -62,7 +63,7 @@
           <n-button size="small" type="primary" :loading="browseLoading" @click="loadDocs">
             <template #icon><n-icon><SearchOutline /></n-icon></template>查询
           </n-button>
-          <n-button size="small">
+          <n-button size="small" type="primary" @click="openInsertDoc">
             <template #icon><n-icon><AddOutline /></n-icon></template>插入文档
           </n-button>
           <div class="spacer" />
@@ -72,17 +73,18 @@
           </div>
         </div>
 
-        <div v-if="viewMode === 'table'" class="browse-table">
+        <n-alert v-if="browseError" type="error" :title="browseError" style="margin:8px;font-size:12px" />
+        <div v-else-if="viewMode === 'table'" class="browse-table">
           <n-data-table :columns="docCols" :data="docs" :loading="browseLoading"
-            size="small" :max-height="'calc(100vh - 340px)'" striped />
+            size="small" :max-height="'calc(100vh - 340px)'" striped :scroll-x="docCols.length * 140" />
         </div>
         <div v-else class="json-scroll">
           <div v-for="(doc, i) in docs" :key="i" class="json-doc">
             <div class="json-doc-actions">
-              <n-button text size="tiny" @click="message.info('编辑文档')">
+              <n-button text size="tiny" @click="openEditDoc(doc)">
                 <template #icon><n-icon><CreateOutline /></n-icon></template>
               </n-button>
-              <n-button text size="tiny" @click="message.warning('删除文档')">
+              <n-button text size="tiny" type="error" @click="deleteDoc(doc)">
                 <template #icon><n-icon><TrashOutline /></n-icon></template>
               </n-button>
             </div>
@@ -115,7 +117,8 @@
           <div class="result-bar">
             <span class="result-label"><n-icon :size="13"><GridOutline /></n-icon> 聚合结果</span>
           </div>
-          <n-data-table v-if="aggResult.length" :columns="aggCols" :data="aggResult"
+          <n-alert v-if="aggError" type="error" :title="aggError" style="margin:8px;font-size:12px" />
+          <n-data-table v-else-if="aggResult.length" :columns="aggCols" :data="aggResult"
             size="small" :max-height="200" striped />
           <div v-else class="result-empty"><n-empty description="执行聚合管道后显示结果" size="small" /></div>
         </div>
@@ -143,46 +146,65 @@
       <!-- Indexes -->
       <div v-else-if="activeTab === 'indexes'" class="tab-content">
         <div class="idx-toolbar">
-          <span class="idx-title">{{ selectedItem?.name }} · {{ selectedItem?.indexes?.length }} 个索引</span>
+          <span class="idx-title">{{ selectedItem?.name }} · {{ indexes.length }} 个索引</span>
           <div class="spacer" />
-          <n-button size="small" type="primary">
-            <template #icon><n-icon><AddOutline /></n-icon></template>新建索引
+          <n-button size="small" :loading="indexesLoading" @click="loadIndexes">
+            <template #icon><n-icon><SearchOutline /></n-icon></template>刷新
           </n-button>
         </div>
-        <div class="idx-list">
+        <n-alert v-if="indexesError" type="error" :title="indexesError" style="margin:8px;font-size:12px" />
+        <div v-else-if="indexesLoading" style="display:flex;align-items:center;justify-content:center;height:120px">
+          <n-spin size="medium" />
+        </div>
+        <div v-else class="idx-list">
           <div class="idx-row header">
             <span class="ih name">索引名</span>
             <span class="ih keys">Key</span>
             <span class="ih unique">UNIQUE</span>
-            <span class="ih actions"></span>
           </div>
-          <div v-for="idx in selectedItem?.indexes" :key="idx.name" class="idx-row">
+          <div v-if="!indexes.length" style="padding:20px;text-align:center;color:rgba(255,255,255,0.3);font-size:13px">暂无索引</div>
+          <div v-for="idx in indexes" :key="idx.name" class="idx-row">
             <span class="ih name"><code>{{ idx.name }}</code></span>
-            <span class="ih keys"><code class="keys-badge">{{ JSON.stringify(idx.keys) }}</code></span>
+            <span class="ih keys"><code class="keys-badge">{{ JSON.stringify(idx.key || idx.keys) }}</code></span>
             <span class="ih unique"><span :class="idx.unique ? 'req-yes' : ''">{{ idx.unique ? '✓' : '—' }}</span></span>
-            <span class="ih actions">
-              <n-button v-if="idx.name !== '_id_'" text size="tiny">
-                <template #icon><n-icon><TrashOutline /></n-icon></template>
-              </n-button>
-            </span>
           </div>
         </div>
       </div>
     </template>
+
+    <!-- Document insert / edit modal -->
+    <n-modal v-model:show="showDocModal">
+      <n-card :title="docModalMode === 'insert' ? '插入文档' : '编辑文档'" style="width:580px" :bordered="false" size="small">
+        <template #header-extra>
+          <n-button text @click="showDocModal = false"><template #icon><n-icon><CloseOutline /></n-icon></template></n-button>
+        </template>
+        <p style="font-size:12px;color:rgba(150,150,150,0.8);margin:0 0 8px">JSON 格式：</p>
+        <n-input v-model:value="docModalJSON" type="textarea" :autosize="{ minRows: 8, maxRows: 18 }"
+          style="font-family:monospace;font-size:12px" />
+        <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:12px">
+          <n-button @click="showDocModal = false">取消</n-button>
+          <n-button type="primary" :loading="docModalSaving" @click="saveDocModal">
+            {{ docModalMode === 'insert' ? '插入' : '保存' }}
+          </n-button>
+        </div>
+      </n-card>
+    </n-modal>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
-import { NButton, NIcon, NInput, NSelect, NDataTable, NTag, NEmpty, useMessage } from 'naive-ui'
+import { NButton, NIcon, NInput, NSelect, NDataTable, NTag, NEmpty, NAlert, NSpin, NModal, NCard, useMessage, useDialog } from 'naive-ui'
 import {
   PlayCircleOutline, GridOutline, DocumentOutline, ListOutline, FilterOutline,
   SearchOutline, AddOutline, CreateOutline, TrashOutline,
-  ChevronBackOutline, ChevronForwardOutline
+  ChevronBackOutline, ChevronForwardOutline, CloseOutline, SaveOutline
 } from '@vicons/ionicons5'
 import { useSettingsStore } from '../../../stores/settings'
+import { mongodbMeta } from '../../../api/meta'
 
 const message = useMessage()
+const dialog = useDialog()
 const settingsStore = useSettingsStore()
 const isDarkTheme = computed(() => settingsStore.settings.theme === 'dark')
 
@@ -190,6 +212,7 @@ const props = defineProps<{
   connection: any
   selectedItem: any
   selectedItemType: string
+  collections?: { label: string; value: string }[]
 }>()
 
 const activeTab = ref('browse')
@@ -202,92 +225,243 @@ const tabs = [
 
 const viewMode = ref<'table' | 'json'>('table')
 const queryCollection = ref<string | null>(null)
-const queryText = ref("db.users.find({ role: 'admin' }).limit(20)")
+const queryText = ref("{ }")
 const running = ref(false)
+const runError = ref('')
 const resultDocs = ref<any[]>([])
 const resultCols = ref<any[]>([])
 const resultTime = ref(0)
 
 const filterQuery = ref('{}')
 const browseLoading = ref(false)
+const browseError = ref('')
 const docs = ref<any[]>([])
 const docCols = ref<any[]>([])
 const page = ref(1)
+const pageSize = 20
+const totalDocs = ref(0)
 
 const aggPipeline = ref('')
 const aggResult = ref<any[]>([])
 const aggCols = ref<any[]>([])
+const aggError = ref('')
 const samplePipeline = `[
   { "$match": { "status": "active" } },
   { "$group": { "_id": "$role", "count": { "$sum": 1 } } },
   { "$sort": { "count": -1 } }
 ]`
 
-const collectionOptions = [
-  { label: 'users', value: 'users' },
-  { label: 'orders', value: 'orders' },
-  { label: 'products', value: 'products' }
-]
+const indexes = ref<any[]>([])
+const indexesLoading = ref(false)
+const indexesError = ref('')
+
+// Collection options from parent or empty
+const collectionOptions = computed(() => props.collections || [])
+
+const getDb = () => props.selectedItem?._db || props.connection?.config?.database || ''
+const getConnId = () => props.connection?.id
+
+const buildDocsQuery = (filter: string, skip: number, limit: number) => {
+  const safeFilter = filter?.trim() || '{}'
+  const db = getDb()
+  const col = props.selectedItem?.name
+  const dbPrefix = db ? `${db}.` : ''
+  return `find:${dbPrefix}${col}:${safeFilter}:${skip}:${limit}`
+}
 
 const runQuery = async () => {
+  if (!queryCollection.value || !getConnId()) {
+    message.warning('请先选择 Collection')
+    return
+  }
   running.value = true
-  await new Promise(r => setTimeout(r, 350))
-  resultCols.value = [
-    { title: '_id', key: '_id', width: 90 },
-    { title: 'username', key: 'username', width: 130 },
-    { title: 'email', key: 'email', width: 200 },
-    { title: 'role', key: 'role', width: 90 }
-  ]
-  resultDocs.value = Array.from({ length: 8 }, (_, i) => ({
-    _id: `ObjectId("${Math.random().toString(16).slice(2, 26)}")`,
-    username: `user_${i + 1}`, email: `user${i + 1}@mail.com`,
-    role: i === 0 ? 'admin' : 'user'
-  }))
-  resultTime.value = Math.floor(Math.random() * 30) + 5
-  running.value = false
+  runError.value = ''
+  resultDocs.value = []
+  const db = getDb()
+  const col = queryCollection.value
+  const dbPrefix = db ? `${db}.` : ''
+  const queryStr = `find:${dbPrefix}${col}:${queryText.value.trim() || '{}'}:0:50`
+  const t0 = Date.now()
+  try {
+    const res = await mongodbMeta.execute(getConnId(), queryStr)
+    resultTime.value = Date.now() - t0
+    if (res.error) { runError.value = res.error; message.error(`查询失败: ${res.error}`); return }
+    const rows: any[] = Array.isArray(res.data) ? res.data : (res.data?.rows || [])
+    resultDocs.value = rows.map(r => {
+      const flat: any = {}
+      Object.entries(r).forEach(([k, v]) => { flat[k] = typeof v === 'object' ? JSON.stringify(v) : v })
+      return flat
+    })
+    if (resultDocs.value.length) {
+      resultCols.value = Object.keys(resultDocs.value[0]).map(k => ({ title: k, key: k, width: k === '_id' ? 90 : 140, ellipsis: { tooltip: true } }))
+    }
+    message.success(`查询成功，${resultDocs.value.length} 文档，耗时 ${resultTime.value}ms`)
+  } catch (e: any) {
+    runError.value = e?.response?.data?.error || e.message || '查询失败'
+    message.error(`查询失败: ${runError.value}`)
+  } finally {
+    running.value = false
+  }
 }
 
 const loadDocs = async () => {
-  if (!props.selectedItem) return
+  if (!props.selectedItem || !getConnId()) return
   browseLoading.value = true
-  await new Promise(r => setTimeout(r, 300))
-  const schema = props.selectedItem.schema || []
-  docCols.value = schema.map((f: any) => ({
-    title: f.name, key: f.name, width: f.name === '_id' ? 80 : 140, ellipsis: { tooltip: true }
-  }))
-  docs.value = Array.from({ length: 12 }, (_, i) => {
-    const doc: any = {}
-    schema.forEach((f: any) => {
-      if (f.name === '_id') doc[f.name] = `obj_${i}`
-      else if (f.type === 'String') doc[f.name] = `${f.name}_${i}`
-      else if (f.type === 'Number') doc[f.name] = Math.floor(Math.random() * 100)
-      else if (f.type === 'Date') doc[f.name] = `2024-0${(i % 9) + 1}-01`
-      else if (f.type === 'Array') doc[f.name] = ['a', 'b']
-      else if (f.type === 'Object') doc[f.name] = { key: 'value' }
-      else doc[f.name] = null
+  browseError.value = ''
+  const db = getDb()
+  const col = props.selectedItem.name
+  const dbPrefix = db ? `${db}.` : ''
+  const skip = (page.value - 1) * pageSize
+  let filter = '{}'
+  try { JSON.parse(filterQuery.value); filter = filterQuery.value.trim() || '{}' } catch { filter = '{}' }
+  const queryStr = `find:${dbPrefix}${col}:${filter}:${skip}:${pageSize}`
+  try {
+    const res = await mongodbMeta.execute(getConnId(), queryStr)
+    if (res.error) { browseError.value = res.error; message.error(`加载失败: ${res.error}`); return }
+    const rows: any[] = Array.isArray(res.data) ? res.data : (res.data?.rows || [])
+    docs.value = rows.map(r => {
+      const flat: any = {}
+      Object.entries(r).forEach(([k, v]) => { flat[k] = typeof v === 'object' ? JSON.stringify(v) : v })
+      return flat
     })
-    return doc
-  })
-  browseLoading.value = false
+    totalDocs.value = props.selectedItem?.count || docs.value.length
+    if (docs.value.length) {
+      docCols.value = Object.keys(docs.value[0]).map(k => ({ title: k, key: k, width: k === '_id' ? 90 : 140, ellipsis: { tooltip: true } }))
+    }
+  } catch (e: any) {
+    browseError.value = e?.response?.data?.error || e.message || '加载文档失败'
+    message.error(`加载文档失败: ${browseError.value}`)
+  } finally {
+    browseLoading.value = false
+  }
 }
 
 const runAgg = async () => {
+  if (!props.selectedItem || !getConnId()) return
   running.value = true
-  await new Promise(r => setTimeout(r, 400))
-  aggCols.value = [{ title: '_id', key: '_id', width: 120 }, { title: 'count', key: 'count', width: 100 }]
-  aggResult.value = [{ _id: 'admin', count: 3 }, { _id: 'user', count: 47 }, { _id: 'guest', count: 12 }]
-  running.value = false
+  aggError.value = ''
+  aggResult.value = []
+  const db = getDb()
+  const col = props.selectedItem.name
+  const dbPrefix = db ? `${db}.` : ''
+  const pipeline = aggPipeline.value.trim() || '[]'
+  const queryStr = `aggregate:${dbPrefix}${col}:${pipeline}`
+  try {
+    const res = await mongodbMeta.execute(getConnId(), queryStr)
+    if (res.error) { aggError.value = res.error; message.error(`聚合失败: ${res.error}`); return }
+    const rows: any[] = Array.isArray(res.data) ? res.data : (res.data?.rows || [])
+    aggResult.value = rows.map(r => {
+      const flat: any = {}
+      Object.entries(r).forEach(([k, v]) => { flat[k] = typeof v === 'object' ? JSON.stringify(v) : v })
+      return flat
+    })
+    if (aggResult.value.length) {
+      aggCols.value = Object.keys(aggResult.value[0]).map(k => ({ title: k, key: k, width: 140 }))
+    }
+    message.success(`聚合成功，${aggResult.value.length} 条结果`)
+  } catch (e: any) {
+    aggError.value = e?.response?.data?.error || e.message || '聚合失败'
+    message.error(`聚合失败: ${aggError.value}`)
+  } finally {
+    running.value = false
+  }
+}
+
+const loadIndexes = async () => {
+  if (!props.selectedItem || !getConnId()) return
+  indexesLoading.value = true
+  indexesError.value = ''
+  try {
+    const db = getDb()
+    const res = await mongodbMeta.indexes(getConnId(), props.selectedItem.name, db)
+    indexes.value = res.indexes || []
+  } catch (e: any) {
+    indexesError.value = e?.response?.data?.error || e.message || '加载索引失败'
+    message.error(`加载索引失败: ${indexesError.value}`)
+  } finally {
+    indexesLoading.value = false
+  }
 }
 
 const prevPage = () => { if (page.value > 1) { page.value--; loadDocs() } }
 const nextPage = () => { page.value++; loadDocs() }
 
-watch(() => props.selectedItem, () => {
+// ── Document CRUD ─────────────────────────────────────────────────────────
+const showDocModal = ref(false)
+const docModalMode = ref<'insert' | 'edit'>('insert')
+const docModalJSON = ref('')
+const docModalSaving = ref(false)
+const editingDocId = ref<any>(null)
+
+const openInsertDoc = () => {
+  docModalMode.value = 'insert'
+  docModalJSON.value = '{\n  \n}'
+  editingDocId.value = null
+  showDocModal.value = true
+}
+
+const openEditDoc = (doc: any) => {
+  docModalMode.value = 'edit'
+  editingDocId.value = doc._id
+  const copy = { ...doc }
+  docModalJSON.value = JSON.stringify(copy, null, 2)
+  showDocModal.value = true
+}
+
+const saveDocModal = async () => {
+  let parsed: any
+  try { parsed = JSON.parse(docModalJSON.value) } catch { message.error('JSON 格式错误'); return }
+  const db = getDb(); const col = props.selectedItem?.name
+  const dbPrefix = db ? `${db}.` : ''
+  docModalSaving.value = true
+  try {
+    let cmd = ''
+    if (docModalMode.value === 'insert') {
+      cmd = `insertOne:${dbPrefix}${col}:${JSON.stringify(parsed)}`
+    } else {
+      const filter = JSON.stringify({ _id: editingDocId.value })
+      const update = JSON.stringify({ $set: parsed })
+      cmd = `updateOne:${dbPrefix}${col}:${filter}:${update}`
+    }
+    const res = await mongodbMeta.execute(getConnId(), cmd)
+    if (res.error) throw new Error(res.error)
+    showDocModal.value = false
+    message.success(docModalMode.value === 'insert' ? '文档已插入' : '文档已更新')
+    loadDocs()
+  } catch (e: any) { message.error('操作失败: ' + (e?.response?.data?.error || e.message)) }
+  finally { docModalSaving.value = false }
+}
+
+const deleteDoc = (doc: any) => {
+  dialog.warning({
+    title: '删除文档', content: `确定删除此文档（_id: ${doc._id}）？`,
+    positiveText: '删除', negativeText: '取消',
+    onPositiveClick: async () => {
+      const db = getDb(); const col = props.selectedItem?.name
+      const dbPrefix = db ? `${db}.` : ''
+      try {
+        const cmd = `deleteOne:${dbPrefix}${col}:${JSON.stringify({ _id: doc._id })}`
+        const res = await mongodbMeta.execute(getConnId(), cmd)
+        if (res.error) throw new Error(res.error)
+        docs.value = docs.value.filter(d => d._id !== doc._id)
+        message.success('文档已删除')
+      } catch (e: any) { message.error('删除失败: ' + (e?.response?.data?.error || e.message)) }
+    }
+  })
+}
+
+watch(() => [props.selectedItem?.name, props.selectedItem?._db], () => {
   activeTab.value = 'browse'
-  if (props.selectedItemType === 'indexes') activeTab.value = 'indexes'
+  page.value = 1
+  docs.value = []
+  if (props.selectedItemType === 'indexes') { activeTab.value = 'indexes'; loadIndexes() }
   else if (props.selectedItemType === 'aggregate') activeTab.value = 'aggregate'
   if (props.selectedItem) loadDocs()
 }, { immediate: true })
+
+watch(() => activeTab.value, (tab) => {
+  if (tab === 'indexes' && !indexes.value.length) loadIndexes()
+})
 </script>
 
 <style scoped>

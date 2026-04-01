@@ -35,7 +35,7 @@
           <n-icon class="sec-icon coll-c"><LayersOutline /></n-icon>
           <span class="sec-label">Collections</span>
           <span class="badge">{{ filteredColls.length }}</span>
-          <n-button text size="tiny" class="sec-action" @click.stop="message.info('新建 Collection')">
+          <n-button text size="tiny" class="sec-action" @click.stop="openCreateColl">
             <template #icon><n-icon><AddOutline /></n-icon></template>
           </n-button>
         </div>
@@ -64,19 +64,34 @@
 
     <n-dropdown trigger="manual" :show="ctxShow" :x="ctxX" :y="ctxY"
       :options="ctxOptions" @select="handleCtx" @clickoutside="ctxShow = false" />
+
+    <!-- Create Collection Modal -->
+    <n-modal v-model:show="showCreateColl">
+      <n-card title="新建 Collection" style="width:360px" :bordered="false" size="small">
+        <template #header-extra>
+          <n-button text @click="showCreateColl = false"><template #icon><n-icon><CloseOutline /></n-icon></template></n-button>
+        </template>
+        <n-input v-model:value="newCollName" placeholder="Collection 名称" size="small" />
+        <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:12px">
+          <n-button @click="showCreateColl = false">取消</n-button>
+          <n-button type="primary" :loading="createCollSaving" @click="createCollection">创建</n-button>
+        </div>
+      </n-card>
+    </n-modal>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { NIcon, NButton, NInput, NTag, NDropdown, useMessage } from 'naive-ui'
-import { RefreshOutline, ChevronForwardOutline, LayersOutline, ServerOutline, SearchOutline, AddOutline, TerminalOutline } from '@vicons/ionicons5'
+import { NIcon, NButton, NInput, NTag, NDropdown, NModal, NCard, useMessage, useDialog } from 'naive-ui'
+import { RefreshOutline, ChevronForwardOutline, LayersOutline, ServerOutline, SearchOutline, AddOutline, TerminalOutline, CloseOutline } from '@vicons/ionicons5'
 import { useSettingsStore } from '../../../stores/settings'
 import { mongodbMeta } from '../../../api/meta'
 
 const { t } = useI18n()
 const message = useMessage()
+const dialog = useDialog()
 const settingsStore = useSettingsStore()
 const isDarkTheme = computed(() => settingsStore.settings.theme === 'dark')
 const props = defineProps<{ connection: any }>()
@@ -93,6 +108,9 @@ const ctxShow = ref(false)
 const ctxX = ref(0)
 const ctxY = ref(0)
 const ctxItem = ref<any>(null)
+const showCreateColl = ref(false)
+const newCollName = ref('')
+const createCollSaving = ref(false)
 
 const ctxOptions = [
   { label: '查看文档', key: 'browse' },
@@ -113,7 +131,44 @@ const handleCtx = (key: string) => {
   if (key === 'browse') select(ctxItem.value, 'collection')
   else if (key === 'aggregate') select(ctxItem.value, 'aggregate')
   else if (key === 'indexes') select(ctxItem.value, 'indexes')
-  else message.info(key)
+  else if (key === 'drop') dropCollection(ctxItem.value)
+}
+
+const dropCollection = (coll: any) => {
+  dialog.warning({
+    title: '删除 Collection', content: `确定删除 "${coll.name}"？所有文档将永久丢失！`,
+    positiveText: '确定删除', negativeText: '取消',
+    onPositiveClick: async () => {
+      try {
+        const db = activeDb.value || props.connection.config?.database
+        const cmd = `dropCollection:${db}.${coll.name}:`
+        const res = await mongodbMeta.execute(props.connection.id, cmd)
+        if ((res as any).error) throw new Error((res as any).error)
+        collections.value = collections.value.filter(c => c.name !== coll.name)
+        message.success(`已删除 ${coll.name}`)
+      } catch (e: any) { message.error('删除失败: ' + (e?.response?.data?.error || e.message)) }
+    }
+  })
+}
+
+const openCreateColl = () => {
+  newCollName.value = ''
+  showCreateColl.value = true
+}
+
+const createCollection = async () => {
+  if (!newCollName.value.trim()) { message.warning('请输入 Collection 名称'); return }
+  createCollSaving.value = true
+  try {
+    const db = activeDb.value || props.connection.config?.database
+    const cmd = `createCollection:${db}.${newCollName.value}:`
+    const res = await mongodbMeta.execute(props.connection.id, cmd)
+    if ((res as any).error) throw new Error((res as any).error)
+    showCreateColl.value = false
+    message.success(`Collection "${newCollName.value}" 已创建`)
+    loadCollections()
+  } catch (e: any) { message.error('创建失败: ' + (e?.response?.data?.error || e.message)) }
+  finally { createCollSaving.value = false }
 }
 
 const loadCollections = async (db?: string) => {

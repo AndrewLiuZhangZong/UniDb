@@ -94,11 +94,17 @@
         <template v-else-if="keyDetail.type === 'hash'">
           <div class="val-toolbar">
             <span class="val-title">Hash 字段 ({{ keyDetail.value?.length ?? 0 }})</span>
-            <n-input v-model:value="hashFilter" size="small" placeholder="过滤字段..." style="width:160px" clearable />
+            <n-input v-model:value="hashFilter" size="small" placeholder="过滤字段..." style="width:140px" clearable />
             <div class="spacer" />
-            <n-button size="small" @click="addHashField">
+            <n-button size="small" @click="showAddHash = !showAddHash">
               <template #icon><n-icon><AddOutline /></n-icon></template>添加
             </n-button>
+          </div>
+          <div v-if="showAddHash" class="add-hash-row">
+            <n-input v-model:value="newHashField" size="small" placeholder="Field" style="width:140px" />
+            <n-input v-model:value="newHashValue" size="small" placeholder="Value" style="flex:1" />
+            <n-button size="small" type="primary" @click="addHashField">确认</n-button>
+            <n-button size="small" @click="showAddHash=false;newHashField='';newHashValue=''">取消</n-button>
           </div>
           <div class="hash-table">
             <div class="hash-header">
@@ -245,10 +251,30 @@ const loadInfo = async () => {
   try {
     const res = await redisMeta.info(props.connection.id)
     rawInfo.value = res.info
+    // Build typeDist from keyspace + sampled keys
+    await buildTypeDist()
   } catch (e: any) {
     infoError.value = e.message || '加载失败'
   } finally {
     infoLoading.value = false
+  }
+}
+
+const buildTypeDist = async () => {
+  if (!props.connection?.id) return
+  try {
+    const res = await redisMeta.keys(props.connection.id, '*', 500)
+    const typeCount: Record<string, number> = {}
+    for (const k of res.keys) {
+      const t = k.type || 'string'
+      typeCount[t] = (typeCount[t] || 0) + 1
+    }
+    const total = Object.values(typeCount).reduce((a, b) => a + b, 0)
+    typeDist.value = Object.entries(typeCount).map(([type, count]) => ({
+      type, count, pct: total ? Math.round(count / total * 100) : 0
+    })).sort((a, b) => b.count - a.count)
+  } catch {
+    // typeDist is optional, silently ignore
   }
 }
 
@@ -307,10 +333,26 @@ const saveHashField = async (f: any) => {
   } catch (e: any) { message.error(e.message) }
 }
 
-const addHashField = () => message.info('请在此功能实际使用 HSET 命令添加字段')
+const getId = () => props.selectedItem?._connectionId || props.connection?.id
+
+// Hash ops
+const newHashField = ref('')
+const newHashValue = ref('')
+const showAddHash = ref(false)
+
+const addHashField = async () => {
+  if (!newHashField.value.trim()) { showAddHash.value = true; return }
+  const id = getId()
+  try {
+    await redisMeta.execute(id, `HSET ${props.selectedItem.key} ${newHashField.value} ${newHashValue.value}`)
+    keyDetail.value!.value.push({ field: newHashField.value, value: newHashValue.value })
+    message.success(`已添加字段 ${newHashField.value}`)
+    newHashField.value = ''; newHashValue.value = ''; showAddHash.value = false
+  } catch (e: any) { message.error(e.message) }
+}
 
 const deleteHashField = async (field: string) => {
-  const id = props.selectedItem._connectionId || props.connection.id
+  const id = getId()
   try {
     await redisMeta.execute(id, `HDEL ${props.selectedItem.key} ${field}`)
     keyDetail.value!.value = keyDetail.value!.value.filter((f: any) => f.field !== field)
@@ -318,13 +360,86 @@ const deleteHashField = async (field: string) => {
   } catch (e: any) { message.error(e.message) }
 }
 
-const lpush = () => message.info('LPUSH: 在命令行执行')
-const rpush = () => message.info('RPUSH: 在命令行执行')
-const lrem = (v: string) => message.info(`LREM ${props.selectedItem.key} 1 ${v}`)
-const sadd = () => message.info('SADD: 在命令行执行')
-const srem = (m: string) => message.info(`SREM ${props.selectedItem.key} ${m}`)
-const zadd = () => message.info('ZADD: 在命令行执行')
-const zrem = (m: string) => message.info(`ZREM ${props.selectedItem.key} ${m}`)
+// List ops
+const newListVal = ref('')
+const lpush = async () => {
+  const v = window.prompt('LPUSH 值:')
+  if (v === null) return
+  const id = getId()
+  try {
+    await redisMeta.execute(id, `LPUSH ${props.selectedItem.key} ${v}`)
+    keyDetail.value!.value.unshift(v)
+    message.success('LPUSH 成功')
+  } catch (e: any) { message.error(e.message) }
+}
+const rpush = async () => {
+  const v = window.prompt('RPUSH 值:')
+  if (v === null) return
+  const id = getId()
+  try {
+    await redisMeta.execute(id, `RPUSH ${props.selectedItem.key} ${v}`)
+    keyDetail.value!.value.push(v)
+    message.success('RPUSH 成功')
+  } catch (e: any) { message.error(e.message) }
+}
+const lrem = async (v: string) => {
+  dialog.warning({
+    title: '删除元素', content: `删除列表中值为 "${v}" 的元素？`,
+    positiveText: '确定', negativeText: '取消',
+    onPositiveClick: async () => {
+      const id = getId()
+      try {
+        await redisMeta.execute(id, `LREM ${props.selectedItem.key} 1 ${v}`)
+        const idx = keyDetail.value!.value.indexOf(v)
+        if (idx !== -1) keyDetail.value!.value.splice(idx, 1)
+        message.success('已删除元素')
+      } catch (e: any) { message.error(e.message) }
+    }
+  })
+}
+
+// Set ops
+const sadd = async () => {
+  const v = window.prompt('SADD 成员:')
+  if (v === null) return
+  const id = getId()
+  try {
+    await redisMeta.execute(id, `SADD ${props.selectedItem.key} ${v}`)
+    if (!keyDetail.value!.value.includes(v)) keyDetail.value!.value.push(v)
+    message.success('SADD 成功')
+  } catch (e: any) { message.error(e.message) }
+}
+const srem = async (m: string) => {
+  const id = getId()
+  try {
+    await redisMeta.execute(id, `SREM ${props.selectedItem.key} ${m}`)
+    keyDetail.value!.value = keyDetail.value!.value.filter((x: string) => x !== m)
+    message.success('已移除成员')
+  } catch (e: any) { message.error(e.message) }
+}
+
+// ZSet ops
+const zadd = async () => {
+  const score = window.prompt('Score (数字):')
+  if (score === null) return
+  const member = window.prompt('Member:')
+  if (member === null) return
+  const id = getId()
+  try {
+    await redisMeta.execute(id, `ZADD ${props.selectedItem.key} ${score} ${member}`)
+    keyDetail.value!.value.push({ score: Number(score), member })
+    keyDetail.value!.value.sort((a: any, b: any) => a.score - b.score)
+    message.success('ZADD 成功')
+  } catch (e: any) { message.error(e.message) }
+}
+const zrem = async (m: string) => {
+  const id = getId()
+  try {
+    await redisMeta.execute(id, `ZREM ${props.selectedItem.key} ${m}`)
+    keyDetail.value!.value = keyDetail.value!.value.filter((z: any) => z.member !== m)
+    message.success('已移除成员')
+  } catch (e: any) { message.error(e.message) }
+}
 
 const deleteKey = () => {
   dialog.warning({
@@ -441,6 +556,7 @@ watch(() => props.connection?.id, () => {
 .redis-workspace.light-mode .value-textarea { background: #fafafa; color: #1a1a1a; border-top: 1px solid rgba(0,0,0,0.06); }
 
 /* Hash */
+.add-hash-row { display: flex; align-items: center; gap: 6px; padding: 6px 12px; background: rgba(24,160,88,0.06); border-bottom: 1px solid rgba(255,255,255,0.05); flex-shrink: 0; }
 .hash-table { flex: 1; overflow-y: auto; }
 .hash-header, .hash-row { display: grid; grid-template-columns: 180px 1fr 36px; align-items: center; gap: 4px; padding: 6px 14px; }
 .hash-header { font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.3); text-transform: uppercase; border-bottom: 1px solid rgba(255,255,255,0.05); }

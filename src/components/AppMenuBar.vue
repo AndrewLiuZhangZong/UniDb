@@ -2,6 +2,25 @@
   <div class="app-menu-bar" :class="{ 'light-mode': !isDarkTheme }">
     <div class="menu-section">
 
+      <!-- Home / Logo -->
+      <div class="menu-item home-btn" @click="handleAction('home')" title="主页">
+        <svg width="18" height="18" viewBox="0 0 256 256" fill="none">
+          <circle cx="128" cy="128" r="110" fill="url(#logoG)"/>
+          <ellipse cx="128" cy="90" rx="46" ry="18" fill="rgba(255,255,255,0.35)"/>
+          <ellipse cx="128" cy="128" rx="46" ry="18" fill="rgba(255,255,255,0.22)"/>
+          <ellipse cx="128" cy="166" rx="46" ry="18" fill="rgba(255,255,255,0.12)"/>
+          <defs>
+            <linearGradient id="logoG" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#18a058"/>
+              <stop offset="100%" stop-color="#36b374"/>
+            </linearGradient>
+          </defs>
+        </svg>
+        <span class="home-name">UniDb</span>
+      </div>
+
+      <div class="menu-divider-v"></div>
+
       <!-- File -->
       <div class="menu-item" :class="{ 'is-active': activeMenu === 'file' }"
         @click="handleMenuClick('file')" @mouseenter="handleMouseEnter('file')">
@@ -299,8 +318,8 @@ const getMenuLabel = (key: string): string => {
 .app-menu-bar {
   display: flex;
   align-items: center;
-  height: 30px;
-  padding: 0 8px;
+  height: 38px;
+  padding: 0 10px;
   background: rgba(22, 22, 28, 0.97);
   border-bottom: 1px solid rgba(255,255,255,0.06);
   user-select: none;
@@ -327,9 +346,9 @@ const getMenuLabel = (key: string): string => {
   align-items: center;
   gap: 5px;
   height: 100%;
-  padding: 0 10px;
+  padding: 0 12px;
   cursor: pointer;
-  border-radius: 4px;
+  border-radius: 5px;
   transition: background-color 0.12s ease;
   white-space: nowrap;
 }
@@ -345,7 +364,7 @@ const getMenuLabel = (key: string): string => {
 }
 
 .menu-label {
-  font-size: 12px;
+  font-size: 13.5px;
   font-weight: 400;
   color: rgba(255,255,255,0.82);
   line-height: 1;
@@ -356,7 +375,7 @@ const getMenuLabel = (key: string): string => {
 }
 
 .menu-icon-only {
-  font-size: 14px;
+  font-size: 15px;
   color: rgba(255,255,255,0.65);
   flex-shrink: 0;
 }
@@ -364,7 +383,23 @@ const getMenuLabel = (key: string): string => {
   color: rgba(0,0,0,0.55);
 }
 
-.theme-toggle-item { gap: 4px; }
+.home-btn { gap: 7px; padding: 0 10px; }
+.home-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #36b374;
+  letter-spacing: 0.2px;
+}
+.light-mode .home-name { color: #18a058; }
+
+.menu-divider-v {
+  width: 1px;
+  height: 18px;
+  background: rgba(255,255,255,0.1);
+  margin: 0 4px;
+  flex-shrink: 0;
+}
+.light-mode .menu-divider-v { background: rgba(0,0,0,0.1); }
 
 /* Dropdown */
 .dropdown-menu {
@@ -417,7 +452,7 @@ const getMenuLabel = (key: string): string => {
 
 .item-label {
   flex: 1;
-  font-size: 13px;
+  font-size: 13.5px;
   color: rgba(255,255,255,0.85);
 }
 .light-mode .item-label { color: rgba(0,0,0,0.82); }

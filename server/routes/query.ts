@@ -4,28 +4,31 @@ import { DatabaseAdapterFactory } from '../adapters/factory'
 const router = Router()
 
 router.post('/execute', async (req, res) => {
+  let adapter: any = null
   try {
     const { connectionId, query } = req.body
-    
-    const adapter = await DatabaseAdapterFactory.createAdapter(connectionId)
+    adapter = await DatabaseAdapterFactory.createAdapter(connectionId)
     await adapter.connect()
-    
     const startTime = Date.now()
     const result = await adapter.query(query)
     const executionTime = Date.now() - startTime
-    
     await adapter.disconnect()
-    
+    adapter = null
+    const rows = Array.isArray(result) ? result : (result?.rows || [])
     res.json({
       success: true,
       data: result,
       executionTime,
-      rowCount: Array.isArray(result) ? result.length : 0
+      rowCount: Array.isArray(rows) ? rows.length : (result?.affectedRows ?? 0)
     })
   } catch (error) {
-    res.status(500).json({
+    if (adapter) { try { await adapter.disconnect() } catch { /* ignore */ } }
+    res.status(200).json({
       success: false,
-      error: (error as Error).message
+      error: (error as Error).message,
+      data: null,
+      executionTime: 0,
+      rowCount: 0
     })
   }
 })

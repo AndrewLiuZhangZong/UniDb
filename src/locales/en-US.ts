@@ -166,6 +166,7 @@ export default {
     proxySettingsDesc: 'Use proxy server for update checks and downloads',
     proxyUrl: 'Proxy URL',
     updateHistory: 'Update History',
+    logsDesc: 'View application logs and operation records',
     aboutDesc: 'Modern cross-platform database management tool',
     version: 'Version',
     electron: 'Electron',

@@ -73,6 +73,7 @@ import { useI18n } from 'vue-i18n'
 import { NIcon, NButton, NInput, NTag } from 'naive-ui'
 import { RefreshOutline, ChevronForwardOutline, GridOutline, ServerOutline, SearchOutline, TerminalOutline } from '@vicons/ionicons5'
 import { useSettingsStore } from '../../../stores/settings'
+import { clickhouseMeta } from '../../../api/meta'
 
 const { t } = useI18n()
 const settingsStore = useSettingsStore()
@@ -93,34 +94,43 @@ const filteredTables = computed(() =>
 )
 
 const toggle = (k: keyof typeof exp.value) => { exp.value[k] = !exp.value[k] }
-const selectDb = (name: string) => { activeDb.value = name }
-const select = (item: any, type: string) => { sel.value = item; emit('select-item', item, type) }
+const selectDb = async (name: string) => {
+  activeDb.value = name
+  tables.value = []
+  try {
+    const tRes = await clickhouseMeta.tables(props.connection.id, name)
+    tables.value = tRes.tables
+  } catch { /* ignore */ }
+}
+const select = async (item: any, type: string) => {
+  sel.value = item
+  if (type === 'table' && item) await loadTableColumns(item)
+  emit('select-item', { ...item, _db: activeDb.value }, type)
+}
 
 const loadData = async () => {
   loading.value = true
-  databases.value = [{ name: 'default' }, { name: 'system' }, { name: 'analytics' }]
-  tables.value = [
-    { name: 'events', engine: 'MergeTree', columns: [
-      { name: 'id', type: 'UInt64', isSortKey: false },
-      { name: 'event_type', type: 'LowCardinality(String)', isSortKey: false },
-      { name: 'timestamp', type: 'DateTime', isSortKey: true },
-      { name: 'user_id', type: 'UInt32', isSortKey: true },
-      { name: 'properties', type: 'JSON', isSortKey: false }
-    ], orderBy: 'timestamp, user_id', partitionBy: "toYYYYMM(timestamp)" },
-    { name: 'pageviews', engine: 'ReplicatedMergeTree', columns: [
-      { name: 'id', type: 'UInt64', isSortKey: false },
-      { name: 'url', type: 'String', isSortKey: false },
-      { name: 'date', type: 'Date', isSortKey: true },
-      { name: 'user_id', type: 'UInt32', isSortKey: false },
-      { name: 'referrer', type: 'LowCardinality(String)', isSortKey: false }
-    ], orderBy: 'date, url', partitionBy: "toYYYYMM(date)" },
-    { name: 'metrics', engine: 'SummingMergeTree', columns: [
-      { name: 'metric_name', type: 'LowCardinality(String)', isSortKey: true },
-      { name: 'date', type: 'Date', isSortKey: true },
-      { name: 'value', type: 'Float64', isSortKey: false }
-    ], orderBy: 'metric_name, date', partitionBy: null }
-  ]
-  loading.value = false
+  try {
+    const dbRes = await clickhouseMeta.databases(props.connection.id)
+    databases.value = (dbRes.databases || []).filter(d => d !== 'INFORMATION_SCHEMA' && d !== 'information_schema').map((d: string) => ({ name: d }))
+    if (!activeDb.value && databases.value.length) {
+      activeDb.value = props.connection.config?.database || databases.value[0]?.name || 'default'
+    }
+    const tRes = await clickhouseMeta.tables(props.connection.id, activeDb.value)
+    tables.value = tRes.tables
+  } catch {
+    // fall through silently - connection may not be live
+  } finally {
+    loading.value = false
+  }
+}
+
+const loadTableColumns = async (tbl: any) => {
+  if (tbl.columns) return
+  try {
+    const res = await clickhouseMeta.columns(props.connection.id, tbl.name, activeDb.value)
+    tbl.columns = res.columns
+  } catch { /* ignore */ }
 }
 
 watch(() => props.connection, () => { sel.value = null; loadData() }, { immediate: true })

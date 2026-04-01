@@ -1,5 +1,13 @@
 <template>
   <div class="home-container" :class="{ 'light-theme': !isDarkTheme }">
+
+    <!-- Settings Drawer -->
+    <n-drawer v-model:show="showSettings" :width="720" placement="right" :mask-closable="true">
+      <n-drawer-content :title="null" :native-scrollbar="false" :closable="false" body-content-style="padding:0">
+        <SettingsView />
+      </n-drawer-content>
+    </n-drawer>
+
     <n-layout has-sider class="main-layout">
 
       <!-- Column 1: Connection List -->
@@ -112,11 +120,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted, defineAsyncComponent } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useRouter } from 'vue-router'
 import {
-  NLayout, NLayoutSider, NButton, NIcon, NTag, NTooltip, useMessage, useDialog
+  NLayout, NLayoutSider, NButton, NIcon, NTag, NTooltip, NDrawer, NDrawerContent,
+  useMessage, useDialog
 } from 'naive-ui'
 import {
   AddOutline, CubeOutline, RadioButtonOn, RadioButtonOffOutline
@@ -124,6 +132,7 @@ import {
 import ConnectionTree from '../components/ConnectionTree.vue'
 import ConnectionDialog from '../components/ConnectionDialog.vue'
 import DbTypeIcon from '../components/DbTypeIcon.vue'
+import SettingsView from './Settings.vue'
 
 // Lazy-load DB-specific components
 import MySQLExplorer from '../components/database/MySQL/MySQLExplorer.vue'
@@ -141,11 +150,11 @@ import { useSettingsStore } from '../stores/settings'
 const { t } = useI18n()
 const message = useMessage()
 const dialog = useDialog()
-const router = useRouter()
 const connectionStore = useConnectionStore()
 const settingsStore = useSettingsStore()
 
 const isDarkTheme = computed(() => settingsStore.settings.theme === 'dark')
+const showSettings = ref(false)
 const showConnectionDialog = ref(false)
 const editingConnection = ref<any>(null)
 const activeConnection = ref<any>(null)
@@ -204,8 +213,8 @@ const handleMenuAction = (action: string) => {
     case 'newConnection': case 'manageConnections': case 'openConnection':
       editingConnection.value = null; showConnectionDialog.value = true; break
     case 'refresh': connectionStore.fetchConnections(); message.success('Refreshed'); break
-    case 'openConsole': case 'openConsolePanel': router.push('/logs'); break
-    case 'settings': router.push('/settings'); break
+    case 'openConsole': case 'openConsolePanel': showSettings.value = true; break
+    case 'settings': showSettings.value = true; break
     case 'documentation': window.open('https://unidb.com/docs', '_blank'); break
     case 'reportBug': window.open('https://github.com/AndrewLiuZhangZong/UniDb/issues', '_blank'); break
     case 'checkUpdates': message.info('Checking for updates...'); break

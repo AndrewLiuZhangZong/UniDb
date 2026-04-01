@@ -4,6 +4,7 @@ import { initDatabase } from './database/init'
 import connectionRoutes from './routes/connection'
 import queryRoutes from './routes/query'
 import driverRoutes from './routes/drivers'
+import metaRoutes from './routes/meta'
 
 export async function startServer(): Promise<number> {
   const app = express()
@@ -28,6 +29,7 @@ export async function startServer(): Promise<number> {
   app.use('/api/connections', connectionRoutes)
   app.use('/api/query', queryRoutes)
   app.use('/api/drivers', driverRoutes)
+  app.use('/api/meta', metaRoutes)
 
   app.get('/api/health', (req, res) => {
     res.json({ status: 'ok', timestamp: new Date().toISOString() })

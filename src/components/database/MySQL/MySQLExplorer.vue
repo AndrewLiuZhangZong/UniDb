@@ -5,9 +5,25 @@
       <n-input v-model:value="searchText" size="tiny" placeholder="搜索..." clearable class="search-input">
         <template #prefix><n-icon :size="12"><SearchOutline /></n-icon></template>
       </n-input>
-      <n-button text size="tiny" @click="loadData" :loading="loading">
+      <n-button text size="tiny" @click="loadAll" :loading="loading">
         <template #icon><n-icon><RefreshOutline /></n-icon></template>
       </n-button>
+    </div>
+
+    <!-- Database selector -->
+    <div v-if="databases.length" class="db-selector">
+      <n-select
+        v-model:value="activeDb"
+        :options="databases.map(d => ({ label: d, value: d }))"
+        size="tiny"
+        placeholder="选择数据库"
+        @update:value="onDbChange"
+      />
+    </div>
+
+    <div v-if="error" class="error-msg">
+      <n-icon><WarningOutline /></n-icon>
+      {{ error }}
     </div>
 
     <div class="tree-body">
@@ -23,7 +39,8 @@
           </n-button>
         </div>
         <div v-if="exp.tables" class="sec-body">
-          <div v-if="!filteredTables.length" class="empty">{{ t('explorer.noTables') }}</div>
+          <div v-if="tablesLoading" class="loading-hint">加载中...</div>
+          <div v-else-if="!filteredTables.length" class="empty">{{ t('explorer.noTables') }}</div>
           <div
             v-for="tbl in filteredTables" :key="tbl.name"
             class="tree-item"
@@ -60,27 +77,9 @@
         </div>
       </div>
 
-      <!-- Functions -->
+      <!-- SQL Query shortcut -->
       <div class="section">
-        <div class="section-hd" @click="toggle('funcs')">
-          <n-icon class="arrow" :class="{ open: exp.funcs }"><ChevronForwardOutline /></n-icon>
-          <n-icon class="sec-icon func-c"><CodeSlashOutline /></n-icon>
-          <span class="sec-label">{{ t('explorer.functions') }}</span>
-          <span class="badge">{{ functions.length }}</span>
-        </div>
-        <div v-if="exp.funcs" class="sec-body">
-          <div v-if="!functions.length" class="empty">{{ t('explorer.noFunctions') }}</div>
-          <div v-for="fn in functions" :key="fn.name" class="tree-item" @click="select(fn, 'function')">
-            <n-icon class="item-icon func-c"><CodeSlashOutline /></n-icon>
-            <span class="item-name">{{ fn.name }}</span>
-            <span class="item-meta">{{ fn.type }}</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- SQL Query (shortcut) -->
-      <div class="section">
-        <div class="section-hd" @click="select(null, 'query')">
+        <div class="section-hd" @click="select({ db: activeDb }, 'query')">
           <n-icon class="arrow invisible"><ChevronForwardOutline /></n-icon>
           <n-icon class="sec-icon query-c"><TerminalOutline /></n-icon>
           <span class="sec-label">{{ t('explorer.sqlQuery') }}</span>
@@ -104,12 +103,13 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { NIcon, NButton, NInput, NDropdown, useMessage } from 'naive-ui'
+import { NIcon, NButton, NInput, NDropdown, NSelect, useMessage } from 'naive-ui'
 import {
   RefreshOutline, ChevronForwardOutline, GridOutline, EyeOutline,
-  AddOutline, SearchOutline, CodeSlashOutline, TerminalOutline
+  AddOutline, SearchOutline, TerminalOutline, WarningOutline
 } from '@vicons/ionicons5'
 import { useSettingsStore } from '../../../stores/settings'
+import { mysqlMeta } from '../../../api/meta'
 
 const { t } = useI18n()
 const message = useMessage()
@@ -123,13 +123,16 @@ const emit = defineEmits<{
 }>()
 
 const loading = ref(false)
+const tablesLoading = ref(false)
 const searchText = ref('')
 const sel = ref<any>(null)
 const selType = ref('')
+const databases = ref<string[]>([])
+const activeDb = ref<string>('')
 const tables = ref<any[]>([])
 const views = ref<any[]>([])
-const functions = ref<any[]>([])
-const exp = ref({ tables: true, views: false, funcs: false })
+const error = ref('')
+const exp = ref({ tables: true, views: false })
 const ctx = ref({ show: false, x: 0, y: 0, item: null as any, type: '' })
 
 const filteredTables = computed(() =>
@@ -144,7 +147,7 @@ const toggle = (k: keyof typeof exp.value) => { exp.value[k] = !exp.value[k] }
 const select = (item: any, type: string) => {
   sel.value = item
   selType.value = type
-  emit('select-item', item, type)
+  emit('select-item', { ...item, _db: activeDb.value }, type)
 }
 
 const openCtx = (e: MouseEvent, item: any, type: string) => {
@@ -156,7 +159,6 @@ const ctxOptions = computed(() => [
   { label: 'SQL 查询', key: 'query' },
   { label: '表结构', key: 'schema' },
   { type: 'divider', key: 'd1' },
-  { label: '重命名', key: 'rename' },
   { label: '删除表', key: 'drop' }
 ])
 
@@ -168,86 +170,77 @@ const handleCtx = (key: string) => {
   else message.info(key)
 }
 
-const loadData = async () => {
+const loadDatabases = async () => {
   loading.value = true
-  tables.value = [
-    { name: 'users', engine: 'InnoDB', rows: 12540, columns: [
-      { name: 'id', type: 'INT', notNull: true, isPrimary: true, autoIncrement: true, comment: '主键' },
-      { name: 'username', type: 'VARCHAR(50)', notNull: true, isPrimary: false, autoIncrement: false, comment: '用户名' },
-      { name: 'email', type: 'VARCHAR(100)', notNull: true, isPrimary: false, autoIncrement: false, comment: '邮箱' },
-      { name: 'password_hash', type: 'VARCHAR(255)', notNull: true, isPrimary: false, autoIncrement: false, comment: '' },
-      { name: 'role', type: "ENUM('admin','user','guest')", notNull: true, isPrimary: false, autoIncrement: false, comment: '角色' },
-      { name: 'created_at', type: 'TIMESTAMP', notNull: false, isPrimary: false, autoIncrement: false, comment: '创建时间' }
-    ], indexes: [
-      { name: 'PRIMARY', type: 'BTREE', unique: true, columns: ['id'] },
-      { name: 'uk_username', type: 'BTREE', unique: true, columns: ['username'] },
-      { name: 'uk_email', type: 'BTREE', unique: true, columns: ['email'] }
-    ]},
-    { name: 'orders', engine: 'InnoDB', rows: 89200, columns: [
-      { name: 'id', type: 'INT', notNull: true, isPrimary: true, autoIncrement: true, comment: '' },
-      { name: 'user_id', type: 'INT', notNull: true, isPrimary: false, autoIncrement: false, comment: '' },
-      { name: 'total', type: 'DECIMAL(10,2)', notNull: true, isPrimary: false, autoIncrement: false, comment: '' },
-      { name: 'status', type: "ENUM('pending','paid','shipped','done')", notNull: true, isPrimary: false, autoIncrement: false, comment: '' },
-      { name: 'created_at', type: 'TIMESTAMP', notNull: false, isPrimary: false, autoIncrement: false, comment: '' }
-    ], indexes: [
-      { name: 'PRIMARY', type: 'BTREE', unique: true, columns: ['id'] },
-      { name: 'idx_user_id', type: 'BTREE', unique: false, columns: ['user_id'] },
-      { name: 'idx_status', type: 'BTREE', unique: false, columns: ['status'] }
-    ]},
-    { name: 'products', engine: 'InnoDB', rows: 3210, columns: [
-      { name: 'id', type: 'INT', notNull: true, isPrimary: true, autoIncrement: true, comment: '' },
-      { name: 'name', type: 'VARCHAR(200)', notNull: true, isPrimary: false, autoIncrement: false, comment: '' },
-      { name: 'price', type: 'DECIMAL(10,2)', notNull: true, isPrimary: false, autoIncrement: false, comment: '' },
-      { name: 'stock', type: 'INT', notNull: true, isPrimary: false, autoIncrement: false, comment: '' },
-      { name: 'category_id', type: 'INT', notNull: false, isPrimary: false, autoIncrement: false, comment: '' }
-    ], indexes: [
-      { name: 'PRIMARY', type: 'BTREE', unique: true, columns: ['id'] },
-      { name: 'idx_category', type: 'BTREE', unique: false, columns: ['category_id'] }
-    ]},
-    { name: 'categories', engine: 'InnoDB', rows: 48, columns: [
-      { name: 'id', type: 'INT', notNull: true, isPrimary: true, autoIncrement: true, comment: '' },
-      { name: 'name', type: 'VARCHAR(100)', notNull: true, isPrimary: false, autoIncrement: false, comment: '' },
-      { name: 'parent_id', type: 'INT', notNull: false, isPrimary: false, autoIncrement: false, comment: '' }
-    ], indexes: [{ name: 'PRIMARY', type: 'BTREE', unique: true, columns: ['id'] }]}
-  ]
-  views.value = [
-    { name: 'user_orders_view' },
-    { name: 'order_summary' }
-  ]
-  functions.value = [
-    { name: 'get_order_total', type: 'FUNCTION' },
-    { name: 'update_stock', type: 'PROCEDURE' }
-  ]
-  loading.value = false
+  error.value = ''
+  try {
+    const res = await mysqlMeta.databases(props.connection.id)
+    databases.value = res.databases.filter(d => !['information_schema', 'performance_schema', 'sys'].includes(d))
+    if (!activeDb.value && databases.value.length) {
+      activeDb.value = props.connection.config?.database || databases.value[0]
+    }
+    await loadTablesAndViews()
+  } catch (e: any) {
+    error.value = e.message || '加载失败'
+  } finally {
+    loading.value = false
+  }
 }
 
-watch(() => props.connection, () => { sel.value = null; loadData() }, { immediate: true })
+const loadTablesAndViews = async () => {
+  if (!props.connection?.id) return
+  tablesLoading.value = true
+  try {
+    const [tRes, vRes] = await Promise.all([
+      mysqlMeta.tables(props.connection.id, activeDb.value || undefined),
+      mysqlMeta.views(props.connection.id, activeDb.value || undefined)
+    ])
+    tables.value = tRes.tables
+    views.value = vRes.views
+  } catch (e: any) {
+    error.value = e.message || '加载表失败'
+  } finally {
+    tablesLoading.value = false
+  }
+}
+
+const loadAll = () => loadDatabases()
+
+const onDbChange = () => {
+  sel.value = null
+  tables.value = []
+  views.value = []
+  loadTablesAndViews()
+}
+
+watch(() => props.connection?.id, () => {
+  sel.value = null
+  databases.value = []
+  tables.value = []
+  views.value = []
+  activeDb.value = props.connection?.config?.database || ''
+  loadDatabases()
+}, { immediate: true })
 </script>
 
 <style scoped>
-.mysql-explorer {
-  display: flex; flex-direction: column; height: 100%; overflow: hidden;
-  font-size: 12px;
-}
+.mysql-explorer { display: flex; flex-direction: column; height: 100%; overflow: hidden; font-size: 12px; }
 
-.explorer-toolbar {
-  display: flex; align-items: center; gap: 4px;
-  padding: 6px 8px; flex-shrink: 0;
-  border-bottom: 1px solid rgba(255,255,255,0.05);
-}
+.explorer-toolbar { display: flex; align-items: center; gap: 4px; padding: 6px 8px; flex-shrink: 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
 .light-mode .explorer-toolbar { border-bottom-color: rgba(0,0,0,0.06); }
 .search-input { flex: 1; }
+
+.db-selector { padding: 5px 8px; flex-shrink: 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+.light-mode .db-selector { border-bottom-color: rgba(0,0,0,0.06); }
+
+.error-msg { display: flex; align-items: center; gap: 5px; padding: 6px 10px; font-size: 11px; color: #ef4444; background: rgba(239,68,68,0.08); }
 
 .tree-body { flex: 1; overflow-y: auto; padding: 4px 0; }
 .tree-body::-webkit-scrollbar { width: 4px; }
 .tree-body::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
 
-/* Section */
 .section { margin-bottom: 1px; }
-.section-hd {
-  display: flex; align-items: center; gap: 5px; padding: 6px 8px;
-  cursor: pointer; transition: background 0.1s;
-}
+.section-hd { display: flex; align-items: center; gap: 5px; padding: 6px 8px; cursor: pointer; transition: background 0.1s; }
 .section-hd:hover { background: rgba(255,255,255,0.04); }
 .light-mode .section-hd:hover { background: rgba(0,0,0,0.04); }
 
@@ -259,29 +252,19 @@ watch(() => props.connection, () => { sel.value = null; loadData() }, { immediat
 .sec-icon { font-size: 13px; flex-shrink: 0; }
 .tbl-c { color: #4db8ff; }
 .view-c { color: #a78bfa; }
-.func-c { color: #f59e0b; }
 .query-c { color: #18a058; }
 
 .sec-label { flex: 1; font-weight: 500; color: rgba(255,255,255,0.65); }
 .light-mode .sec-label { color: rgba(0,0,0,0.65); }
 
-.badge {
-  font-size: 10px; color: rgba(255,255,255,0.35);
-  background: rgba(255,255,255,0.07); padding: 1px 5px; border-radius: 7px;
-}
+.badge { font-size: 10px; color: rgba(255,255,255,0.35); background: rgba(255,255,255,0.07); padding: 1px 5px; border-radius: 7px; }
 .light-mode .badge { color: rgba(0,0,0,0.35); background: rgba(0,0,0,0.06); }
 
 .sec-action { opacity: 0; transition: opacity 0.1s; }
 .section-hd:hover .sec-action { opacity: 1; }
-
 .sec-body { padding-left: 18px; }
 
-/* Items */
-.tree-item {
-  display: flex; align-items: center; gap: 6px;
-  padding: 5px 10px; cursor: pointer; border-radius: 4px;
-  margin: 1px 4px; transition: background 0.1s;
-}
+.tree-item { display: flex; align-items: center; gap: 6px; padding: 5px 10px; cursor: pointer; border-radius: 4px; margin: 1px 4px; transition: background 0.1s; }
 .tree-item:hover { background: rgba(77,184,255,0.1); }
 .tree-item.active { background: rgba(77,184,255,0.18); }
 .light-mode .tree-item:hover { background: rgba(77,184,255,0.08); }
@@ -293,6 +276,8 @@ watch(() => props.connection, () => { sel.value = null; loadData() }, { immediat
 .item-meta { font-size: 10px; color: rgba(255,255,255,0.28); font-family: monospace; flex-shrink: 0; }
 .light-mode .item-meta { color: rgba(0,0,0,0.28); }
 
+.loading-hint { padding: 6px 10px; color: rgba(255,255,255,0.3); font-size: 11px; }
+.light-mode .loading-hint { color: rgba(0,0,0,0.3); }
 .empty { padding: 6px 10px; color: rgba(255,255,255,0.25); font-style: italic; font-size: 11px; }
 .light-mode .empty { color: rgba(0,0,0,0.25); }
 </style>

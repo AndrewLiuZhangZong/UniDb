@@ -1,15 +1,11 @@
 <template>
   <div class="app-menu-bar" :class="{ 'light-mode': !isDarkTheme }">
     <div class="menu-section">
-      <!-- File Menu -->
-      <div
-        class="menu-item"
-        :class="{ 'is-active': activeMenu === 'file' }"
-        @click="handleMenuClick('file')"
-        @mouseenter="handleMouseEnter('file')"
-      >
-        <span class="menu-label">{{ getMenuLabel('file') }}</span>
 
+      <!-- File -->
+      <div class="menu-item" :class="{ 'is-active': activeMenu === 'file' }"
+        @click="handleMenuClick('file')" @mouseenter="handleMouseEnter('file')">
+        <span class="menu-label">{{ getMenuLabel('file') }}</span>
         <transition name="dropdown">
           <div v-if="activeMenu === 'file'" class="dropdown-menu">
             <div class="dropdown-item" @click.stop="handleAction('newConnection')">
@@ -27,11 +23,6 @@
               <n-icon class="item-icon"><DocumentTextOutline /></n-icon>
               <span class="item-label">{{ t('menu.newQuery') }}</span>
               <span class="item-shortcut">⌘T</span>
-            </div>
-            <div class="dropdown-item" @click.stop="handleAction('newTab')">
-              <n-icon class="item-icon"><AddOutline /></n-icon>
-              <span class="item-label">{{ t('menu.newTab') }}</span>
-              <span class="item-shortcut">⌘⇧N</span>
             </div>
             <div class="dropdown-divider"></div>
             <div class="dropdown-item" @click.stop="handleAction('export')">
@@ -52,15 +43,10 @@
         </transition>
       </div>
 
-      <!-- Edit Menu -->
-      <div
-        class="menu-item"
-        :class="{ 'is-active': activeMenu === 'edit' }"
-        @click="handleMenuClick('edit')"
-        @mouseenter="handleMouseEnter('edit')"
-      >
+      <!-- Edit -->
+      <div class="menu-item" :class="{ 'is-active': activeMenu === 'edit' }"
+        @click="handleMenuClick('edit')" @mouseenter="handleMouseEnter('edit')">
         <span class="menu-label">{{ getMenuLabel('edit') }}</span>
-
         <transition name="dropdown">
           <div v-if="activeMenu === 'edit'" class="dropdown-menu">
             <div class="dropdown-item" @click.stop="handleAction('undo')">
@@ -95,15 +81,10 @@
         </transition>
       </div>
 
-      <!-- Database Menu -->
-      <div
-        class="menu-item"
-        :class="{ 'is-active': activeMenu === 'database' }"
-        @click="handleMenuClick('database')"
-        @mouseenter="handleMouseEnter('database')"
-      >
+      <!-- Database -->
+      <div class="menu-item" :class="{ 'is-active': activeMenu === 'database' }"
+        @click="handleMenuClick('database')" @mouseenter="handleMouseEnter('database')">
         <span class="menu-label">{{ getMenuLabel('database') }}</span>
-
         <transition name="dropdown">
           <div v-if="activeMenu === 'database'" class="dropdown-menu">
             <div class="dropdown-item" @click.stop="handleAction('connect')">
@@ -141,15 +122,10 @@
         </transition>
       </div>
 
-      <!-- SQL Menu -->
-      <div
-        class="menu-item"
-        :class="{ 'is-active': activeMenu === 'sql' }"
-        @click="handleMenuClick('sql')"
-        @mouseenter="handleMouseEnter('sql')"
-      >
-        <span class="menu-label">{{ getMenuLabel('sql') }}</span>
-
+      <!-- SQL -->
+      <div class="menu-item" :class="{ 'is-active': activeMenu === 'sql' }"
+        @click="handleMenuClick('sql')" @mouseenter="handleMouseEnter('sql')">
+        <span class="menu-label">SQL</span>
         <transition name="dropdown">
           <div v-if="activeMenu === 'sql'" class="dropdown-menu">
             <div class="dropdown-item" @click.stop="handleAction('execute')">
@@ -175,25 +151,14 @@
               <n-icon class="item-icon"><BrushOutline /></n-icon>
               <span class="item-label">{{ t('menu.beautify') }}</span>
             </div>
-            <div class="dropdown-divider"></div>
-            <div class="dropdown-item" @click.stop="handleAction('openConsole')">
-              <n-icon class="item-icon"><TerminalOutline /></n-icon>
-              <span class="item-label">{{ t('menu.openConsole') }}</span>
-              <span class="item-shortcut">⌘⇧C</span>
-            </div>
           </div>
         </transition>
       </div>
 
-      <!-- View Menu -->
-      <div
-        class="menu-item"
-        :class="{ 'is-active': activeMenu === 'view' }"
-        @click="handleMenuClick('view')"
-        @mouseenter="handleMouseEnter('view')"
-      >
+      <!-- View -->
+      <div class="menu-item" :class="{ 'is-active': activeMenu === 'view' }"
+        @click="handleMenuClick('view')" @mouseenter="handleMouseEnter('view')">
         <span class="menu-label">{{ getMenuLabel('view') }}</span>
-
         <transition name="dropdown">
           <div v-if="activeMenu === 'view'" class="dropdown-menu">
             <div class="dropdown-item" @click.stop="handleAction('toggleSidebar')">
@@ -232,63 +197,18 @@
         </transition>
       </div>
 
-      <!-- Help Menu -->
-      <div
-        class="menu-item"
-        :class="{ 'is-active': activeMenu === 'help' }"
-        @click="handleMenuClick('help')"
-        @mouseenter="handleMouseEnter('help')"
-      >
-        <span class="menu-label">{{ getMenuLabel('help') }}</span>
+      <!-- ── Settings (opens drawer panel) ── -->
+      <div class="menu-item" @click="handleAction('settings')">
+        <n-icon class="menu-icon-only"><SettingsOutline /></n-icon>
+        <span class="menu-label">{{ t('menu.settings') }}</span>
+      </div>
 
+      <!-- Help -->
+      <div class="menu-item" :class="{ 'is-active': activeMenu === 'help' }"
+        @click="handleMenuClick('help')" @mouseenter="handleMouseEnter('help')">
+        <span class="menu-label">{{ getMenuLabel('help') }}</span>
         <transition name="dropdown">
-          <div v-if="activeMenu === 'help'" class="dropdown-menu" @mouseleave="helpSubmenu = null">
-            <div class="dropdown-item" @click.stop="toggleTheme">
-              <n-icon class="item-icon">
-                <MoonOutline v-if="isDarkTheme" />
-                <SunnyOutline v-else />
-              </n-icon>
-              <span class="item-label">{{ isDarkTheme ? t('menu.switchToLight') : t('menu.switchToDark') }}</span>
-            </div>
-            <div class="dropdown-item" @click.stop="handleAction('settings')">
-              <n-icon class="item-icon"><SettingsOutline /></n-icon>
-              <span class="item-label">{{ t('menu.settings') }}</span>
-              <span class="item-shortcut">⌘,</span>
-            </div>
-            <div class="dropdown-divider"></div>
-            <!-- Language Submenu -->
-            <div
-              class="dropdown-item has-submenu"
-              @click.stop="toggleSubmenu('language')"
-              @mouseenter="helpSubmenu = 'language'"
-            >
-              <n-icon class="item-icon"><GlobeOutline /></n-icon>
-              <span class="item-label">{{ t('menu.language') }}</span>
-              <n-icon class="submenu-arrow"><ChevronForwardOutline /></n-icon>
-              <transition name="submenu">
-                <div v-if="helpSubmenu === 'language'" class="submenu-panel" @click.stop>
-                  <div
-                    class="dropdown-item"
-                    :class="{ 'is-selected': currentLanguage === 'zh-CN' }"
-                    @click.stop="handleLanguageChange('zh-CN')"
-                  >
-                    <n-icon v-if="currentLanguage === 'zh-CN'" class="item-icon"><CheckmarkOutline /></n-icon>
-                    <span v-else class="item-icon-spacer"></span>
-                    <span class="item-label">简体中文</span>
-                  </div>
-                  <div
-                    class="dropdown-item"
-                    :class="{ 'is-selected': currentLanguage === 'en-US' }"
-                    @click.stop="handleLanguageChange('en-US')"
-                  >
-                    <n-icon v-if="currentLanguage === 'en-US'" class="item-icon"><CheckmarkOutline /></n-icon>
-                    <span v-else class="item-icon-spacer"></span>
-                    <span class="item-label">English</span>
-                  </div>
-                </div>
-              </transition>
-            </div>
-            <div class="dropdown-divider"></div>
+          <div v-if="activeMenu === 'help'" class="dropdown-menu">
             <div class="dropdown-item" @click.stop="handleAction('documentation')">
               <n-icon class="item-icon"><BookOutline /></n-icon>
               <span class="item-label">{{ t('menu.documentation') }}</span>
@@ -313,6 +233,7 @@
           </div>
         </transition>
       </div>
+
     </div>
 
     <!-- Backdrop -->
@@ -325,100 +246,39 @@ import { ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { NIcon } from 'naive-ui'
 import {
-  AddOutline,
-  FolderOutline,
-  DocumentTextOutline,
-  DownloadOutline,
-  CloudUploadOutline,
-  ExitOutline,
-  ArrowUndoOutline,
-  ArrowRedoOutline,
-  CloudDoneOutline,
-  CloudOfflineOutline,
-  RefreshOutline,
-  SyncOutline,
-  CreateOutline,
-  ServerOutline,
-  BuildOutline,
-  PlayCircleOutline,
-  ConstructOutline,
-  BrushOutline,
-  TerminalOutline,
-  MenuOutline,
-  RemoveOutline,
-  ExpandOutline,
-  GlobeOutline,
-  CheckmarkOutline,
-  BookOutline,
-  BugOutline,
-  CloudDownloadOutline,
-  InformationCircleOutline,
-  MoonOutline,
-  SunnyOutline,
-  SettingsOutline,
-  ChevronForwardOutline
+  AddOutline, FolderOutline, DocumentTextOutline, DownloadOutline, CloudUploadOutline,
+  ExitOutline, ArrowUndoOutline, ArrowRedoOutline, CloudDoneOutline, CloudOfflineOutline,
+  RefreshOutline, SyncOutline, CreateOutline, ServerOutline, BuildOutline,
+  PlayCircleOutline, ConstructOutline, BrushOutline, TerminalOutline,
+  MenuOutline, RemoveOutline, ExpandOutline,
+  BookOutline, BugOutline, CloudDownloadOutline, InformationCircleOutline,
+  SettingsOutline
 } from '@vicons/ionicons5'
 import { useSettingsStore } from '../stores/settings'
 
 const { t, locale } = useI18n()
 const settingsStore = useSettingsStore()
 
-const emit = defineEmits<{
-  (e: 'menu-action', action: string): void
-}>()
+const emit = defineEmits<{ (e: 'menu-action', action: string): void }>()
 
 const activeMenu = ref<string | null>(null)
-const helpSubmenu = ref<string | null>(null)
-
 const isDarkTheme = computed(() => settingsStore.settings.theme === 'dark')
-const currentLanguage = computed(() => locale.value)
 
-// Toggle theme
-const toggleTheme = () => {
-  const newTheme = isDarkTheme.value ? 'light' : 'dark'
-  settingsStore.updateSetting('theme', newTheme)
-  closeMenu()
-}
-
-// Language
-const handleLanguageChange = (lang: string) => {
-  locale.value = lang
-  settingsStore.updateSetting('language', lang)
-  closeMenu()
-}
-
-// Menu
 const handleMenuClick = (menu: string) => {
-  if (activeMenu.value === menu) {
-    activeMenu.value = null
-  } else {
-    activeMenu.value = menu
-  }
+  activeMenu.value = activeMenu.value === menu ? null : menu
 }
 
 const handleMouseEnter = (menu: string) => {
-  if (activeMenu.value) {
-    activeMenu.value = menu
-  }
+  if (activeMenu.value) activeMenu.value = menu
 }
 
-const closeMenu = () => {
-  activeMenu.value = null
-  helpSubmenu.value = null
-}
+const closeMenu = () => { activeMenu.value = null }
 
-// Submenu toggle (Help menu)
-const toggleSubmenu = (sub: string) => {
-  helpSubmenu.value = helpSubmenu.value === sub ? null : sub
-}
-
-// Actions
 const handleAction = (action: string) => {
   emit('menu-action', action)
   closeMenu()
 }
 
-// Menu labels with i18n fallback
 const getMenuLabel = (key: string): string => {
   const translation = t(`menu.${key}`)
   if (translation === `menu.${key}`) {
@@ -426,7 +286,6 @@ const getMenuLabel = (key: string): string => {
       file: locale.value === 'zh-CN' ? '文件' : 'File',
       edit: locale.value === 'zh-CN' ? '编辑' : 'Edit',
       database: locale.value === 'zh-CN' ? '数据库' : 'Database',
-      sql: 'SQL',
       view: locale.value === 'zh-CN' ? '视图' : 'View',
       help: locale.value === 'zh-CN' ? '帮助' : 'Help'
     }
@@ -440,232 +299,154 @@ const getMenuLabel = (key: string): string => {
 .app-menu-bar {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  height: 28px;
+  height: 30px;
   padding: 0 8px;
-  background: rgba(30, 30, 35, 0.95);
+  background: rgba(22, 22, 28, 0.97);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
   user-select: none;
   position: relative;
   z-index: 100;
+  gap: 0;
 }
 
 .app-menu-bar.light-mode {
-  background: rgba(255, 255, 255, 0.98);
+  background: rgba(246, 246, 250, 0.99);
+  border-bottom: 1px solid rgba(0,0,0,0.09);
 }
 
 .menu-section {
   display: flex;
   align-items: center;
   height: 100%;
+  flex: 1;
 }
 
 .menu-item {
   position: relative;
   display: flex;
   align-items: center;
+  gap: 5px;
   height: 100%;
   padding: 0 10px;
   cursor: pointer;
-  transition: background-color 0.15s ease;
+  border-radius: 4px;
+  transition: background-color 0.12s ease;
+  white-space: nowrap;
 }
 
 .menu-item:hover,
 .menu-item.is-active {
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(255,255,255,0.08);
 }
 
 .light-mode .menu-item:hover,
 .light-mode .menu-item.is-active {
-  background: rgba(0, 0, 0, 0.06);
+  background: rgba(0,0,0,0.07);
 }
 
 .menu-label {
-  font-size: 13px;
-  color: rgba(255, 255, 255, 0.85);
+  font-size: 12px;
+  font-weight: 400;
+  color: rgba(255,255,255,0.82);
+  line-height: 1;
 }
 
 .light-mode .menu-label {
-  color: rgba(0, 0, 0, 0.85);
+  color: rgba(0,0,0,0.78);
 }
 
-/* Dropdown Menu */
+.menu-icon-only {
+  font-size: 14px;
+  color: rgba(255,255,255,0.65);
+  flex-shrink: 0;
+}
+.light-mode .menu-icon-only {
+  color: rgba(0,0,0,0.55);
+}
+
+.theme-toggle-item { gap: 4px; }
+
+/* Dropdown */
 .dropdown-menu {
   position: absolute;
-  top: 100%;
+  top: calc(100% + 2px);
   left: 0;
   min-width: 220px;
-  padding: 6px 0;
-  background: rgba(30, 30, 35, 0.98);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 5px 0;
+  background: #1e1e26;
+  border: 1px solid rgba(255,255,255,0.1);
   border-radius: 8px;
-  box-shadow:
-    0 8px 24px rgba(0, 0, 0, 0.4),
-    0 2px 8px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 8px 28px rgba(0,0,0,0.5), 0 2px 8px rgba(0,0,0,0.3);
   z-index: 1000;
 }
 
 .light-mode .dropdown-menu {
-  background: rgba(255, 255, 255, 0.98);
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  box-shadow:
-    0 8px 24px rgba(0, 0, 0, 0.15),
-    0 2px 8px rgba(0, 0, 0, 0.1);
+  background: #ffffff;
+  border-color: rgba(0,0,0,0.1);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.07);
 }
+
+.lang-menu { min-width: 150px; }
 
 .dropdown-item {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 8px 14px;
+  gap: 10px;
+  padding: 7px 14px;
   cursor: pointer;
   transition: background-color 0.1s ease;
 }
 
-.dropdown-item:hover {
-  background: rgba(24, 160, 88, 0.25);
-}
+.dropdown-item:hover { background: rgba(24,160,88,0.18); }
+.light-mode .dropdown-item:hover { background: rgba(24,160,88,0.1); }
 
-.light-mode .dropdown-item:hover {
-  background: rgba(24, 160, 88, 0.15);
-}
-
-.dropdown-item.is-selected {
-  background: rgba(24, 160, 88, 0.15);
-}
-
-.dropdown-item.is-disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
-
-.dropdown-item.is-disabled:hover {
-  background: transparent;
-}
+.dropdown-item.is-selected { background: rgba(24,160,88,0.12); }
+.light-mode .dropdown-item.is-selected { background: rgba(24,160,88,0.08); }
 
 .item-icon {
-  font-size: 16px;
-  color: rgba(255, 255, 255, 0.6);
+  font-size: 15px;
+  color: rgba(255,255,255,0.55);
   flex-shrink: 0;
-}
-
-.light-mode .item-icon {
-  color: rgba(0, 0, 0, 0.6);
-}
-
-.item-icon-spacer {
   width: 16px;
-  flex-shrink: 0;
 }
+.light-mode .item-icon { color: rgba(0,0,0,0.5); }
+.dropdown-item:hover .item-icon { color: rgba(255,255,255,0.9); }
+.light-mode .dropdown-item:hover .item-icon { color: rgba(0,0,0,0.85); }
 
-.dropdown-item:hover .item-icon {
-  color: rgba(255, 255, 255, 0.9);
-}
-
-.light-mode .dropdown-item:hover .item-icon {
-  color: rgba(0, 0, 0, 0.9);
-}
+.item-icon-spacer { width: 16px; flex-shrink: 0; }
 
 .item-label {
   flex: 1;
   font-size: 13px;
-  color: rgba(255, 255, 255, 0.85);
+  color: rgba(255,255,255,0.85);
 }
-
-.light-mode .item-label {
-  color: rgba(0, 0, 0, 0.85);
-}
+.light-mode .item-label { color: rgba(0,0,0,0.82); }
+.dropdown-item:hover .item-label { color: rgba(255,255,255,0.95); }
+.light-mode .dropdown-item:hover .item-label { color: rgba(0,0,0,0.92); }
 
 .item-shortcut {
   font-size: 11px;
-  color: rgba(255, 255, 255, 0.35);
-  font-family: 'SF Mono', 'Monaco', 'Inconsolata', monospace;
+  color: rgba(255,255,255,0.3);
+  font-family: 'SF Mono','Monaco',monospace;
+  flex-shrink: 0;
 }
-
-.light-mode .item-shortcut {
-  color: rgba(0, 0, 0, 0.35);
-}
+.light-mode .item-shortcut { color: rgba(0,0,0,0.3); }
 
 .dropdown-divider {
   height: 1px;
-  margin: 6px 12px;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  margin: 4px 10px;
+  background: rgba(255,255,255,0.08);
 }
-
-.light-mode .dropdown-divider {
-  background: linear-gradient(90deg, transparent, rgba(0, 0, 0, 0.1), transparent);
-}
+.light-mode .dropdown-divider { background: rgba(0,0,0,0.08); }
 
 /* Backdrop */
 .menu-backdrop {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  inset: 0;
   z-index: 99;
 }
 
-/* Submenu panel (cascading from Help menu) */
-.submenu-panel {
-  position: absolute;
-  top: 0;
-  left: 100%;
-  min-width: 160px;
-  padding: 6px 0;
-  background: rgba(30, 30, 35, 0.98);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 8px;
-  box-shadow:
-    0 8px 24px rgba(0, 0, 0, 0.4),
-    0 2px 8px rgba(0, 0, 0, 0.2);
-  z-index: 1001;
-}
-
-.light-mode .submenu-panel {
-  background: rgba(255, 255, 255, 0.98);
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  box-shadow:
-    0 8px 24px rgba(0, 0, 0, 0.15),
-    0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.has-submenu {
-  position: relative;
-}
-
-.submenu-arrow {
-  font-size: 12px;
-  margin-left: auto;
-  color: rgba(255, 255, 255, 0.4);
-}
-
-.light-mode .submenu-arrow {
-  color: rgba(0, 0, 0, 0.4);
-}
-
-/* Submenu animation */
-.submenu-enter-active,
-.submenu-leave-active {
-  transition: all 0.12s ease;
-}
-
-.submenu-enter-from,
-.submenu-leave-to {
-  opacity: 0;
-  transform: translateX(-4px);
-}
-
 /* Dropdown animation */
-.dropdown-enter-active,
-.dropdown-leave-active {
-  transition: all 0.15s ease;
-}
-
-.dropdown-enter-from,
-.dropdown-leave-to {
-  opacity: 0;
-  transform: translateY(-4px);
-}
+.dropdown-enter-active, .dropdown-leave-active { transition: all 0.13s ease; }
+.dropdown-enter-from, .dropdown-leave-to { opacity: 0; transform: translateY(-3px); }
 </style>

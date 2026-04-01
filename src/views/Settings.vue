@@ -4,11 +4,6 @@
       <!-- Sidebar -->
       <div class="settings-sidebar">
         <div class="sidebar-header">
-          <n-button text @click="goBack" class="back-btn">
-            <template #icon>
-              <n-icon><ArrowBackOutline /></n-icon>
-            </template>
-          </n-button>
           <h2 class="sidebar-title">{{ t('settings.title') }}</h2>
         </div>
         <div class="settings-nav">
@@ -116,6 +111,13 @@
           </div>
         </div>
 
+        <!-- Logs -->
+        <div v-if="activeSection === 'logs'" class="settings-section">
+          <h3 class="section-title">{{ t('settings.sections.logs') }}</h3>
+          <p class="section-desc">{{ t('settings.logsDesc') }}</p>
+          <LogsPanel />
+        </div>
+
         <!-- About -->
         <div v-if="activeSection === 'about'" class="settings-section">
           <h3 class="section-title">{{ t('settings.sections.about') }}</h3>
@@ -150,28 +152,18 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, defineAsyncComponent } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useRouter } from 'vue-router'
+import { NIcon, NSelect, NButton, NTag, useMessage } from 'naive-ui'
 import {
-  NIcon,
-  NSelect,
-  NButton,
-  NTag,
-  useMessage
-} from 'naive-ui'
-import {
-  ArrowBackOutline,
-  SettingsOutline,
-  HardwareChipOutline,
-  InformationCircleOutline,
-  ServerOutline,
-  CloudDownloadOutline
+  SettingsOutline, HardwareChipOutline, InformationCircleOutline,
+  ServerOutline, CloudDownloadOutline, ListOutline
 } from '@vicons/ionicons5'
 import { useSettingsStore } from '../stores/settings'
 
+const LogsPanel = defineAsyncComponent(() => import('../components/LogsPanel.vue'))
+
 const { t } = useI18n()
-const router = useRouter()
 const message = useMessage()
 
 const settingsStore = useSettingsStore()
@@ -183,6 +175,7 @@ const activeSection = ref('general')
 const sections = [
   { key: 'general', icon: SettingsOutline },
   { key: 'drivers', icon: HardwareChipOutline },
+  { key: 'logs', icon: ListOutline },
   { key: 'about', icon: InformationCircleOutline }
 ]
 
@@ -202,10 +195,6 @@ const drivers = ref([
   { id: 'mongodb', name: 'MongoDB', version: '7.1', installed: true, outdated: false, icon: ServerOutline },
   { id: 'redis', name: 'Redis', version: '5.0', installed: true, outdated: false, icon: ServerOutline }
 ])
-
-const goBack = () => {
-  router.push('/')
-}
 
 const handleInstallDriver = (driver: any) => {
   message.info(`Installing ${driver.name}...`)
@@ -260,15 +249,10 @@ const handleRemoveDriver = (driver: any) => {
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
   display: flex;
   align-items: center;
-  gap: 12px;
 }
 
 .light-theme .sidebar-header {
   border-bottom-color: rgba(0, 0, 0, 0.08);
-}
-
-.back-btn {
-  font-size: 18px;
 }
 
 .sidebar-title {

@@ -20,7 +20,7 @@
         <div v-if="exp.dbs" class="sec-body">
           <div v-for="db in databases" :key="db.name"
             class="tree-item" :class="{ active: activeDb === db.name }"
-            @click="activeDb = db.name">
+            @click="activeDb = db.name; loadCollections(db.name)">
             <n-icon class="item-icon db-c"><ServerOutline /></n-icon>
             <span class="item-name">{{ db.name }}</span>
             <n-tag v-if="activeDb === db.name" size="tiny" type="info" class="active-tag">active</n-tag>
@@ -73,6 +73,7 @@ import { useI18n } from 'vue-i18n'
 import { NIcon, NButton, NInput, NTag, NDropdown, useMessage } from 'naive-ui'
 import { RefreshOutline, ChevronForwardOutline, LayersOutline, ServerOutline, SearchOutline, AddOutline, TerminalOutline } from '@vicons/ionicons5'
 import { useSettingsStore } from '../../../stores/settings'
+import { mongodbMeta } from '../../../api/meta'
 
 const { t } = useI18n()
 const message = useMessage()
@@ -84,7 +85,7 @@ const emit = defineEmits<{ (e: 'select-item', item: any, type: string): void }>(
 const loading = ref(false)
 const searchText = ref('')
 const sel = ref<any>(null)
-const activeDb = ref('mydb')
+const activeDb = ref('')
 const databases = ref<any[]>([])
 const collections = ref<any[]>([])
 const exp = ref({ dbs: true, colls: true })
@@ -115,7 +116,30 @@ const handleCtx = (key: string) => {
   else message.info(key)
 }
 
+const loadCollections = async (db?: string) => {
+  try {
+    const res = await mongodbMeta.collections(props.connection.id, db || activeDb.value || props.connection.config?.database)
+    collections.value = res.collections
+  } catch { /* ignore */ }
+}
+
 const loadData = async () => {
+  loading.value = true
+  try {
+    const dbRes = await mongodbMeta.databases(props.connection.id)
+    databases.value = dbRes.databases.filter((d: any) => !['admin','local','config'].includes(d.name))
+    if (!activeDb.value && databases.value.length) {
+      activeDb.value = props.connection.config?.database || databases.value[0]?.name || ''
+    }
+    await loadCollections()
+  } catch {
+    // Fall through - use empty state
+  } finally {
+    loading.value = false
+  }
+}
+
+const _legacyLoadData = async () => {
   loading.value = true
   databases.value = [{ name: 'mydb' }, { name: 'analytics' }, { name: 'logs' }]
   collections.value = [
@@ -158,7 +182,13 @@ const loadData = async () => {
   loading.value = false
 }
 
-watch(() => props.connection, () => { sel.value = null; loadData() }, { immediate: true })
+watch(() => props.connection?.id, () => {
+  sel.value = null
+  databases.value = []
+  collections.value = []
+  activeDb.value = props.connection?.config?.database || ''
+  loadData()
+}, { immediate: true })
 </script>
 
 <style scoped>

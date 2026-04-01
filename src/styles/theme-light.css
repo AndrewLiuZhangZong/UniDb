@@ -1,4 +1,38 @@
-/* Light Theme Styles */
+/* Light Theme Styles - Global overrides for all .light-mode components */
+
+/* ── Workspace shell (workspace-shell, db-tree-panel, workspace-main) ── */
+body.light-theme .workspace-shell {
+  background: #f0f0f5;
+}
+body.light-theme .db-tree-panel {
+  background: #fafafa !important;
+  border-right-color: rgba(0,0,0,0.08) !important;
+}
+body.light-theme .panel-conn-name { color: rgba(0,0,0,0.88) !important; }
+body.light-theme .panel-conn-host { color: rgba(0,0,0,0.4) !important; }
+body.light-theme .workspace-main { background: #f5f5f8; }
+
+/* ── Workspace tab bars across all DB types ── */
+body.light-theme .tab-bar {
+  background: rgba(0,0,0,0.03) !important;
+  border-bottom-color: rgba(0,0,0,0.08) !important;
+}
+body.light-theme .tab-btn { color: rgba(0,0,0,0.55) !important; }
+body.light-theme .tab-btn:hover { color: rgba(0,0,0,0.85) !important; background: rgba(0,0,0,0.04) !important; }
+
+/* ── SQL textarea ── */
+body.light-theme .sql-textarea,
+body.light-theme .q-textarea,
+body.light-theme .value-textarea { background: #fff !important; color: #1a1a1a !important; }
+
+/* ── Data table in light ── */
+body.light-theme .n-data-table { --n-border-color: rgba(0,0,0,0.07); }
+body.light-theme .n-data-table-th { background: #f8f8fb !important; color: rgba(0,0,0,0.65) !important; }
+body.light-theme .n-data-table-td { color: rgba(0,0,0,0.82) !important; }
+
+/* ── Connection tree sider ── */
+body.light-theme .conn-sidebar { background: #fafafa !important; }
+
 
 /* Layout */
 .light-theme .sidebar,

@@ -166,6 +166,7 @@ export default {
     proxySettingsDesc: '使用代理服务器检查和下载更新',
     proxyUrl: '代理地址',
     updateHistory: '更新历史',
+    logsDesc: '查看应用运行日志和操作记录',
     aboutDesc: '现代化跨平台数据库管理工具',
     version: '版本',
     electron: 'Electron',

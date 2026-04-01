@@ -18,10 +18,10 @@
         <n-icon><RemoveOutline /></n-icon>
       </button>
       <button class="control-btn maximize" @click="handleMaximize">
-        <n-icon><square-outline /></n-icon>
+        <n-icon><SquareOutline /></n-icon>
       </button>
       <button class="control-btn close" @click="handleClose">
-        <n-icon><close-outline /></n-icon>
+        <n-icon><CloseOutline /></n-icon>
       </button>
     </div>
   </div>
@@ -61,7 +61,7 @@ const handleMaximize = async () => {
 }
 
 const handleClose = () => {
-  window.electronAPI?.close()
+  window.electronAPI?.close?.()
 }
 
 // Listen for maximize state changes

@@ -32,15 +32,17 @@ const isMacOS = computed(() => {
 
 const handleMenuAction = (action: string) => {
   switch (action) {
-    case 'new_connection':
-    case 'open_connection':
-    case 'manage_connections':
+    case 'newConnection':
+    case 'manageConnections':
       window.dispatchEvent(new CustomEvent('open-connection-dialog'))
       break
-    case 'new_query':
+    case 'openConnection':
+      window.dispatchEvent(new CustomEvent('open-connection-dialog'))
+      break
+    case 'newQuery':
       message.info('New query tab')
       break
-    case 'new_tab':
+    case 'newTab':
       message.info('New tab')
       break
     case 'export':
@@ -50,7 +52,7 @@ const handleMenuAction = (action: string) => {
       message.info('Import data')
       break
     case 'exit':
-      window.electronAPI?.close()
+      window.electronAPI?.close?.()
       break
     case 'undo':
       document.execCommand('undo')
@@ -67,14 +69,14 @@ const handleMenuAction = (action: string) => {
     case 'paste':
       document.execCommand('paste')
       break
-    case 'select_all':
+    case 'selectAll':
       document.execCommand('selectAll')
       break
     case 'refresh':
       connectionStore.fetchConnections()
       message.success('Refreshed')
       break
-    case 'refresh_metadata':
+    case 'refreshMetadata':
       message.info('Refreshing metadata...')
       break
     case 'connect':
@@ -83,63 +85,62 @@ const handleMenuAction = (action: string) => {
     case 'disconnect':
       message.info('Disconnect from database')
       break
-    case 'create_table':
+    case 'createTable':
       message.info('Create table dialog')
       break
-    case 'create_database':
+    case 'createDatabase':
       message.info('Create database dialog')
       break
-    case 'create_index':
+    case 'createIndex':
       message.info('Create index dialog')
       break
     case 'execute':
       window.dispatchEvent(new CustomEvent('execute-query'))
       break
-    case 'execute_line':
+    case 'executeLine':
       window.dispatchEvent(new CustomEvent('execute-query-line'))
       break
-    case 'execute_selection':
+    case 'executeSelection':
       window.dispatchEvent(new CustomEvent('execute-query-selection'))
       break
-    case 'format_sql':
+    case 'formatSQL':
       window.dispatchEvent(new CustomEvent('format-sql'))
       break
     case 'beautify':
       window.dispatchEvent(new CustomEvent('beautify-query'))
       break
-    case 'open_console':
-    case 'open_console_panel':
+    case 'openConsole':
+    case 'openConsolePanel':
       router.push('/logs')
       break
-    case 'toggle_sidebar':
+    case 'toggleSidebar':
       window.dispatchEvent(new CustomEvent('toggle-sidebar'))
       break
-    case 'zoom_in':
+    case 'zoomIn':
       message.info('Zoom in')
       break
-    case 'zoom_out':
+    case 'zoomOut':
       message.info('Zoom out')
       break
-    case 'reset_zoom':
+    case 'resetZoom':
       message.info('Reset zoom')
       break
-    case 'toggle_fullscreen':
-      window.electronAPI?.toggleFullscreen()
+    case 'toggleFullscreen':
+      window.electronAPI?.toggleFullscreen?.()
       break
-    case 'open_settings':
     case 'settings':
       router.push('/settings')
       break
     case 'documentation':
       window.open('https://unidb.com/docs', '_blank')
       break
-    case 'keyboard_shortcuts':
+    case 'keyboardShortcuts':
       message.info('Keyboard shortcuts')
       break
-    case 'report_bug':
+    case 'reportBug':
       window.open('https://github.com/AndrewLiuZhangZong/UniDb/issues', '_blank')
       break
-    case 'check_updates':
+    case 'checkUpdates':
       message.info('Checking for updates...')
       break
     case 'about':

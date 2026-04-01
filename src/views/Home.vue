@@ -1,171 +1,104 @@
 <template>
   <div class="home-container" :class="{ 'light-theme': !isDarkTheme }">
-    <!-- Main Layout -->
-    <n-layout has-sider class="main-layout" :has-sider="true">
-      <!-- Sidebar -->
+    <n-layout has-sider class="main-layout">
+
+      <!-- Column 1: Connection List -->
       <n-layout-sider
         bordered
-        :width="260"
+        :width="220"
         :collapsed-width="0"
         show-trigger="bar"
         collapse-mode="width"
         :native-scrollbar="false"
-        class="sidebar"
+        class="conn-sidebar"
         :class="{ 'light-mode': !isDarkTheme }"
       >
         <ConnectionTree @select="handleConnectionSelect" />
       </n-layout-sider>
 
-      <!-- Main Content -->
+      <!-- Column 2 + 3: DB Explorer + Workspace -->
       <n-layout class="content-layout">
-        <!-- Connection Header -->
-        <div v-if="activeConnection" class="connection-header">
-          <div class="connection-header-left">
-            <DbTypeIcon :type="activeConnection.type" :size="28" />
-            <div class="connection-header-info">
-              <h2 class="connection-header-name">{{ activeConnection.name }}</h2>
-              <div class="connection-header-meta">
-                <n-tag size="small" :type="getDbTypeTagType(activeConnection.type)">
-                  {{ getDbTypeName(activeConnection.type) }}
-                </n-tag>
-                <span class="connection-host">
-                  {{ activeConnection.config.host }}:{{ activeConnection.config.port }}
-                </span>
+
+        <!-- No connection selected: welcome -->
+        <div v-if="!activeConnection" class="welcome-page">
+          <div class="welcome-hero">
+            <div class="welcome-icon">
+              <svg width="110" height="110" viewBox="0 0 120 120" fill="none">
+                <circle cx="60" cy="60" r="55" fill="url(#heroGrad)" opacity="0.08"/>
+                <circle cx="60" cy="60" r="38" fill="url(#heroGrad)" opacity="0.15"/>
+                <circle cx="60" cy="60" r="22" fill="url(#heroGrad)"/>
+                <defs>
+                  <linearGradient id="heroGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#18a058"/><stop offset="100%" stop-color="#36b374"/>
+                  </linearGradient>
+                </defs>
+              </svg>
+              <n-icon class="hero-center-icon"><CubeOutline /></n-icon>
+            </div>
+            <h1 class="welcome-title">{{ t('welcome.title') }}</h1>
+            <p class="welcome-subtitle">{{ t('welcome.subtitle') }}</p>
+          </div>
+          <div class="supported-databases">
+            <h3 class="supported-title">{{ t('welcome.supported') }}</h3>
+            <div class="db-grid">
+              <div v-for="db in supportedDatabases" :key="db.type" class="db-card"
+                   @click="showConnectionDialog = true">
+                <DbTypeIcon :type="db.type" :size="38" />
+                <span class="db-label">{{ db.label }}</span>
               </div>
             </div>
           </div>
-          <div class="connection-header-actions">
-            <n-button size="small" type="primary" @click="handleConnect">
-              <template #icon>
-                <n-icon><CloudDoneOutline /></n-icon>
-              </template>
-              {{ t('connection.connect') }}
-            </n-button>
-            <n-button size="small" @click="handleEditConnection">
-              <template #icon>
-                <n-icon><CreateOutline /></n-icon>
-              </template>
-              {{ t('common.edit') }}
-            </n-button>
-            <n-button size="small" type="error" ghost @click="handleDeleteConnection">
-              <template #icon>
-                <n-icon><TrashOutline /></n-icon>
-              </template>
-              {{ t('common.delete') }}
-            </n-button>
-          </div>
+          <n-button type="primary" size="large" @click="showConnectionDialog = true">
+            <template #icon><n-icon><AddOutline /></n-icon></template>
+            {{ t('connection.new') }}
+          </n-button>
         </div>
 
-        <!-- Content Area -->
-        <n-layout-content class="content-area" :native-scrollbar="false">
-          <!-- Welcome Page -->
-          <div v-if="!activeConnection" class="welcome-page">
-            <div class="welcome-hero">
-              <div class="welcome-icon">
-                <svg width="120" height="120" viewBox="0 0 120 120" fill="none">
-                  <circle cx="60" cy="60" r="55" fill="url(#heroGrad)" opacity="0.1"/>
-                  <circle cx="60" cy="60" r="40" fill="url(#heroGrad)" opacity="0.2"/>
-                  <circle cx="60" cy="60" r="25" fill="url(#heroGrad)"/>
-                  <defs>
-                    <linearGradient id="heroGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%" stop-color="#18a058"/>
-                      <stop offset="100%" stop-color="#36b374"/>
-                    </linearGradient>
-                  </defs>
-                </svg>
-                <n-icon class="hero-center-icon"><CubeOutline /></n-icon>
-              </div>
-              <h1 class="welcome-title">{{ t('welcome.title') }}</h1>
-              <p class="welcome-subtitle">{{ t('welcome.subtitle') }}</p>
-            </div>
+        <!-- Active connection: DB Explorer + Workspace -->
+        <div v-else class="workspace-shell">
 
-            <!-- Supported Databases -->
-            <div class="supported-databases">
-              <h3 class="supported-title">{{ t('welcome.supported') }}</h3>
-              <div class="db-grid">
-                <div v-for="db in supportedDatabases" :key="db.type" class="db-card">
-                  <DbTypeIcon :type="db.type" :size="40" />
-                  <span class="db-label">{{ db.label }}</span>
-                </div>
+          <!-- Column 2: DB Tree Explorer (left side of content) -->
+          <div class="db-tree-panel" :class="{ 'light-mode': !isDarkTheme }">
+            <!-- Mini connection info header -->
+            <div class="panel-conn-header">
+              <DbTypeIcon :type="activeConnection.type" :size="18" />
+              <div class="panel-conn-info">
+                <span class="panel-conn-name">{{ activeConnection.name }}</span>
+                <span class="panel-conn-host">{{ activeConnection.config?.host }}:{{ activeConnection.config?.port }}</span>
               </div>
-            </div>
-
-            <!-- Quick Actions -->
-            <div class="quick-actions">
-              <n-button type="primary" size="large" @click="showConnectionDialog = true">
-                <template #icon>
-                  <n-icon><AddOutline /></n-icon>
-                </template>
-                {{ t('connection.new') }}
-              </n-button>
-            </div>
-          </div>
-
-          <!-- Connection Detail / Query Area -->
-          <div v-else class="workspace-area">
-            <!-- Tabs -->
-            <div class="workspace-tabs">
-              <div class="tab active">
-                <n-icon><DocumentTextOutline /></n-icon>
-                <span>Query 1</span>
-                <n-icon class="tab-close"><CloseOutline /></n-icon>
-              </div>
-              <div class="tab-add">
-                <n-icon><AddOutline /></n-icon>
-              </div>
-            </div>
-
-            <!-- Query Editor Placeholder -->
-            <div class="query-editor">
-              <div class="editor-toolbar">
-                <n-button-group size="small">
-                  <n-button>
+              <n-tooltip trigger="hover" placement="bottom">
+                <template #trigger>
+                  <n-button text size="tiny" @click="handleConnect">
                     <template #icon>
-                      <n-icon><PlayCircleOutline /></n-icon>
+                      <n-icon :color="isConnected ? '#18a058' : 'rgba(255,255,255,0.3)'">
+                        <RadioButtonOn v-if="isConnected" /><RadioButtonOffOutline v-else />
+                      </n-icon>
                     </template>
-                    {{ t('menu.execute') }}
                   </n-button>
-                  <n-button>
-                    {{ t('menu.format_sql') }}
-                  </n-button>
-                </n-button-group>
-                <n-space>
-                  <n-text depth="3" style="font-size: 12px;">
-                    {{ activeConnection.config.database || 'No database selected' }}
-                  </n-text>
-                </n-space>
-              </div>
-              <div class="editor-content">
-                <div class="editor-placeholder">
-                  <n-icon :size="48"><CodeSlashOutline /></n-icon>
-                  <p>Write your SQL query here...</p>
-                </div>
-              </div>
-              <div class="editor-statusbar">
-                <span class="status-item">Ln 1, Col 1</span>
-                <span class="status-item">UTF-8</span>
-                <span class="status-item">{{ getDbTypeName(activeConnection.type) }}</span>
-              </div>
+                </template>
+                {{ isConnected ? t('connection.disconnect') : t('connection.connect') }}
+              </n-tooltip>
             </div>
 
-            <!-- Results Panel -->
-            <div class="results-panel">
-              <div class="results-tabs">
-                <div class="result-tab active">
-                  <n-icon><GridOutline /></n-icon>
-                  Results
-                </div>
-                <div class="result-tab">
-                  <n-icon><DownloadOutline /></n-icon>
-                  Export
-                </div>
-              </div>
-              <div class="results-placeholder">
-                <n-empty description="Execute a query to see results" />
-              </div>
-            </div>
+            <!-- Per-DB explorer tree -->
+            <component
+              :is="explorerComponent"
+              :connection="activeConnection"
+              @select-item="handleExplorerSelectItem"
+            />
           </div>
-        </n-layout-content>
+
+          <!-- Column 3: Main workspace content -->
+          <div class="workspace-main">
+            <component
+              :is="workspaceComponent"
+              :connection="activeConnection"
+              :selected-item="selectedItem"
+              :selected-item-type="selectedItemType"
+            />
+          </div>
+
+        </div>
       </n-layout>
     </n-layout>
 
@@ -179,41 +112,29 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted, defineAsyncComponent } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import {
-  NLayout,
-  NLayoutSider,
-  NLayoutContent,
-  NButton,
-  NButtonGroup,
-  NSpace,
-  NTag,
-  NIcon,
-  NText,
-  NEmpty,
-  useMessage,
-  useDialog
+  NLayout, NLayoutSider, NButton, NIcon, NTag, NTooltip, useMessage, useDialog
 } from 'naive-ui'
 import {
-  AddOutline,
-  CreateOutline,
-  TrashOutline,
-  CloudDoneOutline,
-  CubeOutline,
-  DocumentTextOutline,
-  CloseOutline,
-  PlayCircleOutline,
-  ConstructOutline,
-  CodeSlashOutline,
-  GridOutline,
-  DownloadOutline,
-  RefreshOutline
+  AddOutline, CubeOutline, RadioButtonOn, RadioButtonOffOutline
 } from '@vicons/ionicons5'
 import ConnectionTree from '../components/ConnectionTree.vue'
 import ConnectionDialog from '../components/ConnectionDialog.vue'
 import DbTypeIcon from '../components/DbTypeIcon.vue'
+
+// Lazy-load DB-specific components
+import MySQLExplorer from '../components/database/MySQL/MySQLExplorer.vue'
+import MySQLWorkspace from '../components/database/MySQL/MySQLWorkspace.vue'
+import ClickHouseExplorer from '../components/database/ClickHouse/ClickHouseExplorer.vue'
+import ClickHouseWorkspace from '../components/database/ClickHouse/ClickHouseWorkspace.vue'
+import MongoDBExplorer from '../components/database/MongoDB/MongoDBExplorer.vue'
+import MongoDBWorkspace from '../components/database/MongoDB/MongoDBWorkspace.vue'
+import RedisExplorer from '../components/database/Redis/RedisExplorer.vue'
+import RedisWorkspace from '../components/database/Redis/RedisWorkspace.vue'
+
 import { useConnectionStore } from '../stores/connection'
 import { useSettingsStore } from '../stores/settings'
 
@@ -224,12 +145,13 @@ const router = useRouter()
 const connectionStore = useConnectionStore()
 const settingsStore = useSettingsStore()
 
+const isDarkTheme = computed(() => settingsStore.settings.theme === 'dark')
 const showConnectionDialog = ref(false)
 const editingConnection = ref<any>(null)
 const activeConnection = ref<any>(null)
-
-// Current theme
-const isDarkTheme = computed(() => settingsStore.settings.theme === 'dark')
+const isConnected = ref(false)
+const selectedItem = ref<any>(null)
+const selectedItemType = ref<string>('')
 
 const supportedDatabases = [
   { type: 'mysql', label: 'MySQL' },
@@ -238,204 +160,79 @@ const supportedDatabases = [
   { type: 'redis', label: 'Redis' }
 ]
 
-// Database type helpers
-const getDbTypeName = (type: string) => {
-  const names: Record<string, string> = {
-    mysql: 'MySQL',
-    clickhouse: 'ClickHouse',
-    mongodb: 'MongoDB',
-    redis: 'Redis'
-  }
-  return names[type] || type
+// Route to the correct Explorer / Workspace by db type
+const explorerMap: Record<string, any> = {
+  mysql: MySQLExplorer,
+  clickhouse: ClickHouseExplorer,
+  mongodb: MongoDBExplorer,
+  redis: RedisExplorer
+}
+const workspaceMap: Record<string, any> = {
+  mysql: MySQLWorkspace,
+  clickhouse: ClickHouseWorkspace,
+  mongodb: MongoDBWorkspace,
+  redis: RedisWorkspace
 }
 
-const getDbTypeTagType = (type: string) => {
-  const types: Record<string, 'success' | 'info' | 'warning' | 'error'> = {
-    mysql: 'success',
-    clickhouse: 'warning',
-    mongodb: 'info',
-    redis: 'error'
-  }
-  return types[type] || 'default'
-}
+const explorerComponent = computed(() => explorerMap[activeConnection.value?.type] ?? null)
+const workspaceComponent = computed(() => workspaceMap[activeConnection.value?.type] ?? null)
 
-// Handle connection selection
 const handleConnectionSelect = (conn: any) => {
   activeConnection.value = conn
+  selectedItem.value = null
+  selectedItemType.value = ''
+  isConnected.value = false
 }
 
-// Handle connection actions
 const handleConnect = () => {
-  message.info(`Connecting to ${activeConnection.value?.name}...`)
+  isConnected.value = !isConnected.value
+  message.success(isConnected.value
+    ? `Connected to ${activeConnection.value?.name}`
+    : `Disconnected from ${activeConnection.value?.name}`)
 }
 
-const handleEditConnection = () => {
-  editingConnection.value = activeConnection.value
-  showConnectionDialog.value = true
+const handleExplorerSelectItem = (item: any, type: string) => {
+  selectedItem.value = item
+  selectedItemType.value = type
 }
 
-const handleDeleteConnection = async () => {
-  dialog.warning({
-    title: t('connection.deleteConnection'),
-    content: `Are you sure you want to delete "${activeConnection.value?.name}"?`,
-    positiveText: t('common.confirm'),
-    negativeText: t('common.cancel'),
-    onPositiveClick: async () => {
-      try {
-        await connectionStore.deleteConnection(activeConnection.value.id)
-        activeConnection.value = null
-        message.success('Connection deleted')
-      } catch {
-        message.error('Delete failed')
-      }
-    }
-  })
-}
+const handleDialogSaved = () => { editingConnection.value = null }
 
-// Handle dialog events
-const handleDialogSaved = () => {
-  editingConnection.value = null
-}
-
-// Handle menu actions
+// Menu action handler (kept for AppLayout events)
 const handleMenuAction = (action: string) => {
-  console.log('Menu action:', action)
   switch (action) {
-    case 'new_connection':
-    case 'manage_connections':
-      editingConnection.value = null
-      showConnectionDialog.value = true
-      break
-    case 'open_connection':
-      message.info('Open connection dialog')
-      break
-    case 'new_query':
-      message.info('New query tab')
-      break
-    case 'new_tab':
-      message.info('New tab')
-      break
-    case 'export':
-      message.info('Export data')
-      break
-    case 'import':
-      message.info('Import data')
-      break
-    case 'refresh':
-      connectionStore.fetchConnections()
-      message.success('Refreshed')
-      break
-    case 'refresh_metadata':
-      message.info('Refreshing metadata...')
-      break
-    case 'create_table':
-      message.info('Create table dialog')
-      break
-    case 'create_database':
-      message.info('Create database dialog')
-      break
-    case 'create_index':
-      message.info('Create index dialog')
-      break
-    case 'connect':
-      if (activeConnection.value) {
-        message.info(`Connecting to ${activeConnection.value.name}...`)
-      } else {
-        message.warning('No connection selected')
-      }
-      break
-    case 'disconnect':
-      message.info('Disconnect from database')
-      break
-    case 'execute':
-      message.info('Execute query')
-      break
-    case 'execute_line':
-      message.info('Execute current line')
-      break
-    case 'execute_selection':
-      message.info('Execute selection')
-      break
-    case 'format_sql':
-      message.info('Format SQL')
-      break
-    case 'beautify':
-      message.info('Beautify query')
-      break
-    case 'open_console':
-      router.push('/logs')
-      break
-    case 'settings':
-      router.push('/settings')
-      break
-    case 'logs':
-      router.push('/logs')
-      break
-    case 'documentation':
-      window.open('https://unidb.com/docs', '_blank')
-      break
-    case 'keyboard_shortcuts':
-      message.info('Keyboard shortcuts dialog')
-      break
-    case 'report_bug':
-      window.open('https://github.com/unidb/unidb/issues', '_blank')
-      break
+    case 'newConnection': case 'manageConnections': case 'openConnection':
+      editingConnection.value = null; showConnectionDialog.value = true; break
+    case 'refresh': connectionStore.fetchConnections(); message.success('Refreshed'); break
+    case 'openConsole': case 'openConsolePanel': router.push('/logs'); break
+    case 'settings': router.push('/settings'); break
+    case 'documentation': window.open('https://unidb.com/docs', '_blank'); break
+    case 'reportBug': window.open('https://github.com/AndrewLiuZhangZong/UniDb/issues', '_blank'); break
+    case 'checkUpdates': message.info('Checking for updates...'); break
     case 'about':
       dialog.info({
         title: 'UniDb',
         content: `Version: 0.1.0\nElectron: ${window.electronAPI?.versions?.electron || 'N/A'}\nNode: ${window.electronAPI?.versions?.node || 'N/A'}`,
         positiveText: 'OK'
-      })
-      break
-    case 'exit':
-      window.close()
-      break
-    default:
-      console.log('Unhandled action:', action)
+      }); break
+    case 'exit': window.electronAPI?.close?.(); break
   }
 }
 
-const handleOpenSettings = () => {
-  router.push('/settings')
-}
-
-// Listen for menu events from main process (macOS native menu)
-const handleMenuEvent = (event: Event) => {
-  const customEvent = event as CustomEvent<string>
-  handleMenuAction(customEvent.detail)
-}
-
-// Handle open connection dialog from menu
-const handleOpenConnectionDialog = () => {
-  editingConnection.value = null
-  showConnectionDialog.value = true
-}
-
-// Handle edit connection from menu/context menu
-const handleEditConnectionEvent = (event: Event) => {
-  const customEvent = event as CustomEvent<any>
-  editingConnection.value = customEvent.detail
+const handleMenuEvent = (e: Event) => handleMenuAction((e as CustomEvent<string>).detail)
+const handleOpenConnectionDialog = () => { editingConnection.value = null; showConnectionDialog.value = true }
+const handleEditConnectionEvent = (e: Event) => {
+  editingConnection.value = (e as CustomEvent<any>).detail
   showConnectionDialog.value = true
 }
 
 onMounted(() => {
-  // Listen for menu action events from Electron main process
   window.addEventListener('menu-action', handleMenuEvent)
-
-  // Listen for open connection dialog events
   window.addEventListener('open-connection-dialog', handleOpenConnectionDialog)
-
-  // Listen for edit connection events
   window.addEventListener('edit-connection', handleEditConnectionEvent)
-
-  // Also set up listener via electronAPI if available
   // @ts-ignore
-  if (window.electronAPI?.onMenuAction) {
-    // @ts-ignore
-    window.electronAPI.onMenuAction(handleMenuAction)
-  }
+  if (window.electronAPI?.onMenuAction) window.electronAPI.onMenuAction(handleMenuAction)
 })
-
 onUnmounted(() => {
   window.removeEventListener('menu-action', handleMenuEvent)
   window.removeEventListener('open-connection-dialog', handleOpenConnectionDialog)
@@ -451,433 +248,136 @@ onUnmounted(() => {
   overflow: hidden;
 }
 
-.main-layout {
-  flex: 1;
-  overflow: hidden;
-}
+.main-layout { flex: 1; overflow: hidden; }
 
-.sidebar {
-  background: rgba(30, 30, 35, 0.95) !important;
-}
-
-.light-theme .sidebar {
-  background: rgba(255, 255, 255, 0.98) !important;
-}
+.conn-sidebar { background: rgba(28, 28, 32, 0.98) !important; }
+.conn-sidebar.light-mode { background: rgba(255,255,255,0.99) !important; }
 
 .content-layout {
-  background: linear-gradient(135deg, #1a1a1f 0%, #12121a 100%);
-}
-
-.light-theme .content-layout {
-  background: linear-gradient(135deg, #ffffff 0%, #f5f5f5 100%);
-}
-
-/* Connection Header */
-.connection-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 16px 24px;
-  background: rgba(255, 255, 255, 0.02);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-}
-
-.light-theme .connection-header {
-  background: rgba(0, 0, 0, 0.02);
-  border-bottom-color: rgba(0, 0, 0, 0.06);
-}
-
-.connection-header-left {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-
-.connection-header-info {
+  background: #13131a;
   display: flex;
   flex-direction: column;
-  gap: 4px;
 }
+.light-theme .content-layout { background: #f4f4f7; }
 
-.connection-header-name {
-  font-size: 18px;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.95);
-  margin: 0;
-}
-
-.light-theme .connection-header-name {
-  color: rgba(0, 0, 0, 0.95);
-}
-
-.connection-header-meta {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.connection-host {
-  font-size: 12px;
-  color: rgba(255, 255, 255, 0.4);
-  font-family: 'SF Mono', 'Monaco', monospace;
-}
-
-.light-theme .connection-host {
-  color: rgba(0, 0, 0, 0.4);
-}
-
-.connection-header-actions {
-  display: flex;
-  gap: 8px;
-}
-
-/* Content Area */
-.content-area {
-  flex: 1;
-  overflow: auto;
-}
-
-/* Welcome Page */
+/* ── Welcome ── */
 .welcome-page {
+  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: calc(100vh - 100px);
-  padding: 48px 24px;
+  gap: 40px;
+  padding: 48px 32px;
+  animation: fadeInUp 0.5s ease;
 }
-
 .welcome-hero {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 24px;
-  margin-bottom: 48px;
-  animation: fadeInUp 0.6s ease;
+  display: flex; flex-direction: column; align-items: center; gap: 20px;
 }
-
-.welcome-icon {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.hero-center-icon {
-  position: absolute;
-  font-size: 48px;
-  color: #18a058;
-}
-
+.welcome-icon { position: relative; display: flex; align-items: center; justify-content: center; }
+.hero-center-icon { position: absolute; font-size: 44px; color: #18a058; }
 .welcome-title {
-  font-size: 36px;
-  font-weight: 700;
-  color: rgba(255, 255, 255, 0.95);
-  margin: 0;
-  letter-spacing: -0.5px;
+  font-size: 32px; font-weight: 700; margin: 0;
+  color: rgba(255,255,255,0.95); letter-spacing: -0.5px;
 }
+.light-theme .welcome-title { color: rgba(0,0,0,0.9); }
+.welcome-subtitle { font-size: 15px; margin: 0; color: rgba(255,255,255,0.45); }
+.light-theme .welcome-subtitle { color: rgba(0,0,0,0.45); }
 
-.welcome-subtitle {
-  font-size: 16px;
-  color: rgba(255, 255, 255, 0.5);
-  margin: 0;
-}
-
-/* Supported Databases */
-.supported-databases {
-  margin-bottom: 48px;
-  animation: fadeInUp 0.6s ease 0.1s both;
-}
-
+.supported-databases { text-align: center; }
 .supported-title {
-  font-size: 14px;
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.4);
-  text-align: center;
-  margin-bottom: 20px;
-  text-transform: uppercase;
-  letter-spacing: 1px;
+  font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.3);
+  text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 16px;
 }
-
-.db-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
-}
-
+.light-theme .supported-title { color: rgba(0,0,0,0.3); }
+.db-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
 .db-card {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 12px;
-  padding: 24px 20px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 16px;
-  cursor: pointer;
-  transition: all 0.3s ease;
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
+  padding: 20px 16px; background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.06); border-radius: 14px;
+  cursor: pointer; transition: all 0.25s ease;
 }
-
 .db-card:hover {
-  background: rgba(255, 255, 255, 0.06);
-  border-color: rgba(255, 255, 255, 0.1);
-  transform: translateY(-4px);
+  background: rgba(255,255,255,0.07); border-color: rgba(255,255,255,0.12);
+  transform: translateY(-3px);
 }
+.light-theme .db-card { background: rgba(0,0,0,0.02); border-color: rgba(0,0,0,0.06); }
+.light-theme .db-card:hover { background: rgba(0,0,0,0.05); border-color: rgba(0,0,0,0.1); }
+.db-label { font-size: 13px; font-weight: 500; color: rgba(255,255,255,0.75); }
+.light-theme .db-label { color: rgba(0,0,0,0.75); }
 
-.db-label {
-  font-size: 14px;
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.8);
-}
-
-/* Quick Actions */
-.quick-actions {
-  animation: fadeInUp 0.6s ease 0.2s both;
-}
-
-/* Workspace Area */
-.workspace-area {
+/* ── Workspace shell ── */
+.workspace-shell {
+  flex: 1;
   display: flex;
-  flex-direction: column;
-  height: calc(100vh - 100px);
-}
-
-.workspace-tabs {
-  display: flex;
-  align-items: center;
-  padding: 0 16px;
-  background: rgba(0, 0, 0, 0.2);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-  height: 40px;
-}
-
-.tab {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 0 16px;
+  flex-direction: row;
+  overflow: hidden;
   height: 100%;
-  font-size: 13px;
-  color: rgba(255, 255, 255, 0.6);
-  cursor: pointer;
-  border-bottom: 2px solid transparent;
-  transition: all 0.15s ease;
 }
 
-.tab:hover {
-  color: rgba(255, 255, 255, 0.9);
-  background: rgba(255, 255, 255, 0.03);
-}
-
-.tab.active {
-  color: rgba(255, 255, 255, 0.95);
-  border-bottom-color: #18a058;
-  background: rgba(255, 255, 255, 0.05);
-}
-
-.tab-close {
-  font-size: 14px;
-  opacity: 0.5;
-  transition: opacity 0.15s;
-}
-
-.tab:hover .tab-close {
-  opacity: 1;
-}
-
-.tab-add {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  margin-left: 8px;
-  border-radius: 6px;
-  cursor: pointer;
-  color: rgba(255, 255, 255, 0.5);
-  transition: all 0.15s;
-}
-
-.tab-add:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: rgba(255, 255, 255, 0.9);
-}
-
-/* Query Editor */
-.query-editor {
-  flex: 1;
+/* Column 2: DB tree panel */
+.db-tree-panel {
+  width: 240px;
+  flex-shrink: 0;
   display: flex;
   flex-direction: column;
-  min-height: 200px;
-  background: #1e1e1e;
-  margin: 16px;
-  border-radius: 12px;
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(22, 22, 28, 0.95);
+  border-right: 1px solid rgba(255,255,255,0.06);
+}
+.db-tree-panel.light-mode {
+  background: rgba(248, 248, 252, 0.98);
+  border-right-color: rgba(0,0,0,0.07);
 }
 
-.editor-toolbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 10px 16px;
-  background: rgba(0, 0, 0, 0.3);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-}
-
-.editor-content {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.editor-placeholder {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 12px;
-  color: rgba(255, 255, 255, 0.3);
-}
-
-.editor-placeholder p {
-  font-size: 14px;
-  margin: 0;
-}
-
-.editor-statusbar {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 6px 16px;
-  background: rgba(0, 0, 0, 0.4);
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
-}
-
-.status-item {
-  font-size: 11px;
-  color: rgba(255, 255, 255, 0.4);
-}
-
-/* Results Panel */
-.results-panel {
-  height: 300px;
-  margin: 0 16px 16px;
-  background: rgba(0, 0, 0, 0.3);
-  border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  overflow: hidden;
-}
-
-.results-tabs {
-  display: flex;
-  padding: 0 16px;
-  background: rgba(0, 0, 0, 0.2);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-  height: 36px;
-}
-
-.result-tab {
+/* Mini connection header inside DB tree */
+.panel-conn-header {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 0 12px;
-  font-size: 12px;
-  color: rgba(255, 255, 255, 0.5);
-  cursor: pointer;
-  border-bottom: 2px solid transparent;
-  transition: all 0.15s;
+  padding: 10px 12px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  flex-shrink: 0;
 }
+.light-mode .panel-conn-header { border-bottom-color: rgba(0,0,0,0.07); }
 
-.result-tab:hover {
-  color: rgba(255, 255, 255, 0.8);
-}
-
-.result-tab.active {
-  color: rgba(255, 255, 255, 0.95);
-  border-bottom-color: #18a058;
-}
-
-.results-placeholder {
+.panel-conn-info {
+  flex: 1;
+  min-width: 0;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  height: calc(100% - 36px);
+  flex-direction: column;
+  gap: 1px;
+}
+.panel-conn-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.9);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.light-mode .panel-conn-name { color: rgba(0,0,0,0.9); }
+.panel-conn-host {
+  font-size: 10px;
+  color: rgba(255,255,255,0.35);
+  font-family: 'SF Mono', monospace;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.light-mode .panel-conn-host { color: rgba(0,0,0,0.35); }
+
+/* Column 3: Main workspace */
+.workspace-main {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
-/* Animations */
 @keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Light theme for Home page */
-.light-theme .welcome-title {
-  color: rgba(0, 0, 0, 0.95);
-}
-
-.light-theme .welcome-subtitle {
-  color: rgba(0, 0, 0, 0.5);
-}
-
-.light-theme .supported-title {
-  color: rgba(0, 0, 0, 0.4);
-}
-
-.light-theme .db-card {
-  background: rgba(0, 0, 0, 0.02);
-  border-color: rgba(0, 0, 0, 0.06);
-}
-
-.light-theme .db-card:hover {
-  background: rgba(0, 0, 0, 0.04);
-  border-color: rgba(0, 0, 0, 0.1);
-}
-
-.light-theme .db-label {
-  color: rgba(0, 0, 0, 0.8);
-}
-
-.light-theme .workspace-tabs {
-  background: rgba(0, 0, 0, 0.02);
-  border-bottom-color: rgba(0, 0, 0, 0.06);
-}
-
-.light-theme .tab {
-  color: rgba(0, 0, 0, 0.6);
-}
-
-.light-theme .tab:hover {
-  color: rgba(0, 0, 0, 0.9);
-  background: rgba(0, 0, 0, 0.03);
-}
-
-.light-theme .tab.active {
-  color: rgba(0, 0, 0, 0.95);
-  background: rgba(0, 0, 0, 0.05);
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-  .db-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .connection-header {
-    flex-direction: column;
-    gap: 16px;
-    align-items: flex-start;
-  }
-
-  .connection-header-actions {
-    width: 100%;
-    justify-content: flex-start;
-  }
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 </style>

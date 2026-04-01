@@ -64,16 +64,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { NIcon, NButton, NSpace, NEmpty, NTooltip, NDropdown, useMessage, useDialog } from 'naive-ui'
+import { NIcon, NSpace, NTooltip, NDropdown, useMessage, useDialog } from 'naive-ui'
 import {
-  AddOutline,
   EllipsisHorizontalOutline,
   RefreshOutline,
   ServerOutline,
   CreateOutline,
-  CopyOutline,
   TrashOutline,
   CloudDoneOutline
 } from '@vicons/ionicons5'
@@ -122,9 +120,6 @@ const contextMenuOptions = [
   }
 ]
 
-// Import h from vue
-import { h } from 'vue'
-
 // Get database type name
 const getDbTypeName = (type: string) => {
   const names: Record<string, string> = {
@@ -140,11 +135,6 @@ const getDbTypeName = (type: string) => {
 const handleSelectConnection = (conn: any) => {
   activeConnectionId.value = conn.id
   emit('select', conn)
-}
-
-// Add connection
-const handleAddConnection = () => {
-  window.dispatchEvent(new CustomEvent('open-connection-dialog'))
 }
 
 // Connection menu (right-click context)
@@ -201,8 +191,6 @@ const handleRefresh = async () => {
   message.success('Refreshed')
 }
 
-// Load connections on mount
-import { onMounted } from 'vue'
 onMounted(() => {
   connectionStore.fetchConnections()
 })

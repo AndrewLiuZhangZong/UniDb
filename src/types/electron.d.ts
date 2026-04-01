@@ -10,6 +10,12 @@ declare global {
         chrome: string
         electron: string
       }
+      minimize?: () => void
+      maximize?: () => void
+      unmaximize?: () => void
+      close?: () => void
+      toggleFullscreen?: () => void
+      onMenuAction?: (callback: (action: string) => void) => void
     }
   }
 }

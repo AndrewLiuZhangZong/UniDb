@@ -15,11 +15,13 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useRouter } from 'vue-router'
 import { useMessage, useDialog } from 'naive-ui'
 import TitleBar from './TitleBar.vue'
 import AppMenuBar from './AppMenuBar.vue'
 import { useConnectionStore } from '../stores/connection'
 
+const router = useRouter()
 const message = useMessage()
 const dialog = useDialog()
 const connectionStore = useConnectionStore()
@@ -107,12 +109,11 @@ const handleMenuAction = (action: string) => {
     case 'beautify':
       window.dispatchEvent(new CustomEvent('beautify-query'))
       break
-    case 'openConsole':
-    case 'openConsolePanel':
-      window.dispatchEvent(new CustomEvent('open-settings', { detail: 'logs' }))
+    case 'settings':
+      router.push('/settings')
       break
     case 'home':
-      window.dispatchEvent(new CustomEvent('go-home'))
+      router.push('/')
       break
     case 'toggleSidebar':
       window.dispatchEvent(new CustomEvent('toggle-sidebar'))
@@ -128,9 +129,6 @@ const handleMenuAction = (action: string) => {
       break
     case 'toggleFullscreen':
       window.electronAPI?.toggleFullscreen?.()
-      break
-    case 'settings':
-      window.dispatchEvent(new CustomEvent('open-settings', { detail: 'general' }))
       break
     case 'documentation':
       window.open('https://unidb.com/docs', '_blank')

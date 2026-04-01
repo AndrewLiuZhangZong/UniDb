@@ -22,246 +22,243 @@
       <div class="menu-divider-v"></div>
 
       <!-- File -->
-      <div class="menu-item" :class="{ 'is-active': activeMenu === 'file' }"
-        @click="handleMenuClick('file')" @mouseenter="handleMouseEnter('file')">
-        <span class="menu-label">{{ getMenuLabel('file') }}</span>
-        <transition name="dropdown">
-          <div v-if="activeMenu === 'file'" class="dropdown-menu">
-            <div class="dropdown-item" @click.stop="handleAction('newConnection')">
-              <n-icon class="item-icon"><AddOutline /></n-icon>
-              <span class="item-label">{{ t('menu.newConnection') }}</span>
-              <span class="item-shortcut">⌘N</span>
-            </div>
-            <div class="dropdown-item" @click.stop="handleAction('openConnection')">
-              <n-icon class="item-icon"><FolderOutline /></n-icon>
-              <span class="item-label">{{ t('menu.openConnection') }}</span>
-              <span class="item-shortcut">⌘O</span>
-            </div>
-            <div class="dropdown-divider"></div>
-            <div class="dropdown-item" @click.stop="handleAction('newQuery')">
-              <n-icon class="item-icon"><DocumentTextOutline /></n-icon>
-              <span class="item-label">{{ t('menu.newQuery') }}</span>
-              <span class="item-shortcut">⌘T</span>
-            </div>
-            <div class="dropdown-divider"></div>
-            <div class="dropdown-item" @click.stop="handleAction('export')">
-              <n-icon class="item-icon"><DownloadOutline /></n-icon>
-              <span class="item-label">{{ t('menu.export') }}</span>
-            </div>
-            <div class="dropdown-item" @click.stop="handleAction('import')">
-              <n-icon class="item-icon"><CloudUploadOutline /></n-icon>
-              <span class="item-label">{{ t('menu.import') }}</span>
-            </div>
-            <div class="dropdown-divider"></div>
-            <div class="dropdown-item" @click.stop="handleAction('exit')">
-              <n-icon class="item-icon"><ExitOutline /></n-icon>
-              <span class="item-label">{{ t('menu.exit') }}</span>
-              <span class="item-shortcut">⌘Q</span>
-            </div>
+      <div class="menu-wrapper">
+        <div class="menu-item">
+          <span class="menu-label">{{ getMenuLabel('file') }}</span>
+        </div>
+        <div class="dropdown-menu">
+          <div class="dropdown-item" @click.stop="handleAction('newConnection')">
+            <n-icon class="item-icon"><AddOutline /></n-icon>
+            <span class="item-label">{{ t('menu.newConnection') }}</span>
+            <span class="item-shortcut">⌘N</span>
           </div>
-        </transition>
+          <div class="dropdown-item" @click.stop="handleAction('openConnection')">
+            <n-icon class="item-icon"><FolderOutline /></n-icon>
+            <span class="item-label">{{ t('menu.openConnection') }}</span>
+            <span class="item-shortcut">⌘O</span>
+          </div>
+          <div class="dropdown-divider"></div>
+          <div class="dropdown-item" @click.stop="handleAction('newQuery')">
+            <n-icon class="item-icon"><DocumentTextOutline /></n-icon>
+            <span class="item-label">{{ t('menu.newQuery') }}</span>
+            <span class="item-shortcut">⌘T</span>
+          </div>
+          <div class="dropdown-divider"></div>
+          <div class="dropdown-item" @click.stop="handleAction('export')">
+            <n-icon class="item-icon"><DownloadOutline /></n-icon>
+            <span class="item-label">{{ t('menu.export') }}</span>
+          </div>
+          <div class="dropdown-item" @click.stop="handleAction('import')">
+            <n-icon class="item-icon"><CloudUploadOutline /></n-icon>
+            <span class="item-label">{{ t('menu.import') }}</span>
+          </div>
+          <div class="dropdown-divider"></div>
+          <div class="dropdown-item" @click.stop="handleAction('exit')">
+            <n-icon class="item-icon"><ExitOutline /></n-icon>
+            <span class="item-label">{{ t('menu.exit') }}</span>
+            <span class="item-shortcut">⌘Q</span>
+          </div>
+        </div>
       </div>
 
       <!-- Edit -->
-      <div class="menu-item" :class="{ 'is-active': activeMenu === 'edit' }"
-        @click="handleMenuClick('edit')" @mouseenter="handleMouseEnter('edit')">
-        <span class="menu-label">{{ getMenuLabel('edit') }}</span>
-        <transition name="dropdown">
-          <div v-if="activeMenu === 'edit'" class="dropdown-menu">
-            <div class="dropdown-item" @click.stop="handleAction('undo')">
-              <n-icon class="item-icon"><ArrowUndoOutline /></n-icon>
-              <span class="item-label">{{ t('menu.undo') }}</span>
-              <span class="item-shortcut">⌘Z</span>
-            </div>
-            <div class="dropdown-item" @click.stop="handleAction('redo')">
-              <n-icon class="item-icon"><ArrowRedoOutline /></n-icon>
-              <span class="item-label">{{ t('menu.redo') }}</span>
-              <span class="item-shortcut">⇧⌘Z</span>
-            </div>
-            <div class="dropdown-divider"></div>
-            <div class="dropdown-item" @click.stop="handleAction('cut')">
-              <span class="item-label">{{ t('menu.cut') }}</span>
-              <span class="item-shortcut">⌘X</span>
-            </div>
-            <div class="dropdown-item" @click.stop="handleAction('copy')">
-              <span class="item-label">{{ t('menu.copy') }}</span>
-              <span class="item-shortcut">⌘C</span>
-            </div>
-            <div class="dropdown-item" @click.stop="handleAction('paste')">
-              <span class="item-label">{{ t('menu.paste') }}</span>
-              <span class="item-shortcut">⌘V</span>
-            </div>
-            <div class="dropdown-divider"></div>
-            <div class="dropdown-item" @click.stop="handleAction('selectAll')">
-              <span class="item-label">{{ t('menu.selectAll') }}</span>
-              <span class="item-shortcut">⌘A</span>
-            </div>
+      <div class="menu-wrapper">
+        <div class="menu-item">
+          <span class="menu-label">{{ getMenuLabel('edit') }}</span>
+        </div>
+        <div class="dropdown-menu">
+          <div class="dropdown-item" @click.stop="handleAction('undo')">
+            <n-icon class="item-icon"><ArrowUndoOutline /></n-icon>
+            <span class="item-label">{{ t('menu.undo') }}</span>
+            <span class="item-shortcut">⌘Z</span>
           </div>
-        </transition>
+          <div class="dropdown-item" @click.stop="handleAction('redo')">
+            <n-icon class="item-icon"><ArrowRedoOutline /></n-icon>
+            <span class="item-label">{{ t('menu.redo') }}</span>
+            <span class="item-shortcut">⇧⌘Z</span>
+          </div>
+          <div class="dropdown-divider"></div>
+          <div class="dropdown-item" @click.stop="handleAction('cut')">
+            <span class="item-label">{{ t('menu.cut') }}</span>
+            <span class="item-shortcut">⌘X</span>
+          </div>
+          <div class="dropdown-item" @click.stop="handleAction('copy')">
+            <span class="item-label">{{ t('menu.copy') }}</span>
+            <span class="item-shortcut">⌘C</span>
+          </div>
+          <div class="dropdown-item" @click.stop="handleAction('paste')">
+            <span class="item-label">{{ t('menu.paste') }}</span>
+            <span class="item-shortcut">⌘V</span>
+          </div>
+          <div class="dropdown-divider"></div>
+          <div class="dropdown-item" @click.stop="handleAction('selectAll')">
+            <span class="item-label">{{ t('menu.selectAll') }}</span>
+            <span class="item-shortcut">⌘A</span>
+          </div>
+        </div>
       </div>
 
       <!-- Database -->
-      <div class="menu-item" :class="{ 'is-active': activeMenu === 'database' }"
-        @click="handleMenuClick('database')" @mouseenter="handleMouseEnter('database')">
-        <span class="menu-label">{{ getMenuLabel('database') }}</span>
-        <transition name="dropdown">
-          <div v-if="activeMenu === 'database'" class="dropdown-menu">
-            <div class="dropdown-item" @click.stop="handleAction('connect')">
-              <n-icon class="item-icon"><CloudDoneOutline /></n-icon>
-              <span class="item-label">{{ t('menu.connect') }}</span>
-            </div>
-            <div class="dropdown-item" @click.stop="handleAction('disconnect')">
-              <n-icon class="item-icon"><CloudOfflineOutline /></n-icon>
-              <span class="item-label">{{ t('menu.disconnect') }}</span>
-            </div>
-            <div class="dropdown-divider"></div>
-            <div class="dropdown-item" @click.stop="handleAction('refresh')">
-              <n-icon class="item-icon"><RefreshOutline /></n-icon>
-              <span class="item-label">{{ t('menu.refresh') }}</span>
-              <span class="item-shortcut">F5</span>
-            </div>
-            <div class="dropdown-item" @click.stop="handleAction('refreshMetadata')">
-              <n-icon class="item-icon"><SyncOutline /></n-icon>
-              <span class="item-label">{{ t('menu.refreshMetadata') }}</span>
-            </div>
-            <div class="dropdown-divider"></div>
-            <div class="dropdown-item" @click.stop="handleAction('createTable')">
-              <n-icon class="item-icon"><CreateOutline /></n-icon>
-              <span class="item-label">{{ t('menu.createTable') }}</span>
-            </div>
-            <div class="dropdown-item" @click.stop="handleAction('createDatabase')">
-              <n-icon class="item-icon"><ServerOutline /></n-icon>
-              <span class="item-label">{{ t('menu.createDatabase') }}</span>
-            </div>
-            <div class="dropdown-item" @click.stop="handleAction('createIndex')">
-              <n-icon class="item-icon"><BuildOutline /></n-icon>
-              <span class="item-label">{{ t('menu.createIndex') }}</span>
-            </div>
+      <div class="menu-wrapper">
+        <div class="menu-item">
+          <span class="menu-label">{{ getMenuLabel('database') }}</span>
+        </div>
+        <div class="dropdown-menu">
+          <div class="dropdown-item" @click.stop="handleAction('connect')">
+            <n-icon class="item-icon"><CloudDoneOutline /></n-icon>
+            <span class="item-label">{{ t('menu.connect') }}</span>
           </div>
-        </transition>
+          <div class="dropdown-item" @click.stop="handleAction('disconnect')">
+            <n-icon class="item-icon"><CloudOfflineOutline /></n-icon>
+            <span class="item-label">{{ t('menu.disconnect') }}</span>
+          </div>
+          <div class="dropdown-divider"></div>
+          <div class="dropdown-item" @click.stop="handleAction('refresh')">
+            <n-icon class="item-icon"><RefreshOutline /></n-icon>
+            <span class="item-label">{{ t('menu.refresh') }}</span>
+            <span class="item-shortcut">F5</span>
+          </div>
+          <div class="dropdown-item" @click.stop="handleAction('refreshMetadata')">
+            <n-icon class="item-icon"><SyncOutline /></n-icon>
+            <span class="item-label">{{ t('menu.refreshMetadata') }}</span>
+          </div>
+          <div class="dropdown-divider"></div>
+          <div class="dropdown-item" @click.stop="handleAction('createTable')">
+            <n-icon class="item-icon"><CreateOutline /></n-icon>
+            <span class="item-label">{{ t('menu.createTable') }}</span>
+          </div>
+          <div class="dropdown-item" @click.stop="handleAction('createDatabase')">
+            <n-icon class="item-icon"><ServerOutline /></n-icon>
+            <span class="item-label">{{ t('menu.createDatabase') }}</span>
+          </div>
+          <div class="dropdown-item" @click.stop="handleAction('createIndex')">
+            <n-icon class="item-icon"><BuildOutline /></n-icon>
+            <span class="item-label">{{ t('menu.createIndex') }}</span>
+          </div>
+        </div>
       </div>
 
       <!-- SQL -->
-      <div class="menu-item" :class="{ 'is-active': activeMenu === 'sql' }"
-        @click="handleMenuClick('sql')" @mouseenter="handleMouseEnter('sql')">
-        <span class="menu-label">SQL</span>
-        <transition name="dropdown">
-          <div v-if="activeMenu === 'sql'" class="dropdown-menu">
-            <div class="dropdown-item" @click.stop="handleAction('execute')">
-              <n-icon class="item-icon"><PlayCircleOutline /></n-icon>
-              <span class="item-label">{{ t('menu.execute') }}</span>
-              <span class="item-shortcut">⌘↵</span>
-            </div>
-            <div class="dropdown-item" @click.stop="handleAction('executeLine')">
-              <n-icon class="item-icon"><PlayCircleOutline /></n-icon>
-              <span class="item-label">{{ t('menu.executeLine') }}</span>
-              <span class="item-shortcut">⌘L</span>
-            </div>
-            <div class="dropdown-item" @click.stop="handleAction('executeSelection')">
-              <span class="item-label">{{ t('menu.executeSelection') }}</span>
-            </div>
-            <div class="dropdown-divider"></div>
-            <div class="dropdown-item" @click.stop="handleAction('formatSQL')">
-              <n-icon class="item-icon"><ConstructOutline /></n-icon>
-              <span class="item-label">{{ t('menu.formatSQL') }}</span>
-              <span class="item-shortcut">⇧⌘F</span>
-            </div>
-            <div class="dropdown-item" @click.stop="handleAction('beautify')">
-              <n-icon class="item-icon"><BrushOutline /></n-icon>
-              <span class="item-label">{{ t('menu.beautify') }}</span>
-            </div>
+      <div class="menu-wrapper">
+        <div class="menu-item">
+          <span class="menu-label">SQL</span>
+        </div>
+        <div class="dropdown-menu">
+          <div class="dropdown-item" @click.stop="handleAction('execute')">
+            <n-icon class="item-icon"><PlayCircleOutline /></n-icon>
+            <span class="item-label">{{ t('menu.execute') }}</span>
+            <span class="item-shortcut">⌘↵</span>
           </div>
-        </transition>
+          <div class="dropdown-item" @click.stop="handleAction('executeLine')">
+            <n-icon class="item-icon"><PlayCircleOutline /></n-icon>
+            <span class="item-label">{{ t('menu.executeLine') }}</span>
+            <span class="item-shortcut">⌘L</span>
+          </div>
+          <div class="dropdown-item" @click.stop="handleAction('executeSelection')">
+            <span class="item-label">{{ t('menu.executeSelection') }}</span>
+          </div>
+          <div class="dropdown-divider"></div>
+          <div class="dropdown-item" @click.stop="handleAction('formatSQL')">
+            <n-icon class="item-icon"><ConstructOutline /></n-icon>
+            <span class="item-label">{{ t('menu.formatSQL') }}</span>
+            <span class="item-shortcut">⇧⌘F</span>
+          </div>
+          <div class="dropdown-item" @click.stop="handleAction('beautify')">
+            <n-icon class="item-icon"><BrushOutline /></n-icon>
+            <span class="item-label">{{ t('menu.beautify') }}</span>
+          </div>
+        </div>
       </div>
 
       <!-- View -->
-      <div class="menu-item" :class="{ 'is-active': activeMenu === 'view' }"
-        @click="handleMenuClick('view')" @mouseenter="handleMouseEnter('view')">
-        <span class="menu-label">{{ getMenuLabel('view') }}</span>
-        <transition name="dropdown">
-          <div v-if="activeMenu === 'view'" class="dropdown-menu">
-            <div class="dropdown-item" @click.stop="handleAction('toggleSidebar')">
-              <n-icon class="item-icon"><MenuOutline /></n-icon>
-              <span class="item-label">{{ t('menu.toggleSidebar') }}</span>
-              <span class="item-shortcut">⌘B</span>
-            </div>
-            <div class="dropdown-divider"></div>
-            <div class="dropdown-item" @click.stop="handleAction('zoomIn')">
-              <n-icon class="item-icon"><AddOutline /></n-icon>
-              <span class="item-label">{{ t('menu.zoomIn') }}</span>
-              <span class="item-shortcut">⌘+</span>
-            </div>
-            <div class="dropdown-item" @click.stop="handleAction('zoomOut')">
-              <n-icon class="item-icon"><RemoveOutline /></n-icon>
-              <span class="item-label">{{ t('menu.zoomOut') }}</span>
-              <span class="item-shortcut">⌘-</span>
-            </div>
-            <div class="dropdown-item" @click.stop="handleAction('resetZoom')">
-              <span class="item-label">{{ t('menu.resetZoom') }}</span>
-              <span class="item-shortcut">⌘0</span>
-            </div>
-            <div class="dropdown-divider"></div>
-            <div class="dropdown-item" @click.stop="handleAction('toggleFullscreen')">
-              <n-icon class="item-icon"><ExpandOutline /></n-icon>
-              <span class="item-label">{{ t('menu.toggleFullscreen') }}</span>
-              <span class="item-shortcut">F11</span>
-            </div>
-            <div class="dropdown-divider"></div>
-            <div class="dropdown-item" @click.stop="handleAction('openConsolePanel')">
-              <n-icon class="item-icon"><TerminalOutline /></n-icon>
-              <span class="item-label">{{ t('menu.openConsolePanel') }}</span>
-              <span class="item-shortcut">⌘J</span>
-            </div>
+      <div class="menu-wrapper">
+        <div class="menu-item">
+          <span class="menu-label">{{ getMenuLabel('view') }}</span>
+        </div>
+        <div class="dropdown-menu">
+          <div class="dropdown-item" @click.stop="handleAction('toggleSidebar')">
+            <n-icon class="item-icon"><MenuOutline /></n-icon>
+            <span class="item-label">{{ t('menu.toggleSidebar') }}</span>
+            <span class="item-shortcut">⌘B</span>
           </div>
-        </transition>
+          <div class="dropdown-divider"></div>
+          <div class="dropdown-item" @click.stop="handleAction('zoomIn')">
+            <n-icon class="item-icon"><AddOutline /></n-icon>
+            <span class="item-label">{{ t('menu.zoomIn') }}</span>
+            <span class="item-shortcut">⌘+</span>
+          </div>
+          <div class="dropdown-item" @click.stop="handleAction('zoomOut')">
+            <n-icon class="item-icon"><RemoveOutline /></n-icon>
+            <span class="item-label">{{ t('menu.zoomOut') }}</span>
+            <span class="item-shortcut">⌘-</span>
+          </div>
+          <div class="dropdown-item" @click.stop="handleAction('resetZoom')">
+            <span class="item-label">{{ t('menu.resetZoom') }}</span>
+            <span class="item-shortcut">⌘0</span>
+          </div>
+          <div class="dropdown-divider"></div>
+          <div class="dropdown-item" @click.stop="handleAction('toggleFullscreen')">
+            <n-icon class="item-icon"><ExpandOutline /></n-icon>
+            <span class="item-label">{{ t('menu.toggleFullscreen') }}</span>
+            <span class="item-shortcut">F11</span>
+          </div>
+          <div class="dropdown-divider"></div>
+          <div class="dropdown-item" @click.stop="handleAction('openConsolePanel')">
+            <n-icon class="item-icon"><TerminalOutline /></n-icon>
+            <span class="item-label">{{ t('menu.openConsolePanel') }}</span>
+            <span class="item-shortcut">⌘J</span>
+          </div>
+        </div>
       </div>
 
-      <!-- ── Settings (opens drawer panel) ── -->
-      <div class="menu-item" @click="handleAction('settings')">
-        <n-icon class="menu-icon-only"><SettingsOutline /></n-icon>
-        <span class="menu-label">{{ t('menu.settings') }}</span>
+      <!-- Settings -->
+      <div class="menu-wrapper">
+        <div class="menu-item">
+          <span class="menu-label">{{ t('menu.settings') }}</span>
+        </div>
+        <div class="dropdown-menu">
+          <div class="dropdown-item" @click.stop="handleAction('settings')">
+            <span class="item-label">{{ t('menu.settings') }}</span>
+          </div>
+        </div>
       </div>
 
       <!-- Help -->
-      <div class="menu-item" :class="{ 'is-active': activeMenu === 'help' }"
-        @click="handleMenuClick('help')" @mouseenter="handleMouseEnter('help')">
-        <span class="menu-label">{{ getMenuLabel('help') }}</span>
-        <transition name="dropdown">
-          <div v-if="activeMenu === 'help'" class="dropdown-menu">
-            <div class="dropdown-item" @click.stop="handleAction('documentation')">
-              <n-icon class="item-icon"><BookOutline /></n-icon>
-              <span class="item-label">{{ t('menu.documentation') }}</span>
-            </div>
-            <div class="dropdown-item" @click.stop="handleAction('keyboardShortcuts')">
-              <n-icon class="item-icon"><DocumentTextOutline /></n-icon>
-              <span class="item-label">{{ t('menu.keyboardShortcuts') }}</span>
-            </div>
-            <div class="dropdown-item" @click.stop="handleAction('reportBug')">
-              <n-icon class="item-icon"><BugOutline /></n-icon>
-              <span class="item-label">{{ t('menu.reportBug') }}</span>
-            </div>
-            <div class="dropdown-item" @click.stop="handleAction('checkUpdates')">
-              <n-icon class="item-icon"><CloudDownloadOutline /></n-icon>
-              <span class="item-label">{{ t('menu.checkUpdates') }}</span>
-            </div>
-            <div class="dropdown-divider"></div>
-            <div class="dropdown-item" @click.stop="handleAction('about')">
-              <n-icon class="item-icon"><InformationCircleOutline /></n-icon>
-              <span class="item-label">{{ t('menu.about') }}</span>
-            </div>
+      <div class="menu-wrapper">
+        <div class="menu-item">
+          <span class="menu-label">{{ getMenuLabel('help') }}</span>
+        </div>
+        <div class="dropdown-menu">
+          <div class="dropdown-item" @click.stop="handleAction('documentation')">
+            <n-icon class="item-icon"><BookOutline /></n-icon>
+            <span class="item-label">{{ t('menu.documentation') }}</span>
           </div>
-        </transition>
+          <div class="dropdown-item" @click.stop="handleAction('keyboardShortcuts')">
+            <n-icon class="item-icon"><DocumentTextOutline /></n-icon>
+            <span class="item-label">{{ t('menu.keyboardShortcuts') }}</span>
+          </div>
+          <div class="dropdown-item" @click.stop="handleAction('reportBug')">
+            <n-icon class="item-icon"><BugOutline /></n-icon>
+            <span class="item-label">{{ t('menu.reportBug') }}</span>
+          </div>
+          <div class="dropdown-item" @click.stop="handleAction('checkUpdates')">
+            <n-icon class="item-icon"><CloudDownloadOutline /></n-icon>
+            <span class="item-label">{{ t('menu.checkUpdates') }}</span>
+          </div>
+          <div class="dropdown-divider"></div>
+          <div class="dropdown-item" @click.stop="handleAction('about')">
+            <n-icon class="item-icon"><InformationCircleOutline /></n-icon>
+            <span class="item-label">{{ t('menu.about') }}</span>
+          </div>
+        </div>
       </div>
 
     </div>
-
-    <!-- Backdrop -->
-    <div v-if="activeMenu" class="menu-backdrop" @click="closeMenu"></div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { NIcon } from 'naive-ui'
 import {
@@ -270,43 +267,30 @@ import {
   RefreshOutline, SyncOutline, CreateOutline, ServerOutline, BuildOutline,
   PlayCircleOutline, ConstructOutline, BrushOutline, TerminalOutline,
   MenuOutline, RemoveOutline, ExpandOutline,
-  BookOutline, BugOutline, CloudDownloadOutline, InformationCircleOutline,
-  SettingsOutline
+  BookOutline, BugOutline, CloudDownloadOutline, InformationCircleOutline
 } from '@vicons/ionicons5'
 import { useSettingsStore } from '../stores/settings'
 
-const { t, locale } = useI18n()
+const { t } = useI18n()
 const settingsStore = useSettingsStore()
 
 const emit = defineEmits<{ (e: 'menu-action', action: string): void }>()
 
-const activeMenu = ref<string | null>(null)
 const isDarkTheme = computed(() => settingsStore.settings.theme === 'dark')
-
-const handleMenuClick = (menu: string) => {
-  activeMenu.value = activeMenu.value === menu ? null : menu
-}
-
-const handleMouseEnter = (menu: string) => {
-  if (activeMenu.value) activeMenu.value = menu
-}
-
-const closeMenu = () => { activeMenu.value = null }
 
 const handleAction = (action: string) => {
   emit('menu-action', action)
-  closeMenu()
 }
 
 const getMenuLabel = (key: string): string => {
   const translation = t(`menu.${key}`)
   if (translation === `menu.${key}`) {
     const fallbacks: Record<string, string> = {
-      file: locale.value === 'zh-CN' ? '文件' : 'File',
-      edit: locale.value === 'zh-CN' ? '编辑' : 'Edit',
-      database: locale.value === 'zh-CN' ? '数据库' : 'Database',
-      view: locale.value === 'zh-CN' ? '视图' : 'View',
-      help: locale.value === 'zh-CN' ? '帮助' : 'Help'
+      file: 'File',
+      edit: 'Edit',
+      database: 'Database',
+      view: 'View',
+      help: 'Help'
     }
     return fallbacks[key] || key
   }
@@ -340,55 +324,46 @@ const getMenuLabel = (key: string): string => {
   flex: 1;
 }
 
-.menu-item {
+/* wrapper holds both the menu item and its dropdown */
+.menu-wrapper {
   position: relative;
+  height: 100%;
+}
+
+/* show dropdown on hover */
+.menu-wrapper:hover .dropdown-menu {
+  display: block;
+}
+
+.menu-item {
   display: flex;
   align-items: center;
-  gap: 5px;
+  padding: 0 10px;
   height: 100%;
-  padding: 0 12px;
   cursor: pointer;
-  border-radius: 5px;
-  transition: background-color 0.12s ease;
-  white-space: nowrap;
+  transition: background 0.1s;
+  position: relative;
 }
 
-.menu-item:hover,
-.menu-item.is-active {
-  background: rgba(255,255,255,0.08);
-}
-
-.light-mode .menu-item:hover,
-.light-mode .menu-item.is-active {
-  background: rgba(0,0,0,0.07);
-}
+.menu-item:hover { background: rgba(255,255,255,0.07); }
+.light-mode .menu-item:hover { background: rgba(0,0,0,0.05); }
+.menu-item.is-active { background: rgba(24,160,88,0.15); }
+.light-mode .menu-item.is-active { background: rgba(24,160,88,0.1); }
 
 .menu-label {
-  font-size: 13.5px;
-  font-weight: 400;
+  font-size: 13px;
   color: rgba(255,255,255,0.82);
+  white-space: nowrap;
   line-height: 1;
 }
-
-.light-mode .menu-label {
-  color: rgba(0,0,0,0.78);
-}
-
-.menu-icon-only {
-  font-size: 15px;
-  color: rgba(255,255,255,0.65);
-  flex-shrink: 0;
-}
-.light-mode .menu-icon-only {
-  color: rgba(0,0,0,0.55);
-}
+.light-mode .menu-label { color: rgba(0,0,0,0.78); }
 
 .home-btn { gap: 7px; padding: 0 10px; }
 .home-name {
-  font-size: 14px;
+  font-size: 13.5px;
   font-weight: 600;
-  color: #36b374;
-  letter-spacing: 0.2px;
+  color: rgba(255,255,255,0.9);
+  letter-spacing: 0.3px;
 }
 .light-mode .home-name { color: #18a058; }
 
@@ -403,6 +378,7 @@ const getMenuLabel = (key: string): string => {
 
 /* Dropdown */
 .dropdown-menu {
+  display: none;
   position: absolute;
   top: calc(100% + 2px);
   left: 0;
@@ -482,6 +458,12 @@ const getMenuLabel = (key: string): string => {
 }
 
 /* Dropdown animation */
-.dropdown-enter-active, .dropdown-leave-active { transition: all 0.13s ease; }
-.dropdown-enter-from, .dropdown-leave-to { opacity: 0; transform: translateY(-3px); }
+.dropdown-menu {
+  animation: dropdown-in 0.12s ease;
+}
+
+@keyframes dropdown-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
 </style>

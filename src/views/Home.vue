@@ -405,9 +405,28 @@ const handleMenuEvent = (event: Event) => {
   handleMenuAction(customEvent.detail)
 }
 
+// Handle open connection dialog from menu
+const handleOpenConnectionDialog = () => {
+  editingConnection.value = null
+  showConnectionDialog.value = true
+}
+
+// Handle edit connection from menu/context menu
+const handleEditConnectionEvent = (event: Event) => {
+  const customEvent = event as CustomEvent<any>
+  editingConnection.value = customEvent.detail
+  showConnectionDialog.value = true
+}
+
 onMounted(() => {
   // Listen for menu action events from Electron main process
   window.addEventListener('menu-action', handleMenuEvent)
+
+  // Listen for open connection dialog events
+  window.addEventListener('open-connection-dialog', handleOpenConnectionDialog)
+
+  // Listen for edit connection events
+  window.addEventListener('edit-connection', handleEditConnectionEvent)
 
   // Also set up listener via electronAPI if available
   // @ts-ignore
@@ -419,6 +438,8 @@ onMounted(() => {
 
 onUnmounted(() => {
   window.removeEventListener('menu-action', handleMenuEvent)
+  window.removeEventListener('open-connection-dialog', handleOpenConnectionDialog)
+  window.removeEventListener('edit-connection', handleEditConnectionEvent)
 })
 </script>
 

@@ -276,6 +276,19 @@
 
         <transition name="dropdown">
           <div v-if="activeMenu === 'help'" class="dropdown-menu">
+            <div class="dropdown-item" @click.stop="handleAction('toggle_theme')">
+              <n-icon class="item-icon">
+                <MoonOutline v-if="isDarkTheme" />
+                <SunnyOutline v-else />
+              </n-icon>
+              <span class="item-label">{{ isDarkTheme ? t('menu.switchToLight') : t('menu.switchToDark') }}</span>
+            </div>
+            <div class="dropdown-item" @click.stop="handleAction('open_settings')">
+              <n-icon class="item-icon"><SettingsOutline /></n-icon>
+              <span class="item-label">{{ t('menu.settings') }}</span>
+              <span class="item-shortcut">⌘,</span>
+            </div>
+            <div class="dropdown-divider"></div>
             <div class="dropdown-item" @click.stop="handleAction('documentation')">
               <n-icon class="item-icon"><BookOutline /></n-icon>
               <span class="item-label">{{ t('menu.documentation') }}</span>
@@ -303,21 +316,6 @@
       </div>
     </div>
 
-    <!-- Right Section: Theme Toggle -->
-    <div class="menu-section right">
-      <div class="menu-item" @click="toggleTheme">
-        <n-tooltip trigger="hover" placement="bottom">
-          <template #trigger>
-            <n-icon class="menu-icon-btn">
-              <MoonOutline v-if="isDarkTheme" />
-              <SunnyOutline v-else />
-            </n-icon>
-          </template>
-          {{ isDarkTheme ? t('settings.lightTheme') : t('settings.darkTheme') }}
-        </n-tooltip>
-      </div>
-    </div>
-
     <!-- Backdrop -->
     <div v-if="activeMenu" class="menu-backdrop" @click="closeMenu"></div>
   </div>
@@ -326,7 +324,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { NIcon, NTooltip } from 'naive-ui'
+import { NIcon } from 'naive-ui'
 import {
   AddOutline,
   FolderOutline,
@@ -357,7 +355,8 @@ import {
   CloudDownloadOutline,
   InformationCircleOutline,
   MoonOutline,
-  SunnyOutline
+  SunnyOutline,
+  SettingsOutline
 } from '@vicons/ionicons5'
 import { useSettingsStore } from '../stores/settings'
 
@@ -408,6 +407,11 @@ const closeMenu = () => {
 
 // Actions
 const handleAction = (action: string) => {
+  // Handle theme toggle directly
+  if (action === 'toggle_theme') {
+    toggleTheme()
+    return
+  }
   emit('menu-action', action)
   closeMenu()
 }
@@ -454,10 +458,6 @@ const getMenuLabel = (key: string): string => {
   height: 100%;
 }
 
-.menu-section.right {
-  gap: 4px;
-}
-
 .menu-item {
   position: relative;
   display: flex;
@@ -485,29 +485,6 @@ const getMenuLabel = (key: string): string => {
 
 .light-mode .menu-label {
   color: rgba(0, 0, 0, 0.85);
-}
-
-.menu-icon-btn {
-  font-size: 16px;
-  color: rgba(255, 255, 255, 0.7);
-  cursor: pointer;
-  padding: 4px 8px;
-  border-radius: 4px;
-  transition: all 0.15s ease;
-}
-
-.light-mode .menu-icon-btn {
-  color: rgba(0, 0, 0, 0.7);
-}
-
-.menu-icon-btn:hover {
-  color: rgba(255, 255, 255, 0.95);
-  background: rgba(255, 255, 255, 0.08);
-}
-
-.light-mode .menu-icon-btn:hover {
-  color: rgba(0, 0, 0, 0.95);
-  background: rgba(0, 0, 0, 0.06);
 }
 
 /* Dropdown Menu */

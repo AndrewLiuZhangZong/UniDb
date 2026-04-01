@@ -14,8 +14,7 @@ const createWindow = () => {
     height: 900,
     minWidth: 1200,
     minHeight: 700,
-    frame: false, // 使用自定义标题栏
-    titleBarStyle: 'hidden', // macOS 上隐藏标题栏但保留 Traffic Lights
+    frame: false, // 完全自定义标题栏
     webPreferences: {
       preload: join(__dirname, 'preload.js'),
       nodeIntegration: false,

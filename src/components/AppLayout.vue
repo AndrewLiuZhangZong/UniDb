@@ -126,6 +126,10 @@ const handleMenuAction = (action: string) => {
     case 'toggle_fullscreen':
       window.electronAPI?.toggleFullscreen()
       break
+    case 'open_settings':
+    case 'settings':
+      router.push('/settings')
+      break
     case 'documentation':
       window.open('https://unidb.com/docs', '_blank')
       break

@@ -3,27 +3,17 @@
     <div class="tree-header">
       <n-space justify="space-between" align="center">
         <span class="tree-title">{{ t('sidebar.connections') }}</span>
-        <n-button text @click="handleAddConnection">
-          <template #icon>
-            <n-icon><AddOutline /></n-icon>
-          </template>
-        </n-button>
       </n-space>
     </div>
 
     <div class="tree-content">
-      <!-- Unconnected State -->
+      <!-- Empty State -->
       <div v-if="connectionStore.connections.length === 0" class="empty-state">
         <div class="empty-icon">
           <n-icon :size="48"><ServerOutline /></n-icon>
         </div>
         <p class="empty-text">{{ t('sidebar.noConnections') }}</p>
-        <n-button size="small" type="primary" @click="handleAddConnection">
-          <template #icon>
-            <n-icon><AddOutline /></n-icon>
-          </template>
-          {{ t('sidebar.createConnection') }}
-        </n-button>
+        <p class="empty-hint">{{ t('sidebar.useMenuToCreate') }}</p>
       </div>
 
       <!-- Connection List -->
@@ -304,6 +294,17 @@ onMounted(() => {
 
 .light-mode .empty-text {
   color: rgba(0, 0, 0, 0.45);
+}
+
+.empty-hint {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.25);
+  margin: 0;
+  text-align: center;
+}
+
+.light-mode .empty-hint {
+  color: rgba(0, 0, 0, 0.35);
 }
 
 /* Connection List */

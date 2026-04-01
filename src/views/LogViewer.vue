@@ -1,8 +1,13 @@
 <template>
-  <div class="log-viewer-container">
+  <div class="log-viewer-container" :class="{ 'light-theme': !isDarkTheme }">
     <!-- Header -->
     <div class="page-header">
       <div class="header-left">
+        <n-button text @click="goBack" class="back-btn">
+          <template #icon>
+            <n-icon><ArrowBackOutline /></n-icon>
+          </template>
+        </n-button>
         <h1 class="page-title">{{ t('logViewer.title') }}</h1>
         <p class="page-subtitle">{{ t('logViewer.subtitle') }}</p>
       </div>
@@ -127,6 +132,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useRouter } from 'vue-router'
 import {
   NButton,
   NButtonGroup,
@@ -144,15 +150,21 @@ import {
   useDialog
 } from 'naive-ui'
 import {
+  ArrowBackOutline,
   RefreshOutline,
   DownloadOutline,
   TrashOutline,
   SearchOutline
 } from '@vicons/ionicons5'
+import { useSettingsStore } from '../stores/settings'
 
 const { t } = useI18n()
+const router = useRouter()
 const message = useMessage()
 const dialog = useDialog()
+const settingsStore = useSettingsStore()
+
+const isDarkTheme = computed(() => settingsStore.settings.theme === 'dark')
 
 // State
 const loading = ref(false)
@@ -176,21 +188,18 @@ const levelOptions = [
 const filteredLogs = computed(() => {
   let result = [...logs.value]
 
-  // Filter by date range
   if (dateRange.value) {
     const [start, end] = dateRange.value
     result = result.filter(log => {
       const logTime = new Date(log.timestamp).getTime()
-      return logTime >= start && logTime <= end + 86400000 // Add one day to include end date
+      return logTime >= start && logTime <= end + 86400000
     })
   }
 
-  // Filter by level
   if (levelFilter.value.length > 0) {
     result = result.filter(log => levelFilter.value.includes(log.level))
   }
 
-  // Filter by search keyword
   if (searchKeyword.value) {
     const keyword = searchKeyword.value.toLowerCase()
     result = result.filter(log =>
@@ -211,6 +220,10 @@ const paginatedLogs = computed(() => {
 })
 
 // Methods
+const goBack = () => {
+  router.push('/')
+}
+
 const getLevelTagType = (level: string): 'error' | 'warning' | 'info' | 'default' => {
   const types: Record<string, 'error' | 'warning' | 'info' | 'default'> = {
     error: 'error',
@@ -244,7 +257,6 @@ const handleSearch = () => {
 
 const handlePageChange = (page: number) => {
   currentPage.value = page
-  // Scroll to top of log list
   const logList = document.querySelector('.log-list')
   logList?.scrollTo({ top: 0, behavior: 'smooth' })
 }
@@ -252,8 +264,6 @@ const handlePageChange = (page: number) => {
 const loadLogs = async () => {
   loading.value = true
   try {
-    // In real implementation, this would call the backend API
-    // For now, generate sample logs
     const sampleLogs = generateSampleLogs()
     logs.value = sampleLogs
   } catch (error) {
@@ -329,7 +339,6 @@ const handleClear = () => {
     negativeText: t('common.cancel'),
     onPositiveClick: async () => {
       try {
-        // In real implementation, this would call the backend API
         logs.value = []
         message.success(t('logViewer.cleared'))
       } catch {
@@ -349,7 +358,12 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   height: 100%;
-  background: var(--n-color);
+  background: #12121a;
+  transition: background 0.3s ease;
+}
+
+.log-viewer-container.light-theme {
+  background: #f5f5f5;
 }
 
 .page-header {
@@ -360,10 +374,20 @@ onMounted(() => {
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
+.light-theme .page-header {
+  border-bottom-color: rgba(0, 0, 0, 0.08);
+}
+
 .header-left {
   display: flex;
   flex-direction: column;
   gap: 4px;
+}
+
+.back-btn {
+  font-size: 18px;
+  margin-bottom: 8px;
+  align-self: flex-start;
 }
 
 .page-title {
@@ -373,10 +397,18 @@ onMounted(() => {
   margin: 0;
 }
 
+.light-theme .page-title {
+  color: rgba(0, 0, 0, 0.95);
+}
+
 .page-subtitle {
   font-size: 14px;
   color: rgba(255, 255, 255, 0.5);
   margin: 0;
+}
+
+.light-theme .page-subtitle {
+  color: rgba(0, 0, 0, 0.5);
 }
 
 .filters-bar {
@@ -386,6 +418,11 @@ onMounted(() => {
   padding: 16px 24px;
   background: rgba(255, 255, 255, 0.02);
   border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.light-theme .filters-bar {
+  background: rgba(0, 0, 0, 0.02);
+  border-bottom-color: rgba(0, 0, 0, 0.04);
 }
 
 .log-list {
@@ -403,6 +440,11 @@ onMounted(() => {
   height: 300px;
   gap: 16px;
   color: rgba(255, 255, 255, 0.5);
+}
+
+.light-theme .loading-state,
+.light-theme .empty-state {
+  color: rgba(0, 0, 0, 0.5);
 }
 
 .log-entries {
@@ -423,13 +465,25 @@ onMounted(() => {
   transition: background-color 0.15s ease;
 }
 
+.light-theme .log-entry {
+  background: rgba(0, 0, 0, 0.02);
+}
+
 .log-entry:hover {
   background: rgba(255, 255, 255, 0.04);
+}
+
+.light-theme .log-entry:hover {
+  background: rgba(0, 0, 0, 0.04);
 }
 
 .log-entry.level-error {
   border-left-color: #d03050;
   background: rgba(208, 48, 80, 0.05);
+}
+
+.light-theme .log-entry.level-error {
+  background: rgba(208, 48, 80, 0.03);
 }
 
 .log-entry.level-warn {
@@ -444,6 +498,10 @@ onMounted(() => {
   border-left-color: rgba(255, 255, 255, 0.3);
 }
 
+.light-theme .log-entry.level-debug {
+  border-left-color: rgba(0, 0, 0, 0.3);
+}
+
 .log-level {
   display: flex;
   align-items: center;
@@ -455,6 +513,10 @@ onMounted(() => {
   font-family: 'SF Mono', 'Monaco', monospace;
 }
 
+.light-theme .log-timestamp {
+  color: rgba(0, 0, 0, 0.5);
+}
+
 .log-source {
   font-size: 11px;
 }
@@ -462,6 +524,10 @@ onMounted(() => {
 .log-message {
   font-size: 13px;
   color: rgba(255, 255, 255, 0.8);
+}
+
+.light-theme .log-message {
+  color: rgba(0, 0, 0, 0.8);
 }
 
 .log-message pre {
@@ -480,5 +546,9 @@ onMounted(() => {
   justify-content: center;
   padding: 16px;
   border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.light-theme .pagination-bar {
+  border-top-color: rgba(0, 0, 0, 0.08);
 }
 </style>

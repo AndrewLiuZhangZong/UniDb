@@ -1,5 +1,5 @@
 <template>
-  <div class="app-menu-bar" :class="{ 'is-macos': isMacOS }">
+  <div class="app-menu-bar" :class="{ 'is-macos': isMacOS, 'light-mode': !isDarkTheme }">
     <!-- Drag Region for macOS -->
     <div v-if="isMacOS" class="drag-region"></div>
 
@@ -123,6 +123,7 @@ const activeMenu = ref<string | null>(null)
 
 // Current theme
 const currentTheme = computed(() => settingsStore.settings.theme)
+const isDarkTheme = computed(() => settingsStore.settings.theme === 'dark')
 
 // Toggle theme
 const toggleTheme = () => {
@@ -447,6 +448,62 @@ const closeMenu = () => {
   right: 0;
   bottom: 0;
   z-index: 99;
+}
+
+/* Light mode */
+.app-menu-bar.light-mode {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(248, 248, 248, 0.98) 100%);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.light-mode .menu-label {
+  color: rgba(0, 0, 0, 0.85);
+}
+
+.light-mode .menu-item:hover,
+.light-mode .menu-item.is-active {
+  background: rgba(0, 0, 0, 0.06);
+}
+
+.light-mode .menu-icon-btn {
+  color: rgba(0, 0, 0, 0.7);
+}
+
+.light-mode .menu-icon-btn:hover {
+  color: rgba(0, 0, 0, 0.95);
+  background: rgba(0, 0, 0, 0.06);
+}
+
+.light-mode .dropdown-menu {
+  background: rgba(255, 255, 255, 0.98);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow:
+    0 8px 24px rgba(0, 0, 0, 0.15),
+    0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.light-mode .dropdown-item:hover {
+  background: rgba(24, 160, 88, 0.15);
+}
+
+.light-mode .item-icon {
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.light-mode .dropdown-item:hover .item-icon {
+  color: rgba(0, 0, 0, 0.9);
+}
+
+.light-mode .item-label {
+  color: rgba(0, 0, 0, 0.85);
+}
+
+.light-mode .item-shortcut {
+  color: rgba(0, 0, 0, 0.35);
+}
+
+.light-mode .dropdown-divider {
+  background: linear-gradient(90deg, transparent, rgba(0, 0, 0, 0.1), transparent);
 }
 
 /* Dropdown animation */

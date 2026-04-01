@@ -1,9 +1,14 @@
 <template>
-  <div class="settings-container">
+  <div class="settings-container" :class="{ 'light-theme': !isDarkTheme }">
     <div class="settings-layout">
       <!-- Sidebar -->
       <div class="settings-sidebar">
         <div class="sidebar-header">
+          <n-button text @click="goBack" class="back-btn">
+            <template #icon>
+              <n-icon><ArrowBackOutline /></n-icon>
+            </template>
+          </n-button>
           <h2 class="sidebar-title">{{ t('settings.title') }}</h2>
         </div>
         <div class="settings-nav">
@@ -46,18 +51,11 @@
                 <p class="setting-desc">{{ t('settings.themeDesc') }}</p>
               </div>
               <n-select
-                v-model:value="settings.theme"
+                :value="settings.theme"
                 :options="themeOptions"
                 style="width: 200px;"
+                @update:value="(val) => settingsStore.updateSetting('theme', val)"
               />
-            </div>
-
-            <div class="setting-item">
-              <div class="setting-info">
-                <label class="setting-label">{{ t('settings.autoUpdate') }}</label>
-                <p class="setting-desc">{{ t('settings.autoUpdateDesc') }}</p>
-              </div>
-              <n-switch v-model:value="settings.autoUpdate" />
             </div>
           </div>
         </div>
@@ -116,164 +114,6 @@
               </div>
             </div>
           </div>
-
-          <div class="add-driver">
-            <n-button type="primary" @click="showAddDriverModal = true">
-              <template #icon>
-                <n-icon><AddOutline /></n-icon>
-              </template>
-              {{ t('settings.addDriver') }}
-            </n-button>
-          </div>
-        </div>
-
-        <!-- Log Settings -->
-        <div v-if="activeSection === 'logs'" class="settings-section">
-          <h3 class="section-title">{{ t('settings.sections.logs') }}</h3>
-
-          <div class="setting-group">
-            <div class="setting-item">
-              <div class="setting-info">
-                <label class="setting-label">{{ t('settings.logRetention') }}</label>
-                <p class="setting-desc">{{ t('settings.logRetentionDesc') }}</p>
-              </div>
-              <n-input-number
-                v-model:value="settings.logRetentionDays"
-                :min="1"
-                :max="365"
-                style="width: 120px;"
-              />
-              <span class="setting-suffix">{{ t('settings.days') }}</span>
-            </div>
-
-            <div class="setting-item">
-              <div class="setting-info">
-                <label class="setting-label">{{ t('settings.logLevel') }}</label>
-                <p class="setting-desc">{{ t('settings.logLevelDesc') }}</p>
-              </div>
-              <n-select
-                v-model:value="settings.logLevel"
-                :options="logLevelOptions"
-                style="width: 200px;"
-              />
-            </div>
-
-            <div class="setting-item">
-              <div class="setting-info">
-                <label class="setting-label">{{ t('settings.enableFileLogging') }}</label>
-                <p class="setting-desc">{{ t('settings.enableFileLoggingDesc') }}</p>
-              </div>
-              <n-switch v-model:value="settings.enableFileLogging" />
-            </div>
-
-            <div class="setting-item">
-              <div class="setting-info">
-                <label class="setting-label">{{ t('settings.maxLogFileSize') }}</label>
-                <p class="setting-desc">{{ t('settings.maxLogFileSizeDesc') }}</p>
-              </div>
-              <n-input-number
-                v-model:value="settings.maxLogFileSize"
-                :min="1"
-                :max="100"
-                style="width: 120px;"
-              />
-              <span class="setting-suffix">MB</span>
-            </div>
-          </div>
-
-          <div class="setting-actions">
-            <n-button @click="handleOpenLogViewer">
-              <template #icon>
-                <n-icon><DocumentTextOutline /></n-icon>
-              </template>
-              {{ t('settings.viewLogs') }}
-            </n-button>
-          </div>
-        </div>
-
-        <!-- Update Settings -->
-        <div v-if="activeSection === 'updates'" class="settings-section">
-          <h3 class="section-title">{{ t('settings.sections.updates') }}</h3>
-
-          <div class="update-status-card">
-            <div class="update-status-info">
-              <div class="update-version">
-                <n-icon :size="24"><RocketOutline /></n-icon>
-                <div>
-                  <h4>UniDb</h4>
-                  <p>{{ t('settings.currentVersion') }}: {{ currentVersion }}</p>
-                </div>
-              </div>
-              <div v-if="updateAvailable" class="update-available">
-                <n-tag type="success">{{ t('settings.updateAvailable') }}</n-tag>
-                <p>{{ t('settings.newVersion') }}: {{ latestVersion }}</p>
-              </div>
-            </div>
-            <div class="update-actions">
-              <n-button v-if="updateAvailable" type="primary" @click="handleCheckUpdate">
-                {{ t('settings.downloadUpdate') }}
-              </n-button>
-              <n-button v-else @click="handleCheckUpdate">
-                {{ t('settings.checkForUpdates') }}
-              </n-button>
-            </div>
-          </div>
-
-          <div class="setting-group">
-            <div class="setting-item">
-              <div class="setting-info">
-                <label class="setting-label">{{ t('settings.autoCheckUpdate') }}</label>
-                <p class="setting-desc">{{ t('settings.autoCheckUpdateDesc') }}</p>
-              </div>
-              <n-switch v-model:value="settings.autoCheckUpdate" />
-            </div>
-
-            <div class="setting-item">
-              <div class="setting-info">
-                <label class="setting-label">{{ t('settings.updateChannel') }}</label>
-                <p class="setting-desc">{{ t('settings.updateChannelDesc') }}</p>
-              </div>
-              <n-select
-                v-model:value="settings.updateChannel"
-                :options="updateChannelOptions"
-                style="width: 200px;"
-              />
-            </div>
-
-            <div class="setting-item">
-              <div class="setting-info">
-                <label class="setting-label">{{ t('settings.proxySettings') }}</label>
-                <p class="setting-desc">{{ t('settings.proxySettingsDesc') }}</p>
-              </div>
-              <n-switch v-model:value="settings.useProxy" />
-            </div>
-
-            <div v-if="settings.useProxy" class="setting-item nested">
-              <div class="setting-info">
-                <label class="setting-label">{{ t('settings.proxyUrl') }}</label>
-              </div>
-              <n-input
-                v-model:value="settings.proxyUrl"
-                placeholder="http://proxy:8080"
-                style="width: 300px;"
-              />
-            </div>
-          </div>
-
-          <n-divider />
-
-          <div class="update-history">
-            <h4>{{ t('settings.updateHistory') }}</h4>
-            <div class="history-list">
-              <div v-for="(version, index) in updateHistory" :key="index" class="history-item">
-                <div class="history-version">
-                  <n-tag size="small">{{ version.version }}</n-tag>
-                  <span class="history-date">{{ version.date }}</span>
-                </div>
-                <p class="history-changes">{{ version.changes }}</p>
-              </div>
-            </div>
-          </div>
         </div>
 
         <!-- About -->
@@ -299,34 +139,8 @@
               <h2 class="about-name">UniDb</h2>
               <p class="about-desc">{{ t('settings.aboutDesc') }}</p>
               <div class="about-meta">
-                <span>{{ t('settings.version') }}: {{ currentVersion }}</span>
-                <span>{{ t('settings.electron') }}: {{ electronVersion }}</span>
-                <span>{{ t('settings.node') }}: {{ nodeVersion }}</span>
+                <span>{{ t('settings.version') }}: 0.1.0</span>
               </div>
-            </div>
-          </div>
-
-          <n-divider />
-
-          <div class="links-section">
-            <h4>{{ t('settings.links') }}</h4>
-            <div class="links-grid">
-              <a href="#" class="link-item">
-                <n-icon><BookOutline /></n-icon>
-                <span>{{ t('settings.documentation') }}</span>
-              </a>
-              <a href="#" class="link-item">
-                <n-icon><LogoGithub /></n-icon>
-                <span>GitHub</span>
-              </a>
-              <a href="#" class="link-item">
-                <n-icon><BugOutline /></n-icon>
-                <span>{{ t('settings.reportIssue') }}</span>
-              </a>
-              <a href="#" class="link-item">
-                <n-icon><HeartOutline /></n-icon>
-                <span>{{ t('settings.support') }}</span>
-              </a>
             </div>
           </div>
         </div>
@@ -336,79 +150,41 @@
 </template>
 
 <script setup lang="ts">
-import { ref, h, computed, watch } from 'vue'
+import { ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import {
   NIcon,
   NSelect,
-  NSwitch,
-  NInputNumber,
-  NInput,
   NButton,
   NTag,
-  NDivider,
   useMessage
 } from 'naive-ui'
 import {
+  ArrowBackOutline,
   SettingsOutline,
-  GlobeOutline,
-  ConstructOutline,
-  DocumentTextOutline,
-  RocketOutline,
-  InformationCircleOutline,
-  AddOutline,
-  BookOutline,
-  HeartOutline,
-  BugOutline,
   HardwareChipOutline,
+  InformationCircleOutline,
   ServerOutline,
   CloudDownloadOutline
 } from '@vicons/ionicons5'
-import { LogoGithub } from '@vicons/ionicons5'
 import { useSettingsStore } from '../stores/settings'
 
 const { t } = useI18n()
 const router = useRouter()
 const message = useMessage()
 
-const activeSection = ref('general')
-const showAddDriverModal = ref(false)
+const settingsStore = useSettingsStore()
+const isDarkTheme = computed(() => settingsStore.settings.theme === 'dark')
+const settings = computed(() => settingsStore.settings)
 
-const currentVersion = ref('0.1.0')
-const latestVersion = ref('0.2.0')
-const updateAvailable = ref(true)
-const electronVersion = ref('28.0.0')
-const nodeVersion = ref('18.0.0')
+const activeSection = ref('general')
 
 const sections = [
   { key: 'general', icon: SettingsOutline },
   { key: 'drivers', icon: HardwareChipOutline },
-  { key: 'logs', icon: DocumentTextOutline },
-  { key: 'updates', icon: RocketOutline },
   { key: 'about', icon: InformationCircleOutline }
 ]
-
-const settingsStore = useSettingsStore()
-
-// Use settings from store
-const settings = computed(() => settingsStore.settings)
-
-// Watch for language changes
-watch(
-  () => settings.value.language,
-  (newLang) => {
-    settingsStore.updateSetting('language', newLang)
-  }
-)
-
-// Watch for theme changes
-watch(
-  () => settings.value.theme,
-  (newTheme) => {
-    settingsStore.updateSetting('theme', newTheme)
-  }
-)
 
 const languageOptions = [
   { label: '简体中文', value: 'zh-CN' },
@@ -420,30 +196,16 @@ const themeOptions = [
   { label: 'Light', value: 'light' }
 ]
 
-const logLevelOptions = [
-  { label: 'DEBUG', value: 'debug' },
-  { label: 'INFO', value: 'info' },
-  { label: 'WARN', value: 'warn' },
-  { label: 'ERROR', value: 'error' }
-]
-
-const updateChannelOptions = [
-  { label: 'Stable', value: 'stable' },
-  { label: 'Beta', value: 'beta' },
-  { label: 'Dev', value: 'dev' }
-]
-
 const drivers = ref([
-  { id: 'mysql-connector', name: 'MySQL Connector', version: '8.0.33', installed: true, outdated: true, icon: ServerOutline },
-  { id: 'postgresql', name: 'PostgreSQL JDBC', version: '42.6.0', installed: false, outdated: false, icon: ServerOutline },
-  { id: 'clickhouse', name: 'ClickHouse JDBC', version: '0.4.6', installed: true, outdated: false, icon: CloudDownloadOutline },
-  { id: 'mariadb', name: 'MariaDB Connector', version: '3.1.4', installed: false, outdated: false, icon: ServerOutline }
+  { id: 'mysql', name: 'MySQL', version: '8.0', installed: true, outdated: false, icon: ServerOutline },
+  { id: 'clickhouse', name: 'ClickHouse', version: '0.4.6', installed: true, outdated: false, icon: CloudDownloadOutline },
+  { id: 'mongodb', name: 'MongoDB', version: '7.1', installed: true, outdated: false, icon: ServerOutline },
+  { id: 'redis', name: 'Redis', version: '5.0', installed: true, outdated: false, icon: ServerOutline }
 ])
 
-const updateHistory = ref([
-  { version: '0.1.0', date: '2024-01-15', changes: 'Initial release with MySQL, ClickHouse, MongoDB, Redis support' },
-  { version: '0.0.5', date: '2024-01-10', changes: 'Beta testing phase' }
-])
+const goBack = () => {
+  router.push('/')
+}
 
 const handleInstallDriver = (driver: any) => {
   message.info(`Installing ${driver.name}...`)
@@ -456,20 +218,19 @@ const handleUpdateDriver = (driver: any) => {
 const handleRemoveDriver = (driver: any) => {
   message.warning(`Removing ${driver.name}...`)
 }
-
-const handleCheckUpdate = () => {
-  message.info(t('settings.checkingUpdate'))
-}
-
-const handleOpenLogViewer = () => {
-  router.push('/logs')
-}
 </script>
 
 <style scoped>
 .settings-container {
   height: 100%;
-  background: var(--n-color);
+  background: #12121a;
+  color: rgba(255, 255, 255, 0.9);
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+.settings-container.light-theme {
+  background: #f5f5f5;
+  color: rgba(0, 0, 0, 0.9);
 }
 
 .settings-layout {
@@ -480,15 +241,32 @@ const handleOpenLogViewer = () => {
 /* Sidebar */
 .settings-sidebar {
   width: 240px;
-  background: rgba(30, 30, 35, 0.95);
+  background: #1e1e23;
   border-right: 1px solid rgba(255, 255, 255, 0.06);
   display: flex;
   flex-direction: column;
+  transition: background 0.3s ease;
+}
+
+.light-theme .settings-sidebar {
+  background: #ffffff;
+  border-right-color: rgba(0, 0, 0, 0.08);
 }
 
 .sidebar-header {
-  padding: 20px;
+  padding: 16px 20px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.light-theme .sidebar-header {
+  border-bottom-color: rgba(0, 0, 0, 0.08);
+}
+
+.back-btn {
+  font-size: 18px;
 }
 
 .sidebar-title {
@@ -496,6 +274,10 @@ const handleOpenLogViewer = () => {
   font-weight: 600;
   color: rgba(255, 255, 255, 0.9);
   margin: 0;
+}
+
+.light-theme .sidebar-title {
+  color: rgba(0, 0, 0, 0.9);
 }
 
 .settings-nav {
@@ -512,10 +294,19 @@ const handleOpenLogViewer = () => {
   cursor: pointer;
   transition: all 0.15s ease;
   margin-bottom: 4px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.light-theme .nav-item {
+  color: rgba(0, 0, 0, 0.7);
 }
 
 .nav-item:hover {
   background: rgba(255, 255, 255, 0.06);
+}
+
+.light-theme .nav-item:hover {
+  background: rgba(0, 0, 0, 0.04);
 }
 
 .nav-item.is-active {
@@ -523,22 +314,16 @@ const handleOpenLogViewer = () => {
   color: #18a058;
 }
 
-.nav-icon {
-  font-size: 18px;
-  color: rgba(255, 255, 255, 0.6);
+.light-theme .nav-item.is-active {
+  background: rgba(24, 160, 88, 0.1);
 }
 
-.nav-item.is-active .nav-icon {
-  color: #18a058;
+.nav-icon {
+  font-size: 18px;
 }
 
 .nav-label {
   font-size: 14px;
-  color: rgba(255, 255, 255, 0.8);
-}
-
-.nav-item.is-active .nav-label {
-  color: rgba(255, 255, 255, 0.95);
 }
 
 /* Content */
@@ -559,16 +344,24 @@ const handleOpenLogViewer = () => {
   margin: 0 0 8px;
 }
 
+.light-theme .section-title {
+  color: rgba(0, 0, 0, 0.95);
+}
+
 .section-desc {
   font-size: 14px;
   color: rgba(255, 255, 255, 0.5);
   margin: 0 0 24px;
 }
 
+.light-theme .section-desc {
+  color: rgba(0, 0, 0, 0.5);
+}
+
 .setting-group {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 16px;
 }
 
 .setting-item {
@@ -580,12 +373,12 @@ const handleOpenLogViewer = () => {
   background: rgba(255, 255, 255, 0.02);
   border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.06);
+  transition: all 0.2s ease;
 }
 
-.setting-item.nested {
-  background: rgba(255, 255, 255, 0.01);
-  border: none;
-  padding-left: 40px;
+.light-theme .setting-item {
+  background: rgba(0, 0, 0, 0.02);
+  border-color: rgba(0, 0, 0, 0.06);
 }
 
 .setting-info {
@@ -600,20 +393,18 @@ const handleOpenLogViewer = () => {
   margin-bottom: 4px;
 }
 
+.light-theme .setting-label {
+  color: rgba(0, 0, 0, 0.9);
+}
+
 .setting-desc {
   font-size: 12px;
   color: rgba(255, 255, 255, 0.4);
   margin: 0;
 }
 
-.setting-suffix {
-  font-size: 13px;
-  color: rgba(255, 255, 255, 0.5);
-  margin-left: 8px;
-}
-
-.setting-actions {
-  margin-top: 24px;
+.light-theme .setting-desc {
+  color: rgba(0, 0, 0, 0.4);
 }
 
 /* Drivers */
@@ -632,13 +423,9 @@ const handleOpenLogViewer = () => {
   transition: all 0.2s ease;
 }
 
-.driver-card:hover {
-  border-color: rgba(255, 255, 255, 0.1);
-  background: rgba(255, 255, 255, 0.04);
-}
-
-.driver-card.is-outdated {
-  border-color: rgba(240, 160, 32, 0.3);
+.light-theme .driver-card {
+  background: rgba(0, 0, 0, 0.02);
+  border-color: rgba(0, 0, 0, 0.06);
 }
 
 .driver-header {
@@ -663,108 +450,22 @@ const handleOpenLogViewer = () => {
   margin: 0 0 2px;
 }
 
+.light-theme .driver-name {
+  color: rgba(0, 0, 0, 0.9);
+}
+
 .driver-version {
   font-size: 12px;
   color: rgba(255, 255, 255, 0.4);
 }
 
+.light-theme .driver-version {
+  color: rgba(0, 0, 0, 0.4);
+}
+
 .driver-actions {
   display: flex;
   justify-content: flex-end;
-}
-
-.add-driver {
-  display: flex;
-}
-
-/* Update Status */
-.update-status-card {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 24px;
-  background: rgba(24, 160, 88, 0.08);
-  border: 1px solid rgba(24, 160, 88, 0.2);
-  border-radius: 12px;
-  margin-bottom: 24px;
-}
-
-.update-status-info {
-  flex: 1;
-}
-
-.update-version {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 12px;
-}
-
-.update-version h4 {
-  font-size: 18px;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.95);
-  margin: 0;
-}
-
-.update-version p {
-  font-size: 13px;
-  color: rgba(255, 255, 255, 0.5);
-  margin: 0;
-}
-
-.update-available {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.update-available p {
-  font-size: 13px;
-  color: rgba(255, 255, 255, 0.7);
-  margin: 0;
-}
-
-/* Update History */
-.update-history {
-  margin-top: 24px;
-}
-
-.update-history h4 {
-  font-size: 14px;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.9);
-  margin: 0 0 16px;
-}
-
-.history-list {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.history-item {
-  padding: 12px;
-  background: rgba(255, 255, 255, 0.02);
-  border-radius: 8px;
-}
-
-.history-version {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 8px;
-}
-
-.history-date {
-  font-size: 12px;
-  color: rgba(255, 255, 255, 0.4);
-}
-
-.history-changes {
-  font-size: 13px;
-  color: rgba(255, 255, 255, 0.6);
-  margin: 0;
 }
 
 /* About */
@@ -777,6 +478,11 @@ const handleOpenLogViewer = () => {
   border-radius: 16px;
   border: 1px solid rgba(255, 255, 255, 0.06);
   margin-bottom: 24px;
+}
+
+.light-theme .about-card {
+  background: rgba(0, 0, 0, 0.02);
+  border-color: rgba(0, 0, 0, 0.06);
 }
 
 .about-logo svg {
@@ -794,10 +500,18 @@ const handleOpenLogViewer = () => {
   margin: 0 0 8px;
 }
 
+.light-theme .about-name {
+  color: rgba(0, 0, 0, 0.95);
+}
+
 .about-desc {
   font-size: 14px;
   color: rgba(255, 255, 255, 0.5);
   margin: 0 0 16px;
+}
+
+.light-theme .about-desc {
+  color: rgba(0, 0, 0, 0.5);
 }
 
 .about-meta {
@@ -807,33 +521,7 @@ const handleOpenLogViewer = () => {
   color: rgba(255, 255, 255, 0.4);
 }
 
-.links-section h4 {
-  font-size: 14px;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.9);
-  margin: 0 0 16px;
-}
-
-.links-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 12px;
-}
-
-.link-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 16px;
-  background: rgba(255, 255, 255, 0.02);
-  border-radius: 8px;
-  color: rgba(255, 255, 255, 0.7);
-  text-decoration: none;
-  transition: all 0.15s ease;
-}
-
-.link-item:hover {
-  background: rgba(255, 255, 255, 0.06);
-  color: rgba(255, 255, 255, 0.95);
+.light-theme .about-meta {
+  color: rgba(0, 0, 0, 0.4);
 }
 </style>

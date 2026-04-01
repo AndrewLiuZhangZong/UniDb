@@ -1,5 +1,5 @@
 <template>
-  <div class="connection-tree">
+  <div class="connection-tree" :class="{ 'light-mode': !isDarkTheme }">
     <div class="tree-header">
       <n-space justify="space-between" align="center">
         <span class="tree-title">{{ t('sidebar.connections') }}</span>

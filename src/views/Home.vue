@@ -1,17 +1,7 @@
 <template>
-  <div class="home-container" :class="{ 'is-macos': isMacOS }">
-    <!-- Title Bar with Window Controls (non-macOS only) -->
-    <TitleBar v-if="!isMacOS" />
-
-    <!-- Top Menu Bar -->
-    <AppMenuBar
-      :is-macos="isMacOS"
-      @menu-action="handleMenuAction"
-      @open-settings="handleOpenSettings"
-    />
-
+  <div class="home-container" :class="{ 'light-theme': !isDarkTheme }">
     <!-- Main Layout -->
-    <n-layout has-sider class="main-layout">
+    <n-layout has-sider class="main-layout" :has-sider="true">
       <!-- Sidebar -->
       <n-layout-sider
         bordered
@@ -21,8 +11,9 @@
         collapse-mode="width"
         :native-scrollbar="false"
         class="sidebar"
+        :class="{ 'light-mode': !isDarkTheme }"
       >
-        <ConnectionTree :is-dark="isDarkTheme" @select="handleConnectionSelect" />
+        <ConnectionTree @select="handleConnectionSelect" />
       </n-layout-sider>
 
       <!-- Main Content -->
@@ -220,8 +211,6 @@ import {
   DownloadOutline,
   RefreshOutline
 } from '@vicons/ionicons5'
-import AppMenuBar from '../components/AppMenuBar.vue'
-import TitleBar from '../components/TitleBar.vue'
 import ConnectionTree from '../components/ConnectionTree.vue'
 import ConnectionDialog from '../components/ConnectionDialog.vue'
 import DbTypeIcon from '../components/DbTypeIcon.vue'
@@ -441,10 +430,9 @@ onUnmounted(() => {
 
 <style scoped>
 .home-container {
-  height: 100vh;
+  height: 100%;
   display: flex;
   flex-direction: column;
-  background: var(--n-color);
   overflow: hidden;
 }
 
@@ -457,8 +445,16 @@ onUnmounted(() => {
   background: rgba(30, 30, 35, 0.95) !important;
 }
 
+.light-theme .sidebar {
+  background: rgba(255, 255, 255, 0.98) !important;
+}
+
 .content-layout {
   background: linear-gradient(135deg, #1a1a1f 0%, #12121a 100%);
+}
+
+.light-theme .content-layout {
+  background: linear-gradient(135deg, #ffffff 0%, #f5f5f5 100%);
 }
 
 /* Connection Header */
@@ -469,6 +465,11 @@ onUnmounted(() => {
   padding: 16px 24px;
   background: rgba(255, 255, 255, 0.02);
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.light-theme .connection-header {
+  background: rgba(0, 0, 0, 0.02);
+  border-bottom-color: rgba(0, 0, 0, 0.06);
 }
 
 .connection-header-left {
@@ -490,6 +491,10 @@ onUnmounted(() => {
   margin: 0;
 }
 
+.light-theme .connection-header-name {
+  color: rgba(0, 0, 0, 0.95);
+}
+
 .connection-header-meta {
   display: flex;
   align-items: center;
@@ -500,6 +505,10 @@ onUnmounted(() => {
   font-size: 12px;
   color: rgba(255, 255, 255, 0.4);
   font-family: 'SF Mono', 'Monaco', monospace;
+}
+
+.light-theme .connection-host {
+  color: rgba(0, 0, 0, 0.4);
 }
 
 .connection-header-actions {
@@ -791,6 +800,52 @@ onUnmounted(() => {
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+/* Light theme for Home page */
+.light-theme .welcome-title {
+  color: rgba(0, 0, 0, 0.95);
+}
+
+.light-theme .welcome-subtitle {
+  color: rgba(0, 0, 0, 0.5);
+}
+
+.light-theme .supported-title {
+  color: rgba(0, 0, 0, 0.4);
+}
+
+.light-theme .db-card {
+  background: rgba(0, 0, 0, 0.02);
+  border-color: rgba(0, 0, 0, 0.06);
+}
+
+.light-theme .db-card:hover {
+  background: rgba(0, 0, 0, 0.04);
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+.light-theme .db-label {
+  color: rgba(0, 0, 0, 0.8);
+}
+
+.light-theme .workspace-tabs {
+  background: rgba(0, 0, 0, 0.02);
+  border-bottom-color: rgba(0, 0, 0, 0.06);
+}
+
+.light-theme .tab {
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.light-theme .tab:hover {
+  color: rgba(0, 0, 0, 0.9);
+  background: rgba(0, 0, 0, 0.03);
+}
+
+.light-theme .tab.active {
+  color: rgba(0, 0, 0, 0.95);
+  background: rgba(0, 0, 0, 0.05);
 }
 
 /* Responsive */

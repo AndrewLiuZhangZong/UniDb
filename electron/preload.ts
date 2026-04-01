@@ -11,8 +11,11 @@ contextBridge.exposeInMainWorld('electronAPI', {
   // Window controls
   minimize: () => ipcRenderer.send('window-minimize'),
   maximize: () => ipcRenderer.send('window-maximize'),
+  unmaximize: () => ipcRenderer.send('window-unmaximize'),
   close: () => ipcRenderer.send('window-close'),
   isMaximized: () => ipcRenderer.invoke('window-is-maximized'),
+  toggleFullscreen: () => ipcRenderer.send('window-toggle-fullscreen'),
+  isFullscreen: () => ipcRenderer.invoke('window-is-fullscreen'),
   // Menu actions
   onMenuAction: (callback: (action: string) => void) => {
     const handler = (_: Electron.IpcRendererEvent, action: string) => callback(action)
@@ -22,8 +25,13 @@ contextBridge.exposeInMainWorld('electronAPI', {
 })
 
 // Forward window state changes
-ipcRenderer.on('window-maximized', (_, isMax: boolean) => {
-  window.dispatchEvent(new CustomEvent('window-maximized-change', { detail: isMax }))
+ipcRenderer.on('window-maximized-change', (_, isMax: boolean) => {
+  window.dispatchEvent(new CustomEvent('maximize-change', { detail: isMax }))
+})
+
+// Forward window fullscreen changes
+ipcRenderer.on('window-fullscreen-change', (_, isFullscreen: boolean) => {
+  window.dispatchEvent(new CustomEvent('fullscreen-change', { detail: isFullscreen }))
 })
 
 // Forward menu actions from main process

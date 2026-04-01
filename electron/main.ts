@@ -9,15 +9,13 @@ let serverPort: number = 3000
 const VITE_DEV_SERVER_URL = process.env.VITE_DEV_SERVER_URL || 'http://localhost:5173'
 
 const createWindow = () => {
-  // Determine if we should use native frame
-  const isMac = process.platform === 'darwin'
-
   mainWindow = new BrowserWindow({
     width: 1400,
     height: 900,
     minWidth: 1200,
     minHeight: 700,
-    frame: true, // Use native frame on all platforms for proper macOS traffic lights
+    frame: false, // 使用自定义标题栏
+    titleBarStyle: 'hidden', // macOS 上隐藏标题栏但保留 Traffic Lights
     webPreferences: {
       preload: join(__dirname, 'preload.js'),
       nodeIntegration: false,
@@ -28,12 +26,29 @@ const createWindow = () => {
     title: 'UniDb'
   })
 
-  // In development, always load from Vite dev server
   mainWindow.loadURL(VITE_DEV_SERVER_URL)
   mainWindow.webContents.openDevTools()
 
   mainWindow.once('ready-to-show', () => {
     mainWindow?.show()
+  })
+
+  // 监听窗口最大化状态变化
+  mainWindow.on('maximize', () => {
+    mainWindow?.webContents.send('window-maximized-change', true)
+  })
+
+  mainWindow.on('unmaximize', () => {
+    mainWindow?.webContents.send('window-maximized-change', false)
+  })
+
+  // 监听全屏状态变化
+  mainWindow.on('enter-full-screen', () => {
+    mainWindow?.webContents.send('window-fullscreen-change', true)
+  })
+
+  mainWindow.on('leave-full-screen', () => {
+    mainWindow?.webContents.send('window-fullscreen-change', false)
   })
 
   mainWindow.on('closed', () => {
@@ -84,10 +99,25 @@ ipcMain.on('window-maximize', () => {
   }
 })
 
+ipcMain.on('window-unmaximize', () => {
+  mainWindow?.unmaximize()
+})
+
 ipcMain.on('window-close', () => {
   mainWindow?.close()
 })
 
 ipcMain.handle('window-is-maximized', () => {
   return mainWindow?.isMaximized() ?? false
+})
+
+ipcMain.on('window-toggle-fullscreen', () => {
+  if (mainWindow) {
+    const isFullscreen = mainWindow.isFullScreen()
+    mainWindow.setFullScreen(!isFullscreen)
+  }
+})
+
+ipcMain.handle('window-is-fullscreen', () => {
+  return mainWindow?.isFullScreen() ?? false
 })

@@ -1,10 +1,5 @@
 <template>
   <div class="log-viewer-container" :class="{ 'light-theme': !isDarkTheme }">
-    <!-- Top Bar with Menu -->
-    <div class="top-bar" :class="{ 'light-mode': !isDarkTheme }">
-      <AppMenuBar />
-    </div>
-
     <!-- Header -->
     <div class="page-header">
       <div class="header-left">
@@ -162,7 +157,6 @@ import {
   SearchOutline
 } from '@vicons/ionicons5'
 import { useSettingsStore } from '../stores/settings'
-import AppMenuBar from '../components/AppMenuBar.vue'
 
 const { t } = useI18n()
 const router = useRouter()
@@ -370,11 +364,6 @@ onMounted(() => {
 
 .log-viewer-container.light-theme {
   background: #f5f5f5;
-}
-
-.top-bar {
-  height: 28px;
-  flex-shrink: 0;
 }
 
 .page-header {

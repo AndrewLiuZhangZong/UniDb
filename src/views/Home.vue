@@ -1,10 +1,5 @@
 <template>
   <div class="home-container" :class="{ 'light-theme': !isDarkTheme }">
-    <!-- Top Bar with Actions -->
-    <div class="top-bar" :class="{ 'light-mode': !isDarkTheme }">
-      <AppMenuBar />
-    </div>
-
     <!-- Main Layout -->
     <n-layout has-sider class="main-layout" :has-sider="true">
       <!-- Sidebar -->
@@ -219,7 +214,6 @@ import {
 import ConnectionTree from '../components/ConnectionTree.vue'
 import ConnectionDialog from '../components/ConnectionDialog.vue'
 import DbTypeIcon from '../components/DbTypeIcon.vue'
-import AppMenuBar from '../components/AppMenuBar.vue'
 import { useConnectionStore } from '../stores/connection'
 import { useSettingsStore } from '../stores/settings'
 
@@ -434,11 +428,6 @@ onUnmounted(() => {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-}
-
-.top-bar {
-  height: 28px;
-  flex-shrink: 0;
 }
 
 .main-layout {

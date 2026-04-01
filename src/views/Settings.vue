@@ -1,10 +1,5 @@
 <template>
   <div class="settings-container" :class="{ 'light-theme': !isDarkTheme }">
-    <!-- Top Bar with Menu -->
-    <div class="top-bar" :class="{ 'light-mode': !isDarkTheme }">
-      <AppMenuBar />
-    </div>
-
     <div class="settings-layout">
       <!-- Sidebar -->
       <div class="settings-sidebar">
@@ -174,7 +169,6 @@ import {
   CloudDownloadOutline
 } from '@vicons/ionicons5'
 import { useSettingsStore } from '../stores/settings'
-import AppMenuBar from '../components/AppMenuBar.vue'
 
 const { t } = useI18n()
 const router = useRouter()
@@ -239,11 +233,6 @@ const handleRemoveDriver = (driver: any) => {
 .settings-container.light-theme {
   background: #f5f5f5;
   color: rgba(0, 0, 0, 0.9);
-}
-
-.top-bar {
-  height: 28px;
-  flex-shrink: 0;
 }
 
 .settings-layout {

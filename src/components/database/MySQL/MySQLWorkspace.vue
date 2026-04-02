@@ -3,7 +3,7 @@
 
     <!-- No item selected: default SQL editor -->
     <template v-if="!selectedItem || selectedItemType === 'query'">
-      <SqlEditor :connection="connection" :db-type="'mysql'" />
+      <SqlEditor :connection="connection" :db-type="'mysql'" :active-db="activeDb" />
     </template>
 
     <!-- Table selected: tabbed view -->
@@ -33,7 +33,7 @@
 
       <!-- Tab: SQL Query -->
       <div v-else-if="activeTab === 'sql'" class="tab-content">
-        <SqlEditor :connection="connection" :db-type="'mysql'" :initial-sql="`SELECT * FROM \`${selectedItem?.name}\` LIMIT 100;`" />
+        <SqlEditor :connection="connection" :db-type="'mysql'" :active-db="activeDb" :initial-sql="`SELECT * FROM \`${selectedItem?.name}\` LIMIT 100;`" />
       </div>
 
       <!-- Tab: Indexes -->
@@ -47,17 +47,19 @@
 
 <script setup lang="ts">
 import { ref, computed, watch, defineComponent, h } from 'vue'
-import { useI18n } from 'vue-i18n'
-import { NIcon, NButton, NTag, NInput, NSelect, NDataTable, NSpace, NEmpty, NTooltip, NSpin, NAlert, NModal, NCard, useMessage, useDialog } from 'naive-ui'
+import { NIcon, NButton, NInput, NSelect, NDataTable, NEmpty, NSpin, NAlert, NModal, NCard, useMessage, useDialog } from 'naive-ui'
 import {
   GridOutline, ListOutline, CodeSlashOutline, CreateOutline, TrashOutline,
-  AddOutline, SaveOutline, RefreshOutline, DownloadOutline, SearchOutline,
-  ChevronBackOutline, ChevronForwardOutline, FilterOutline, WarningOutline, CloseOutline
+  AddOutline, RefreshOutline, DownloadOutline, ChevronBackOutline,
+  ChevronForwardOutline, FilterOutline, CloseOutline, PlayCircleOutline
 } from '@vicons/ionicons5'
-import { useSettingsStore } from '../../../stores/settings'
 import { mysqlMeta } from '../../../api/meta'
+import { format } from 'sql-formatter'
+import { Parser } from 'node-sql-parser'
+import { useSettingsStore } from '../../../stores/settings'
 
-const { t } = useI18n()
+const mysqlParser = new Parser()
+
 const message = useMessage()
 const dialog = useDialog()
 const settingsStore = useSettingsStore()
@@ -67,6 +69,7 @@ const props = defineProps<{
   connection: any
   selectedItem: any
   selectedItemType: string
+  activeDb: string
 }>()
 
 const activeTab = ref('browse')
@@ -84,7 +87,7 @@ watch(() => props.selectedItem, () => { activeTab.value = 'browse' })
 
 // SQL Editor
 const SqlEditor = defineComponent({
-  props: { connection: Object, dbType: String, initialSql: { type: String, default: '-- Write SQL here\nSELECT 1;' } },
+  props: { connection: Object, dbType: String, initialSql: { type: String, default: '-- Write SQL here\nSELECT 1;' }, activeDb: { type: String, default: '' as string } },
   setup(p) {
     const isDark = computed(() => settingsStore.settings.theme === 'dark')
     const sql = ref(p.initialSql)
@@ -94,20 +97,56 @@ const SqlEditor = defineComponent({
     const resultTime = ref(0)
     const resultError = ref('')
     const activeResultTab = ref('result')
+    let _textareaEl: HTMLTextAreaElement | null = null
+
+    const currentDb = () => p.activeDb || p.connection?.config?.database || ''
+
+    const getSelectedSql = (): string => {
+      const el = _textareaEl
+      if (!el) return sql.value
+      const start = el.selectionStart
+      const end = el.selectionEnd
+      if (start !== end) return sql.value.slice(start, end)
+      return sql.value
+    }
 
     const runQuery = async () => {
-      if (!sql.value.trim() || !p.connection?.id) return
+      const raw = getSelectedSql().trim()
+      if (!raw || !p.connection?.id) return
+      const db = currentDb()
+      if (!db) { message.warning('请先在左侧选择数据库'); return }
       running.value = true
       resultError.value = ''
       resultData.value = []
       resultCols.value = []
+      resultTime.value = 0
       try {
-        const res = await mysqlMeta.execute(p.connection.id, sql.value)
-        resultTime.value = res.executionTime || 0
-        if (res.error) {
-          resultError.value = res.error
-          message.error(`执行失败: ${res.error}`)
+        let statements: string[] = [raw]
+        try {
+          const ast = mysqlParser.astify(raw, { database: 'MySQL' })
+          const list = Array.isArray(ast) ? ast : [ast]
+          statements = list.map((node: any) => {
+            const sql = mysqlParser.sqlify(node, { database: 'MySQL' })
+            return sql.trim()
+          }).filter(Boolean)
+        } catch {
+          // 解析失败时降级为正则拆分
+          statements = raw.split(/;/).map(s => s.trim()).filter(s => s && !s.startsWith('--') && !s.startsWith('/*'))
+        }
+        let lastTime = 0
+        if (statements.length > 1) {
+          // 多语句：逐条执行，只显示最后一条结果
+          for (const stmt of statements) {
+            const res = await mysqlMeta.execute(p.connection.id, stmt, db)
+            lastTime = res.executionTime || 0
+            if (res.error) throw new Error(res.error)
+          }
+          resultTime.value = lastTime
+          message.success(`执行成功，共 ${statements.length} 条语句`)
         } else {
+          const res = await mysqlMeta.execute(p.connection.id, raw, db)
+          resultTime.value = res.executionTime || 0
+          if (res.error) throw new Error(res.error)
           const rows: any[] = Array.isArray(res.data) ? res.data : (res.data?.rows || [])
           resultData.value = rows
           if (rows.length) {
@@ -130,21 +169,28 @@ const SqlEditor = defineComponent({
       }
     }
 
+    const formatSql = () => {
+      if (!sql.value.trim()) return
+      sql.value = format(sql.value, { language: 'mysql', tabWidth: 2 })
+    }
+
     return () => h('div', { class: ['sql-editor-wrap', !isDark.value && 'light-mode'] }, [
       // Toolbar
       h('div', { class: 'sql-toolbar' }, [
         h(NButton, { size: 'small', type: 'primary', loading: running.value, onClick: runQuery }, {
           default: () => '执行 (⌘↵)',
-          icon: () => h(NIcon, null, { default: () => h(CodeSlashOutline) })
+          icon: () => h(NIcon, null, { default: () => h(PlayCircleOutline) })
         }),
         h(NButton, { size: 'small', onClick: () => { sql.value = '' } }, { default: () => '清空' }),
         h('div', { class: 'sql-spacer' }),
-        h('span', { class: 'sql-hint' }, `${p.connection?.config?.database || 'no db'} · MySQL`)
+        h(NButton, { size: 'small', onClick: formatSql }, { default: () => '格式化' }),
+        h('span', { class: 'sql-hint' }, `${currentDb() || 'no db'} · MySQL`)
       ]),
       // Editor area
       h('div', { class: 'sql-area-wrap' }, [
         h('textarea', {
           class: 'sql-textarea',
+          ref: (el: any) => { _textareaEl = el },
           value: sql.value,
           onInput: (e: any) => { sql.value = e.target.value },
           placeholder: '-- 输入 SQL 查询...\nSELECT * FROM users LIMIT 100;',

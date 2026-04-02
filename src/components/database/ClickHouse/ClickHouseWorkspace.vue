@@ -131,13 +131,14 @@
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
-import { NButton, NIcon, NInput, NDataTable, NTag, NText, NEmpty, NAlert, NSpin, useMessage } from 'naive-ui'
+import { NButton, NIcon, NDataTable, NTag, NEmpty, NAlert, NSpin, useMessage } from 'naive-ui'
 import {
   PlayCircleOutline, GridOutline, ListOutline, CodeSlashOutline,
-  SearchOutline, RefreshOutline, DownloadOutline
+  RefreshOutline, DownloadOutline
 } from '@vicons/ionicons5'
 import { useSettingsStore } from '../../../stores/settings'
 import { clickhouseMeta } from '../../../api/meta'
+import { format } from 'sql-formatter'
 
 const message = useMessage()
 const settingsStore = useSettingsStore()
@@ -147,6 +148,7 @@ const props = defineProps<{
   connection: any
   selectedItem: any
   selectedItemType: string
+  activeDb: string
 }>()
 
 const activeTab = ref('browse')
@@ -175,8 +177,9 @@ const runQuery = async () => {
   resultError.value = ''
   resultData.value = []
   resultCols.value = []
+  const db = props.activeDb || props.connection?.config?.database || ''
   try {
-    const res = await clickhouseMeta.execute(props.connection.id, sql.value)
+    const res = await clickhouseMeta.execute(props.connection.id, sql.value, db)
     resultTime.value = res.executionTime || 0
     if (res.error) {
       resultError.value = res.error
@@ -197,6 +200,11 @@ const runQuery = async () => {
   } finally {
     running.value = false
   }
+}
+
+const formatSql = () => {
+  if (!sql.value.trim()) return
+      sql.value = format(sql.value, { language: 'clickhouse', tabWidth: 2 })
 }
 
 const loadTableData = async () => {

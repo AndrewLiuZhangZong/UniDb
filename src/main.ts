@@ -53,7 +53,7 @@ function applyTheme(isDark: boolean) {
 // This will be called when store is ready
 function initTheme() {
   const storedTheme = localStorage.getItem('unidb-theme')
-  const isDark = storedTheme !== 'light'
+  const isDark = storedTheme === 'dark'
   applyTheme(isDark)
 }
 

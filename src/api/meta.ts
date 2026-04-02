@@ -41,8 +41,8 @@ export const mysqlMeta = {
   indexes: (id: string, table: string, database?: string) => get<{ indexes: any[] }>(`/meta/mysql/${id}/indexes`, { table, database }),
   tableData: (id: string, table: string, database?: string, page = 1, pageSize = 50) =>
     get<{ rows: any[]; fields: any[]; total: number }>(`/meta/mysql/${id}/tabledata`, { table, database, page, pageSize }),
-  execute: (connectionId: string, query: string) =>
-    post<{ success: boolean; data: any; executionTime: number; rowCount: number; error?: string }>('/query/execute', { connectionId, query })
+  execute: (connectionId: string, query: string, database?: string) =>
+    post<{ success: boolean; data: any; executionTime: number; rowCount: number; error?: string }>('/query/execute', { connectionId, query, database })
 }
 
 // ── ClickHouse ────────────────────────────────────────────────────────────
@@ -50,8 +50,8 @@ export const clickhouseMeta = {
   databases: (id: string) => get<{ databases: string[] }>(`/meta/clickhouse/${id}/databases`),
   tables: (id: string, database?: string) => get<{ tables: any[] }>(`/meta/clickhouse/${id}/tables`, { database }),
   columns: (id: string, table: string, database?: string) => get<{ columns: any[] }>(`/meta/clickhouse/${id}/columns`, { table, database }),
-  execute: (connectionId: string, query: string) =>
-    post<{ success: boolean; data: any; executionTime: number; rowCount: number; error?: string }>('/query/execute', { connectionId, query })
+  execute: (connectionId: string, query: string, database?: string) =>
+    post<{ success: boolean; data: any; executionTime: number; rowCount: number; error?: string }>('/query/execute', { connectionId, query, database })
 }
 
 // ── MongoDB ────────────────────────────────────────────────────────────────

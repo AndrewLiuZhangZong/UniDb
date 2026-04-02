@@ -141,6 +141,7 @@ const props = defineProps<{ connection: any }>()
 const emit = defineEmits<{
   (e: 'select-item', item: any, type: string): void
   (e: 'action', action: string): void
+  (e: 'db-change', db: string): void
 }>()
 
 const loading = ref(false)
@@ -288,6 +289,7 @@ const onDbChange = () => {
   sel.value = null
   tables.value = []
   views.value = []
+  emit('db-change', activeDb.value)
   loadTablesAndViews()
 }
 

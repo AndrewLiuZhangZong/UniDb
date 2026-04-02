@@ -86,6 +86,7 @@
               :is="explorerComponent"
               :connection="activeConnection"
               @select-item="handleExplorerSelectItem"
+              @db-change="handleDbChange"
             />
           </div>
 
@@ -96,6 +97,7 @@
               :connection="activeConnection"
               :selected-item="selectedItem"
               :selected-item-type="selectedItemType"
+              :active-db="activeDb"
             />
           </div>
 
@@ -152,6 +154,7 @@ const activeConnection = ref<any>(null)
 const isConnected = ref(false)
 const selectedItem = ref<any>(null)
 const selectedItemType = ref<string>('')
+const activeDb = ref<string>('')
 
 const supportedDatabases = [
   { type: 'mysql', label: 'MySQL' },
@@ -194,6 +197,10 @@ const handleConnect = () => {
 const handleExplorerSelectItem = (item: any, type: string) => {
   selectedItem.value = item
   selectedItemType.value = type
+}
+
+const handleDbChange = (db: string) => {
+  activeDb.value = db
 }
 
 const handleDialogSaved = () => { editingConnection.value = null }

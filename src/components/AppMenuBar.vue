@@ -90,38 +90,6 @@
         </div>
       </div>
 
-      <!-- SQL -->
-      <div class="menu-wrapper">
-        <div class="menu-item">
-          <span class="menu-label">SQL</span>
-        </div>
-        <div class="dropdown-menu">
-          <div class="dropdown-item" @click.stop="handleAction('execute')">
-            <n-icon class="item-icon"><PlayCircleOutline /></n-icon>
-            <span class="item-label">{{ t('menu.execute') }}</span>
-            <span class="item-shortcut">⌘↵</span>
-          </div>
-          <div class="dropdown-item" @click.stop="handleAction('executeLine')">
-            <n-icon class="item-icon"><PlayCircleOutline /></n-icon>
-            <span class="item-label">{{ t('menu.executeLine') }}</span>
-            <span class="item-shortcut">⌘L</span>
-          </div>
-          <div class="dropdown-item" @click.stop="handleAction('executeSelection')">
-            <span class="item-label">{{ t('menu.executeSelection') }}</span>
-          </div>
-          <div class="dropdown-divider"></div>
-          <div class="dropdown-item" @click.stop="handleAction('formatSQL')">
-            <n-icon class="item-icon"><ConstructOutline /></n-icon>
-            <span class="item-label">{{ t('menu.formatSQL') }}</span>
-            <span class="item-shortcut">⇧⌘F</span>
-          </div>
-          <div class="dropdown-item" @click.stop="handleAction('beautify')">
-            <n-icon class="item-icon"><BrushOutline /></n-icon>
-            <span class="item-label">{{ t('menu.beautify') }}</span>
-          </div>
-        </div>
-      </div>
-
       <!-- Settings -->
       <div class="menu-wrapper">
         <div class="menu-item">
@@ -176,8 +144,8 @@ import {
   AddOutline, DownloadOutline, CloudUploadOutline,
   ExitOutline, CloudDoneOutline, CloudOfflineOutline,
   RefreshOutline, SyncOutline, CreateOutline, ServerOutline, BuildOutline,
-  PlayCircleOutline, ConstructOutline, BrushOutline,
-  BookOutline, BugOutline, CloudDownloadOutline, InformationCircleOutline
+  BookOutline, BugOutline, CloudDownloadOutline, InformationCircleOutline,
+  DocumentTextOutline
 } from '@vicons/ionicons5'
 import { useSettingsStore } from '../stores/settings'
 

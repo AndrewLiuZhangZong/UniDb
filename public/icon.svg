@@ -1,55 +1,100 @@
-<svg width="256" height="256" viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg">
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
   <defs>
+    <!-- Background gradient -->
     <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#1a1a2e"/>
-      <stop offset="100%" stop-color="#16213e"/>
+      <stop offset="0%" stop-color="#0d1117"/>
+      <stop offset="100%" stop-color="#161b22"/>
     </linearGradient>
-    <linearGradient id="iconGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+    <!-- Green primary gradient -->
+    <linearGradient id="greenGrad" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#18a058"/>
       <stop offset="100%" stop-color="#36b374"/>
     </linearGradient>
-    <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+    <!-- Cyan accent gradient -->
+    <linearGradient id="cyanGrad" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#00d9ff"/>
-      <stop offset="100%" stop-color="#00a8cc"/>
+      <stop offset="100%" stop-color="#0099cc"/>
     </linearGradient>
+    <!-- Soft green radial for glow -->
+    <radialGradient id="glowRad" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#18a058" stop-opacity="0.2"/>
+      <stop offset="100%" stop-color="#18a058" stop-opacity="0"/>
+    </radialGradient>
+    <!-- Clip for main cylinder -->
+    <clipPath id="cylClip">
+      <rect x="0" y="0" width="220" height="280"/>
+    </clipPath>
   </defs>
 
   <!-- Background -->
-  <rect width="256" height="256" rx="48" fill="url(#bgGrad)"/>
+  <rect width="512" height="512" rx="96" fill="url(#bgGrad)"/>
 
-  <!-- Outer ring -->
-  <circle cx="128" cy="128" r="85" stroke="url(#iconGrad)" stroke-width="6" fill="none" opacity="0.3"/>
+  <!-- Soft glow behind icon -->
+  <circle cx="256" cy="220" r="160" fill="url(#glowRad)"/>
 
-  <!-- Database cylinders -->
-  <g transform="translate(64, 68)">
-    <!-- First cylinder -->
-    <path d="M32 0C14.327 0 0 14.327 0 32s14.327 32 32 32 32-14.327 32-32S49.673 0 32 0z" fill="url(#iconGrad)" opacity="0.9"/>
-    <path d="M0 32v48c0 17.673 14.327 32 32 32s32-14.327 32-32V32" fill="url(#iconGrad)"/>
+  <!-- ── Main database cylinder ── -->
+  <g transform="translate(156, 80)">
+    <!-- Cylinder body -->
+    <rect x="0" y="60" width="200" height="170" rx="0" fill="url(#greenGrad)" opacity="0.9"/>
 
-    <!-- Cylinder lines -->
-    <ellipse cx="32" cy="32" rx="32" ry="12" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2"/>
-    <ellipse cx="32" cy="56" rx="32" ry="12" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="2"/>
-    <ellipse cx="32" cy="80" rx="32" ry="12" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="2"/>
+    <!-- Top ellipse -->
+    <ellipse cx="100" cy="60" rx="100" ry="36" fill="#18a058"/>
+    <!-- Top ellipse shine -->
+    <ellipse cx="80" cy="50" rx="50" ry="14" fill="rgba(255,255,255,0.08)"/>
 
-    <!-- Connection lines to second cylinder -->
-    <path d="M96 56 L0 56" stroke="url(#accentGrad)" stroke-width="3" stroke-dasharray="6 4"/>
-    <circle cx="96" cy="56" r="4" fill="url(#accentGrad)"/>
-    <circle cx="0" cy="56" r="4" fill="url(#accentGrad)"/>
+    <!-- Bottom ellipse -->
+    <ellipse cx="100" cy="230" rx="100" ry="36" fill="url(#greenGrad)"/>
+
+    <!-- Cylinder section lines -->
+    <ellipse cx="100" cy="108" rx="100" ry="36" fill="none" stroke="rgba(0,0,0,0.25)" stroke-width="1.5"/>
+    <ellipse cx="100" cy="158" rx="100" ry="36" fill="none" stroke="rgba(0,0,0,0.25)" stroke-width="1.5"/>
+    <ellipse cx="100" cy="208" rx="100" ry="36" fill="none" stroke="rgba(0,0,0,0.25)" stroke-width="1.5"/>
+
+    <!-- Center line -->
+    <line x1="0" y1="145" x2="200" y2="145" stroke="rgba(0,0,0,0.15)" stroke-width="1"/>
+
+    <!-- Data rows in middle section -->
+    <rect x="24" y="120" width="80" height="8" rx="4" fill="rgba(255,255,255,0.18)"/>
+    <rect x="24" y="136" width="60" height="8" rx="4" fill="rgba(255,255,255,0.12)"/>
+    <rect x="24" y="152" width="100" height="8" rx="4" fill="rgba(255,255,255,0.18)"/>
+    <rect x="24" y="168" width="50" height="8" rx="4" fill="rgba(255,255,255,0.10)"/>
+    <rect x="24" y="184" width="75" height="8" rx="4" fill="rgba(255,255,255,0.15)"/>
   </g>
 
-  <!-- Second smaller cylinder (right side) -->
-  <g transform="translate(140, 100)">
-    <path d="M24 0C10.745 0 0 10.745 0 24s10.745 24 24 24 24-10.745 24-24S37.255 0 24 0z" fill="url(#accentGrad)" opacity="0.8"/>
-    <path d="M0 24v36c0 13.255 10.745 24 24 24s24-10.745 24-24V24" fill="url(#accentGrad)" opacity="0.6"/>
-    <ellipse cx="24" cy="24" rx="24" ry="9" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="1.5"/>
+  <!-- ── Small secondary cylinder (right) ── -->
+  <g transform="translate(300, 180)">
+    <!-- Body -->
+    <rect x="0" y="24" width="96" height="110" fill="url(#cyanGrad)" opacity="0.75"/>
+    <!-- Top ellipse -->
+    <ellipse cx="48" cy="24" rx="48" ry="17" fill="#00d9ff"/>
+    <!-- Bottom ellipse -->
+    <ellipse cx="48" cy="134" rx="48" ry="17" fill="url(#cyanGrad)"/>
+    <!-- Section line -->
+    <ellipse cx="48" cy="78" rx="48" ry="17" fill="none" stroke="rgba(0,0,0,0.2)" stroke-width="1"/>
+    <!-- Data rows -->
+    <rect x="14" y="55" width="46" height="6" rx="3" fill="rgba(255,255,255,0.2)"/>
+    <rect x="14" y="66" width="32" height="6" rx="3" fill="rgba(255,255,255,0.13)"/>
+    <rect x="14" y="77" width="52" height="6" rx="3" fill="rgba(255,255,255,0.2)"/>
   </g>
 
-  <!-- U letter (for Uni) -->
-  <text x="128" y="170" text-anchor="middle" font-family="SF Pro Display, -apple-system, sans-serif" font-size="48" font-weight="700" fill="rgba(255,255,255,0.95)">Uni</text>
+  <!-- Connection line between cylinders -->
+  <path d="M 260 200 Q 280 200 290 225" stroke="url(#cyanGrad)" stroke-width="2.5" stroke-dasharray="5 3" fill="none" opacity="0.7"/>
 
-  <!-- Decorative dots -->
-  <circle cx="48" cy="48" r="4" fill="url(#iconGrad)" opacity="0.6"/>
-  <circle cx="208" cy="48" r="4" fill="url(#accentGrad)" opacity="0.6"/>
-  <circle cx="48" cy="208" r="4" fill="url(#accentGrad)" opacity="0.6"/>
-  <circle cx="208" cy="208" r="4" fill="url(#iconGrad)" opacity="0.6"/>
+  <!-- ── "Uni" text ── -->
+  <text x="256" y="388" text-anchor="middle"
+    font-family="'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
+    font-size="80" font-weight="700" letter-spacing="6"
+    fill="rgba(255,255,255,0.95)">Uni</text>
+
+  <!-- "Db" in accent color -->
+  <text x="256" y="462" text-anchor="middle"
+    font-family="'SF Mono', 'Consolas', 'Monaco', monospace"
+    font-size="52" font-weight="600" letter-spacing="4"
+    fill="url(#cyanGrad)">Db</text>
+
+  <!-- Decorative corner accents -->
+  <circle cx="72" cy="72" r="5" fill="url(#greenGrad)" opacity="0.5"/>
+  <circle cx="440" cy="72" r="5" fill="url(#cyanGrad)" opacity="0.5"/>
+  <circle cx="72" cy="440" r="5" fill="url(#cyanGrad)" opacity="0.5"/>
+  <circle cx="440" cy="440" r="5" fill="url(#greenGrad)" opacity="0.5"/>
 </svg>

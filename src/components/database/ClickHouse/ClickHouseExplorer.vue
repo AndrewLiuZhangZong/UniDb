@@ -84,7 +84,7 @@ const dialog = useDialog()
 const settingsStore = useSettingsStore()
 const isDarkTheme = computed(() => settingsStore.settings.theme === 'dark')
 const props = defineProps<{ connection: any }>()
-const emit = defineEmits<{ (e: 'select-item', item: any, type: string): void }>()
+const emit = defineEmits<{ (e: 'select-item', item: any, type: string): void; (e: 'db-change', db: string): void }>()
 
 const loading = ref(false)
 const searchText = ref('')
@@ -135,6 +135,7 @@ const dropTable = (tbl: any) => {
 
 const selectDb = async (name: string) => {
   activeDb.value = name
+  emit('db-change', name)
   tables.value = []
   try {
     const tRes = await clickhouseMeta.tables(props.connection.id, name)

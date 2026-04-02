@@ -20,7 +20,7 @@ export interface AppSettings {
 
 const defaultSettings: AppSettings = {
   language: 'zh-CN',
-  theme: 'dark',
+  theme: 'light',
   autoUpdate: true,
   logRetentionDays: 30,
   logLevel: 'info',
@@ -38,7 +38,13 @@ export const useSettingsStore = defineStore('settings', () => {
     try {
       const stored = localStorage.getItem(STORAGE_KEY)
       if (stored) {
-        return { ...defaultSettings, ...JSON.parse(stored) }
+        const parsed = JSON.parse(stored)
+        return {
+          ...defaultSettings,
+          ...parsed,
+          // theme 始终以 stored 为准，若无则以 default 为准（light）
+          theme: parsed.theme ?? defaultSettings.theme
+        }
       }
     } catch (e) {
       console.error('Failed to load settings:', e)

@@ -32,17 +32,6 @@
             <span class="item-label">{{ t('menu.newConnection') }}</span>
             <span class="item-shortcut">⌘N</span>
           </div>
-          <div class="dropdown-item" @click.stop="handleAction('openConnection')">
-            <n-icon class="item-icon"><FolderOutline /></n-icon>
-            <span class="item-label">{{ t('menu.openConnection') }}</span>
-            <span class="item-shortcut">⌘O</span>
-          </div>
-          <div class="dropdown-divider"></div>
-          <div class="dropdown-item" @click.stop="handleAction('newQuery')">
-            <n-icon class="item-icon"><DocumentTextOutline /></n-icon>
-            <span class="item-label">{{ t('menu.newQuery') }}</span>
-            <span class="item-shortcut">⌘T</span>
-          </div>
           <div class="dropdown-divider"></div>
           <div class="dropdown-item" @click.stop="handleAction('export')">
             <n-icon class="item-icon"><DownloadOutline /></n-icon>
@@ -184,7 +173,7 @@ import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { NIcon } from 'naive-ui'
 import {
-  AddOutline, FolderOutline, DocumentTextOutline, DownloadOutline, CloudUploadOutline,
+  AddOutline, DownloadOutline, CloudUploadOutline,
   ExitOutline, CloudDoneOutline, CloudOfflineOutline,
   RefreshOutline, SyncOutline, CreateOutline, ServerOutline, BuildOutline,
   PlayCircleOutline, ConstructOutline, BrushOutline,

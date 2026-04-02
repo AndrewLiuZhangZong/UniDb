@@ -227,9 +227,12 @@ const loadTableData = async () => {
       }))
     } else if (props.selectedItem.columns?.length) {
       browseColumns.value = props.selectedItem.columns.map((c: any) => ({ title: c.name, key: c.name, width: 140 }))
+    } else {
+      browseColumns.value = []
     }
   } catch (e: any) {
     browseError.value = e?.response?.data?.error || e.message || '加载失败'
+    browseColumns.value = []
     message.error(`加载表数据失败: ${browseError.value}`)
   } finally {
     browseLoading.value = false

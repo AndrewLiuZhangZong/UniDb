@@ -222,12 +222,9 @@ watch(() => props.connection?.id, () => {
 <style scoped>
 .redis-explorer { display: flex; flex-direction: column; height: 100%; overflow: hidden; font-size: 12px; }
 .explorer-toolbar { display: flex; align-items: center; gap: 4px; padding: 6px 8px; flex-shrink: 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
-.light-mode .explorer-toolbar { border-bottom-color: rgba(0,0,0,0.06); }
 
 .type-filters { display: flex; gap: 4px; padding: 6px 8px; flex-shrink: 0; flex-wrap: wrap; border-bottom: 1px solid rgba(255,255,255,0.05); }
-.light-mode .type-filters { border-bottom-color: rgba(0,0,0,0.06); }
 .type-pill { padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: 700; cursor: pointer; transition: all 0.15s; background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.4); }
-.light-mode .type-pill { background: rgba(0,0,0,0.05); color: rgba(0,0,0,0.4); }
 .type-pill.active.str, .type-pill.str:hover { background: rgba(239,68,68,0.2); color: #ef4444; }
 .type-pill.active.hash, .type-pill.hash:hover { background: rgba(245,158,11,0.2); color: #f59e0b; }
 .type-pill.active.list, .type-pill.list:hover { background: rgba(24,160,88,0.2); color: #18a058; }
@@ -243,17 +240,13 @@ watch(() => props.connection?.id, () => {
 .section { margin-bottom: 1px; }
 .section-hd { display: flex; align-items: center; gap: 5px; padding: 6px 8px; cursor: pointer; transition: background 0.1s; }
 .section-hd:hover { background: rgba(255,255,255,0.04); }
-.light-mode .section-hd:hover { background: rgba(0,0,0,0.04); }
 .arrow { font-size: 12px; color: rgba(255,255,255,0.3); transition: transform 0.18s; flex-shrink: 0; }
-.light-mode .arrow { color: rgba(0,0,0,0.3); }
 .arrow.open { transform: rotate(90deg); }
 .sec-icon { font-size: 13px; flex-shrink: 0; }
 .key-c { color: #ef4444; }
 .info-c { color: #f59e0b; }
 .sec-label { flex: 1; font-weight: 500; color: rgba(255,255,255,0.65); }
-.light-mode .sec-label { color: rgba(0,0,0,0.65); }
 .badge { font-size: 10px; color: rgba(255,255,255,0.35); background: rgba(255,255,255,0.07); padding: 1px 5px; border-radius: 7px; }
-.light-mode .badge { color: rgba(0,0,0,0.35); background: rgba(0,0,0,0.06); }
 .sec-action { opacity: 0; transition: opacity 0.1s; }
 .section-hd:hover .sec-action { opacity: 1; }
 .sec-body { padding-left: 8px; }
@@ -271,22 +264,15 @@ watch(() => props.connection?.id, () => {
 .type-dot.zset { background: rgba(167,139,250,0.25); color: #a78bfa; }
 
 .key-name { flex: 1; color: rgba(255,255,255,0.82); font-family: monospace; font-size: 11px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.light-mode .key-name { color: rgba(0,0,0,0.82); }
 .key-ttl { font-size: 10px; color: rgba(255,255,255,0.3); flex-shrink: 0; }
-.light-mode .key-ttl { color: rgba(0,0,0,0.3); }
 .no-ttl { color: rgba(255,255,255,0.15); }
 .more-hint { padding: 4px 10px; font-size: 10px; color: rgba(255,255,255,0.3); font-style: italic; }
-.light-mode .more-hint { color: rgba(0,0,0,0.3); }
 
 .info-body { padding: 4px 0 4px 8px; }
 .info-row { display: flex; align-items: center; gap: 6px; padding: 3px 8px; font-size: 11px; }
 .info-k { color: rgba(255,255,255,0.4); min-width: 120px; text-transform: capitalize; }
-.light-mode .info-k { color: rgba(0,0,0,0.4); }
 .info-v { color: rgba(255,255,255,0.75); font-family: monospace; }
-.light-mode .info-v { color: rgba(0,0,0,0.75); }
 
 .loading-hint { padding: 6px 10px; color: rgba(255,255,255,0.3); font-size: 11px; }
-.light-mode .loading-hint { color: rgba(0,0,0,0.3); }
 .empty { padding: 6px 10px; color: rgba(255,255,255,0.25); font-style: italic; font-size: 11px; }
-.light-mode .empty { color: rgba(0,0,0,0.25); }
 </style>

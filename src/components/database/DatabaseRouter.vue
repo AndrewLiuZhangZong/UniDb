@@ -69,11 +69,6 @@ const onSelectItem = (item: any, type: string) => {
   border-left: 1px solid rgba(255, 255, 255, 0.06);
 }
 
-.database-router.light-mode {
-  background: rgba(0, 0, 0, 0.02);
-  border-left-color: rgba(0, 0, 0, 0.06);
-}
-
 .no-connection,
 .unsupported {
   flex: 1;
@@ -84,10 +79,5 @@ const onSelectItem = (item: any, type: string) => {
   gap: 12px;
   color: rgba(255, 255, 255, 0.25);
   font-size: 12px;
-}
-
-.light-mode .no-connection,
-.light-mode .unsupported {
-  color: rgba(0, 0, 0, 0.25);
 }
 </style>

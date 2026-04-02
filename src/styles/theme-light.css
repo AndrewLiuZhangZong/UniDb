@@ -1,364 +1,645 @@
-/* Light Theme Styles - Global overrides for all .light-mode components */
+/* ============================================================
+   Light Theme Styles - Global overrides for all .light-mode components
+   ============================================================ */
 
-/* ── Workspace shell (workspace-shell, db-tree-panel, workspace-main) ── */
-body.light-theme .workspace-shell {
-  background: #f0f0f5;
+/* ── Database Router ── */
+body.light-theme .database-router {
+  background: rgba(0, 0, 0, 0.02);
+  border-left-color: rgba(0, 0, 0, 0.06);
+}
+body.light-theme .database-router .no-connection,
+body.light-theme .database-router .unsupported {
+  color: rgba(0, 0, 0, 0.25);
+}
+
+/* ── Home.vue ── */
+body.light-theme .conn-sidebar {
+  background: rgba(255, 255, 255, 0.99) !important;
+  border: none !important;
+}
+body.light-theme .content-layout {
+  background: #f4f4f7;
+}
+body.light-theme .welcome-title {
+  color: rgba(0, 0, 0, 0.9);
+}
+body.light-theme .welcome-subtitle {
+  color: rgba(0, 0, 0, 0.45);
+}
+body.light-theme .supported-title {
+  color: rgba(0, 0, 0, 0.3);
+}
+body.light-theme .db-card {
+  background: rgba(0, 0, 0, 0.02);
+  border-color: rgba(0, 0, 0, 0.06);
+}
+body.light-theme .db-card:hover {
+  background: rgba(0, 0, 0, 0.05);
+  border-color: rgba(0, 0, 0, 0.1);
+}
+body.light-theme .db-label {
+  color: rgba(0, 0, 0, 0.75);
 }
 body.light-theme .db-tree-panel {
-  background: #fafafa !important;
-  border-right-color: rgba(0,0,0,0.08) !important;
+  background: rgba(248, 248, 252, 0.98);
+  border-right-color: rgba(0, 0, 0, 0.07);
 }
-body.light-theme .panel-conn-name { color: rgba(0,0,0,0.88) !important; }
-body.light-theme .panel-conn-host { color: rgba(0,0,0,0.4) !important; }
-body.light-theme .workspace-main { background: #f5f5f8; }
-
-/* ── Workspace tab bars across all DB types ── */
-body.light-theme .tab-bar {
-  background: rgba(0,0,0,0.03) !important;
-  border-bottom-color: rgba(0,0,0,0.08) !important;
+body.light-theme .panel-conn-header {
+  border-bottom-color: rgba(0, 0, 0, 0.07);
 }
-body.light-theme .tab-btn { color: rgba(0,0,0,0.55) !important; }
-body.light-theme .tab-btn:hover { color: rgba(0,0,0,0.85) !important; background: rgba(0,0,0,0.04) !important; }
-
-/* ── SQL textarea ── */
-body.light-theme .sql-textarea,
-body.light-theme .q-textarea,
-body.light-theme .value-textarea { background: #fff !important; color: #1a1a1a !important; }
-
-/* ── Data table in light ── */
-body.light-theme .n-data-table { --n-border-color: rgba(0,0,0,0.07); }
-body.light-theme .n-data-table-th { background: #f8f8fb !important; color: rgba(0,0,0,0.65) !important; }
-body.light-theme .n-data-table-td { color: rgba(0,0,0,0.82) !important; }
-
-/* ── Connection tree sider ── */
-body.light-theme .conn-sidebar { background: #fafafa !important; }
-
-
-/* Layout */
-.light-theme .sidebar,
-.light-theme .connection-tree {
-  background: rgba(255, 255, 255, 0.98) !important;
-}
-
-.light-theme .connection-tree .tree-title {
-  color: rgba(0, 0, 0, 0.85);
-}
-
-.light-theme .connection-tree .nav-item {
-  color: rgba(0, 0, 0, 0.7);
-}
-
-.light-theme .connection-tree .nav-item:hover {
-  background: rgba(0, 0, 0, 0.04);
-}
-
-.light-theme .connection-tree .nav-item.is-active {
-  background: rgba(24, 160, 88, 0.1);
-  color: #18a058;
-}
-
-/* Content Layout - Light */
-.light-theme .content-layout,
-.light-theme .home-container {
-  background: linear-gradient(135deg, #ffffff 0%, #f5f5f5 100%);
-}
-
-.light-theme .settings-container,
-.light-theme .log-viewer-container {
-  background: #f5f5f5;
+body.light-theme .panel-conn-name {
   color: rgba(0, 0, 0, 0.9);
 }
-
-/* Menu Bar - Light */
-.light-theme.app-menu-bar {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(248, 248, 248, 0.98) 100%);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-}
-
-.light-theme .menu-label {
-  color: rgba(0, 0, 0, 0.85);
-}
-
-.light-theme .menu-item:hover,
-.light-theme .menu-item.is-active {
-  background: rgba(0, 0, 0, 0.06);
-}
-
-.light-theme .menu-icon-btn {
-  color: rgba(0, 0, 0, 0.7);
-}
-
-.light-theme .menu-icon-btn:hover {
-  color: rgba(0, 0, 0, 0.95);
-  background: rgba(0, 0, 0, 0.06);
-}
-
-/* Dropdown Menu - Light */
-.light-theme .dropdown-menu {
-  background: rgba(255, 255, 255, 0.98);
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  box-shadow:
-    0 8px 24px rgba(0, 0, 0, 0.15),
-    0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.light-theme .dropdown-item:hover {
-  background: rgba(24, 160, 88, 0.15);
-}
-
-.light-theme .dropdown-item .item-icon {
-  color: rgba(0, 0, 0, 0.6);
-}
-
-.light-theme .dropdown-item:hover .item-icon {
-  color: rgba(0, 0, 0, 0.9);
-}
-
-.light-theme .dropdown-item .item-label {
-  color: rgba(0, 0, 0, 0.85);
-}
-
-.light-theme .dropdown-item .item-shortcut {
+body.light-theme .panel-conn-host {
   color: rgba(0, 0, 0, 0.35);
 }
 
-.light-theme .dropdown-divider {
-  background: linear-gradient(90deg, transparent, rgba(0, 0, 0, 0.1), transparent);
+/* ── Workspace shell ── */
+body.light-theme .workspace-shell {
+  background: #f0f0f5;
+}
+body.light-theme .workspace-main {
+  background: #f5f5f8;
 }
 
-/* Connection Header - Light */
-.light-theme .connection-header {
-  background: rgba(0, 0, 0, 0.02);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+/* ── Tab bar (shared across all DB workspaces) ── */
+body.light-theme .tab-bar {
+  background: rgba(0, 0, 0, 0.03) !important;
+  border-bottom-color: rgba(0, 0, 0, 0.08) !important;
+}
+body.light-theme .tab-btn {
+  color: rgba(0, 0, 0, 0.55) !important;
+}
+body.light-theme .tab-btn:hover {
+  color: rgba(0, 0, 0, 0.85) !important;
+  background: rgba(0, 0, 0, 0.04) !important;
 }
 
-.light-theme .connection-header .connection-header-name {
-  color: rgba(0, 0, 0, 0.95);
+/* ── SQL / Query textareas ── */
+body.light-theme .sql-textarea,
+body.light-theme .q-textarea,
+body.light-theme .value-textarea {
+  background: #fff !important;
+  color: #1a1a1a !important;
 }
 
-.light-theme .connection-header .connection-host {
-  color: rgba(0, 0, 0, 0.4);
+/* ── MySQL Workspace ── */
+body.light-theme .mysql-workspace {
+  background: #f5f5f8;
+  color: rgba(0, 0, 0, 0.85);
 }
-
-/* Welcome Page - Light */
-.light-theme .welcome-title {
-  color: rgba(0, 0, 0, 0.95);
+body.light-theme .mysql-workspace .tab-bar {
+  background: rgba(0, 0, 0, 0.04);
+  border-bottom-color: rgba(0, 0, 0, 0.07);
 }
-
-.light-theme .welcome-subtitle {
+body.light-theme .mysql-workspace .tab-btn {
   color: rgba(0, 0, 0, 0.5);
 }
-
-.light-theme .supported-title {
+body.light-theme .mysql-workspace .tab-btn:hover {
+  color: rgba(0, 0, 0, 0.85);
+  background: rgba(0, 0, 0, 0.04);
+}
+body.light-theme .mysql-workspace .tab-btn.active {
+  color: #0070c0;
+  border-bottom-color: #0070c0;
+}
+body.light-theme .sql-editor-wrap .sql-toolbar {
+  border-bottom-color: rgba(0, 0, 0, 0.06);
+}
+body.light-theme .sql-editor-wrap .sql-hint {
+  color: rgba(0, 0, 0, 0.3);
+}
+body.light-theme .sql-editor-wrap .sql-textarea {
+  background: #fff;
+  color: #1a1a1a;
+}
+body.light-theme .sql-editor-wrap .sql-results {
+  border-top-color: rgba(0, 0, 0, 0.07);
+}
+body.light-theme .sql-editor-wrap .result-tabs {
+  background: rgba(0, 0, 0, 0.03);
+  border-bottom-color: rgba(0, 0, 0, 0.05);
+}
+body.light-theme .mysql-workspace .rt {
+  color: rgba(0, 0, 0, 0.5);
+}
+body.light-theme .mysql-workspace .rt.active {
+  color: #0070c0;
+  border-bottom-color: #0070c0;
+}
+body.light-theme .mysql-workspace .result-meta {
+  color: rgba(0, 0, 0, 0.3);
+}
+body.light-theme .table-browse .browse-toolbar {
+  border-bottom-color: rgba(0, 0, 0, 0.06);
+}
+body.light-theme .table-browse .browse-pagination {
+  border-top-color: rgba(0, 0, 0, 0.06);
+}
+body.light-theme .table-browse .browse-title {
+  color: rgba(0, 0, 0, 0.7);
+}
+body.light-theme .table-browse .pg-info {
   color: rgba(0, 0, 0, 0.4);
 }
-
-.light-theme .db-card {
-  background: rgba(0, 0, 0, 0.02);
-  border: 1px solid rgba(0, 0, 0, 0.06);
-}
-
-.light-theme .db-card:hover {
-  background: rgba(0, 0, 0, 0.04);
-  border-color: rgba(0, 0, 0, 0.1);
-  transform: translateY(-4px);
-}
-
-.light-theme .db-label {
-  color: rgba(0, 0, 0, 0.8);
-}
-
-/* Workspace - Light */
-.light-theme .workspace-tabs {
-  background: rgba(0, 0, 0, 0.02);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
-}
-
-.light-theme .tab {
+body.light-theme .table-browse .pg-num {
   color: rgba(0, 0, 0, 0.6);
 }
-
-.light-theme .tab:hover {
-  color: rgba(0, 0, 0, 0.9);
-  background: rgba(0, 0, 0, 0.03);
+body.light-theme .table-schema .schema-toolbar {
+  border-bottom-color: rgba(0, 0, 0, 0.06);
 }
-
-.light-theme .tab.active {
-  color: rgba(0, 0, 0, 0.95);
-  background: rgba(0, 0, 0, 0.05);
-}
-
-/* Settings Page - Light */
-.light-theme .settings-sidebar {
-  background: #ffffff;
-  border-right: 1px solid rgba(0, 0, 0, 0.08);
-}
-
-.light-theme .settings-sidebar .sidebar-title {
-  color: rgba(0, 0, 0, 0.9);
-}
-
-.light-theme .settings-sidebar .sidebar-header {
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-}
-
-.light-theme .settings-nav .nav-item {
-  color: rgba(0, 0, 0, 0.7);
-}
-
-.light-theme .settings-nav .nav-item:hover {
-  background: rgba(0, 0, 0, 0.04);
-}
-
-.light-theme .settings-nav .nav-item.is-active {
-  background: rgba(24, 160, 88, 0.1);
-  color: #18a058;
-}
-
-.light-theme .settings-nav .nav-icon {
-  color: rgba(0, 0, 0, 0.5);
-}
-
-.light-theme .settings-nav .nav-item.is-active .nav-icon {
-  color: #18a058;
-}
-
-.light-theme .settings-content .section-title {
-  color: rgba(0, 0, 0, 0.95);
-}
-
-.light-theme .settings-content .section-desc {
-  color: rgba(0, 0, 0, 0.5);
-}
-
-.light-theme .setting-item {
-  background: rgba(0, 0, 0, 0.02);
-  border: 1px solid rgba(0, 0, 0, 0.06);
-}
-
-.light-theme .setting-item:hover {
-  background: rgba(0, 0, 0, 0.03);
-}
-
-.light-theme .setting-item .setting-label {
-  color: rgba(0, 0, 0, 0.9);
-}
-
-.light-theme .setting-item .setting-desc {
-  color: rgba(0, 0, 0, 0.4);
-}
-
-/* Driver Card - Light */
-.light-theme .driver-card {
-  background: rgba(0, 0, 0, 0.02);
-  border: 1px solid rgba(0, 0, 0, 0.06);
-}
-
-.light-theme .driver-card:hover {
-  border-color: rgba(0, 0, 0, 0.1);
-  background: rgba(0, 0, 0, 0.04);
-}
-
-.light-theme .driver-card .driver-name {
-  color: rgba(0, 0, 0, 0.9);
-}
-
-.light-theme .driver-card .driver-version {
-  color: rgba(0, 0, 0, 0.4);
-}
-
-/* About Card - Light */
-.light-theme .about-card {
-  background: rgba(0, 0, 0, 0.02);
-  border: 1px solid rgba(0, 0, 0, 0.06);
-}
-
-.light-theme .about-card .about-name {
-  color: rgba(0, 0, 0, 0.95);
-}
-
-.light-theme .about-card .about-desc {
-  color: rgba(0, 0, 0, 0.5);
-}
-
-.light-theme .about-card .about-meta {
-  color: rgba(0, 0, 0, 0.4);
-}
-
-/* Log Viewer - Light */
-.light-theme .log-viewer-container .page-header {
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-}
-
-.light-theme .log-viewer-container .page-title {
-  color: rgba(0, 0, 0, 0.95);
-}
-
-.light-theme .log-viewer-container .page-subtitle {
-  color: rgba(0, 0, 0, 0.5);
-}
-
-.light-theme .log-viewer-container .filters-bar {
-  background: rgba(0, 0, 0, 0.02);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
-}
-
-.light-theme .log-viewer-container .loading-state,
-.light-theme .log-viewer-container .empty-state {
-  color: rgba(0, 0, 0, 0.5);
-}
-
-.light-theme .log-entry {
-  background: rgba(0, 0, 0, 0.02);
-}
-
-.light-theme .log-entry:hover {
-  background: rgba(0, 0, 0, 0.04);
-}
-
-.light-theme .log-entry.level-error {
-  border-left-color: #d03050;
-  background: rgba(208, 48, 80, 0.03);
-}
-
-.light-theme .log-entry.level-warn {
-  border-left-color: #f0a020;
-}
-
-.light-theme .log-entry.level-info {
-  border-left-color: #2080f0;
-}
-
-.light-theme .log-entry.level-debug {
-  border-left-color: rgba(0, 0, 0, 0.3);
-}
-
-.light-theme .log-timestamp {
-  color: rgba(0, 0, 0, 0.5);
-}
-
-.light-theme .log-message {
+body.light-theme .table-schema .schema-title {
   color: rgba(0, 0, 0, 0.8);
 }
-
-.light-theme .log-message.has-error {
-  color: #c42b1c;
+body.light-theme .table-schema .schema-col-header {
+  color: rgba(0, 0, 0, 0.3);
+}
+body.light-theme .table-schema .schema-col-row {
+  border-bottom-color: rgba(0, 0, 0, 0.05);
+}
+body.light-theme .table-schema .col-name-val {
+  color: rgba(0, 0, 0, 0.85);
+}
+body.light-theme .table-schema .nn-no {
+  color: rgba(0, 0, 0, 0.2);
+}
+body.light-theme .table-schema .comment-text {
+  color: rgba(0, 0, 0, 0.4);
+}
+body.light-theme .mysql-workspace .def-val {
+  color: rgba(0, 0, 0, 0.55);
+  background: rgba(0, 0, 0, 0.06);
+}
+body.light-theme .mysql-workspace .null-val {
+  color: rgba(0, 0, 0, 0.2);
+}
+body.light-theme .mysql-workspace .id-val {
+  color: #d97706;
+}
+body.light-theme .table-indexes .idx-toolbar {
+  border-bottom-color: rgba(0, 0, 0, 0.06);
+}
+body.light-theme .table-indexes .idx-title {
+  color: rgba(0, 0, 0, 0.8);
+}
+body.light-theme .table-indexes .idx-header {
+  color: rgba(0, 0, 0, 0.3);
+}
+body.light-theme .table-indexes .idx-row {
+  border-bottom-color: rgba(0, 0, 0, 0.04);
+}
+body.light-theme .mysql-workspace .type-sm {
+  color: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.06);
 }
 
-.light-theme .pagination-bar {
-  border-top: 1px solid rgba(0, 0, 0, 0.08);
+/* ── MySQL Explorer ── */
+body.light-theme .mysql-explorer .explorer-toolbar {
+  border-bottom-color: rgba(0, 0, 0, 0.06);
+}
+body.light-theme .mysql-explorer .db-selector {
+  border-bottom-color: rgba(0, 0, 0, 0.06);
+}
+body.light-theme .mysql-explorer .section-hd:hover {
+  background: rgba(0, 0, 0, 0.04);
+}
+body.light-theme .mysql-explorer .arrow {
+  color: rgba(0, 0, 0, 0.3);
+}
+body.light-theme .mysql-explorer .sec-label {
+  color: rgba(0, 0, 0, 0.65);
+}
+body.light-theme .mysql-explorer .badge {
+  color: rgba(0, 0, 0, 0.35);
+  background: rgba(0, 0, 0, 0.06);
+}
+body.light-theme .mysql-explorer .tree-item:hover {
+  background: rgba(77, 184, 255, 0.08);
+}
+body.light-theme .mysql-explorer .tree-item.active {
+  background: rgba(77, 184, 255, 0.15);
+}
+body.light-theme .mysql-explorer .item-name {
+  color: rgba(0, 0, 0, 0.82);
+}
+body.light-theme .mysql-explorer .item-meta {
+  color: rgba(0, 0, 0, 0.28);
+}
+body.light-theme .mysql-explorer .loading-hint {
+  color: rgba(0, 0, 0, 0.3);
+}
+body.light-theme .mysql-explorer .empty {
+  color: rgba(0, 0, 0, 0.25);
 }
 
-/* Tree Node - Light */
-.light-theme .tree-node-content {
+/* ── ClickHouse Workspace ── */
+body.light-theme .ch-workspace {
+  background: #f5f5f8;
+  color: rgba(0, 0, 0, 0.85);
+}
+body.light-theme .ch-workspace .tab-bar {
+  background: rgba(0, 0, 0, 0.04);
+  border-bottom-color: rgba(0, 0, 0, 0.07);
+}
+body.light-theme .ch-workspace .tab-btn {
+  color: rgba(0, 0, 0, 0.5);
+}
+body.light-theme .ch-workspace .tab-btn.active {
+  color: #c2410c;
+  border-bottom-color: #c2410c;
+}
+body.light-theme .ch-workspace .sql-toolbar {
+  border-bottom-color: rgba(0, 0, 0, 0.06);
+}
+body.light-theme .ch-workspace .sql-textarea {
+  background: #fff;
+  color: #1a1a1a;
+}
+body.light-theme .ch-workspace .result-label {
+  color: rgba(0, 0, 0, 0.5);
+}
+body.light-theme .ch-workspace .result-meta {
+  color: rgba(0, 0, 0, 0.3);
+}
+body.light-theme .ch-workspace .browse-toolbar {
+  border-bottom-color: rgba(0, 0, 0, 0.06);
+}
+body.light-theme .ch-workspace .browse-info {
+  color: rgba(0, 0, 0, 0.6);
+}
+body.light-theme .ch-workspace .pg-info {
+  color: rgba(0, 0, 0, 0.4);
+}
+body.light-theme .ch-workspace .schema-header {
+  border-bottom-color: rgba(0, 0, 0, 0.06);
+}
+body.light-theme .ch-workspace .schema-title {
+  color: rgba(0, 0, 0, 0.8);
+}
+body.light-theme .ch-workspace .schema-info {
+  border-bottom-color: rgba(0, 0, 0, 0.06);
+}
+body.light-theme .ch-workspace .info-key {
+  color: rgba(0, 0, 0, 0.4);
+}
+body.light-theme .ch-workspace .info-row code {
+  color: #c2410c;
+  background: rgba(194, 65, 12, 0.08);
+}
+body.light-theme .ch-workspace .col-header {
+  color: rgba(0, 0, 0, 0.3);
+}
+body.light-theme .ch-workspace .col-name-code {
+  color: rgba(0, 0, 0, 0.85);
+}
+body.light-theme .ch-workspace .sort-tag {
+  color: #16a34a;
+}
+
+/* ── ClickHouse Explorer ── */
+body.light-theme .ch-explorer .explorer-toolbar {
+  border-bottom-color: rgba(0, 0, 0, 0.06);
+}
+body.light-theme .ch-explorer .section-hd:hover {
+  background: rgba(0, 0, 0, 0.04);
+}
+body.light-theme .ch-explorer .arrow {
+  color: rgba(0, 0, 0, 0.3);
+}
+body.light-theme .ch-explorer .sec-label {
+  color: rgba(0, 0, 0, 0.65);
+}
+body.light-theme .ch-explorer .badge {
+  color: rgba(0, 0, 0, 0.35);
+  background: rgba(0, 0, 0, 0.06);
+}
+body.light-theme .ch-explorer .tree-item:hover {
+  background: rgba(251, 146, 60, 0.08);
+}
+body.light-theme .ch-explorer .tree-item.active {
+  background: rgba(251, 146, 60, 0.15);
+}
+body.light-theme .ch-explorer .item-name {
+  color: rgba(0, 0, 0, 0.82);
+}
+body.light-theme .ch-explorer .item-meta {
+  color: rgba(0, 0, 0, 0.28);
+}
+body.light-theme .ch-explorer .empty {
+  color: rgba(0, 0, 0, 0.25);
+}
+
+/* ── MongoDB Workspace ── */
+body.light-theme .mongo-workspace {
+  background: #f5f5f8;
+  color: rgba(0, 0, 0, 0.85);
+}
+body.light-theme .mongo-workspace .tab-bar {
+  background: rgba(0, 0, 0, 0.04);
+  border-bottom-color: rgba(0, 0, 0, 0.07);
+}
+body.light-theme .mongo-workspace .tab-btn {
+  color: rgba(0, 0, 0, 0.5);
+}
+body.light-theme .mongo-workspace .tab-btn.active {
+  color: #1d6fa4;
+  border-bottom-color: #1d6fa4;
+}
+body.light-theme .mongo-workspace .q-toolbar {
+  border-bottom-color: rgba(0, 0, 0, 0.06);
+}
+body.light-theme .mongo-workspace .q-textarea {
+  background: #fff;
+  color: #1a1a1a;
+}
+body.light-theme .mongo-workspace .result-bar {
+  background: rgba(0, 0, 0, 0.03);
+  border-bottom-color: rgba(0, 0, 0, 0.05);
+}
+body.light-theme .mongo-workspace .result-label {
+  color: rgba(0, 0, 0, 0.5);
+}
+body.light-theme .mongo-workspace .result-meta {
+  color: rgba(0, 0, 0, 0.3);
+}
+body.light-theme .mongo-workspace .view-btn {
+  color: rgba(0, 0, 0, 0.4);
+}
+body.light-theme .mongo-workspace .view-btn.active {
+  color: #1d6fa4;
+  background: rgba(29, 111, 164, 0.1);
+}
+body.light-theme .mongo-workspace .browse-toolbar {
+  border-bottom-color: rgba(0, 0, 0, 0.06);
+}
+body.light-theme .mongo-workspace .vt {
+  color: rgba(0, 0, 0, 0.35);
+}
+body.light-theme .mongo-workspace .vt.active {
+  color: #1d6fa4;
+  background: rgba(29, 111, 164, 0.1);
+}
+body.light-theme .mongo-workspace .json-doc {
+  background: #fff;
+  border-color: rgba(0, 0, 0, 0.08);
+}
+body.light-theme .mongo-workspace .json-pre {
+  color: rgba(0, 0, 0, 0.75);
+}
+body.light-theme .mongo-workspace .json-pre-sm {
+  color: rgba(0, 0, 0, 0.75);
+}
+body.light-theme .mongo-workspace .agg-toolbar {
+  border-bottom-color: rgba(0, 0, 0, 0.06);
+}
+body.light-theme .mongo-workspace .pagination-bar {
+  border-top-color: rgba(0, 0, 0, 0.06);
+}
+body.light-theme .mongo-workspace .pg-info {
+  color: rgba(0, 0, 0, 0.4);
+}
+body.light-theme .mongo-workspace .pg-num {
+  color: rgba(0, 0, 0, 0.6);
+}
+body.light-theme .mongo-workspace .schema-header {
+  border-bottom-color: rgba(0, 0, 0, 0.06);
+}
+body.light-theme .mongo-workspace .schema-title {
+  color: rgba(0, 0, 0, 0.8);
+}
+body.light-theme .mongo-workspace .schema-row.header {
+  color: rgba(0, 0, 0, 0.3);
+}
+body.light-theme .mongo-workspace .schema-row:not(.header):hover {
+  background: rgba(0, 0, 0, 0.03);
+}
+body.light-theme .mongo-workspace .field-name {
+  color: rgba(0, 0, 0, 0.85);
+}
+body.light-theme .mongo-workspace .req-no {
+  color: rgba(0, 0, 0, 0.2);
+}
+body.light-theme .mongo-workspace .idx-toolbar {
+  border-bottom-color: rgba(0, 0, 0, 0.06);
+}
+body.light-theme .mongo-workspace .idx-title {
+  color: rgba(0, 0, 0, 0.8);
+}
+body.light-theme .mongo-workspace .idx-row.header {
+  color: rgba(0, 0, 0, 0.3);
+}
+body.light-theme .mongo-workspace .idx-row:not(.header):hover {
+  background: rgba(0, 0, 0, 0.03);
+}
+body.light-theme .mongo-workspace .idx-row code {
   color: rgba(0, 0, 0, 0.7);
 }
 
-.light-theme .tree-node-content:hover {
+/* ── MongoDB Explorer ── */
+body.light-theme .mongo-explorer .explorer-toolbar {
+  border-bottom-color: rgba(0, 0, 0, 0.06);
+}
+body.light-theme .mongo-explorer .section-hd:hover {
   background: rgba(0, 0, 0, 0.04);
 }
+body.light-theme .mongo-explorer .arrow {
+  color: rgba(0, 0, 0, 0.3);
+}
+body.light-theme .mongo-explorer .sec-label {
+  color: rgba(0, 0, 0, 0.65);
+}
+body.light-theme .mongo-explorer .badge {
+  color: rgba(0, 0, 0, 0.35);
+  background: rgba(0, 0, 0, 0.06);
+}
+body.light-theme .mongo-explorer .tree-item:hover {
+  background: rgba(96, 165, 250, 0.08);
+}
+body.light-theme .mongo-explorer .tree-item.active {
+  background: rgba(96, 165, 250, 0.15);
+}
+body.light-theme .mongo-explorer .item-name {
+  color: rgba(0, 0, 0, 0.82);
+}
+body.light-theme .mongo-explorer .item-meta {
+  color: rgba(0, 0, 0, 0.28);
+}
+body.light-theme .mongo-explorer .empty {
+  color: rgba(0, 0, 0, 0.25);
+}
 
-.light-theme .tree-node-content.selected {
-  background: rgba(24, 160, 88, 0.1);
-  color: #18a058;
+/* ── Redis Workspace ── */
+body.light-theme .redis-workspace {
+  background: #f5f5f8;
+  color: rgba(0, 0, 0, 0.85);
+}
+body.light-theme .redis-workspace .ov-title {
+  color: rgba(0, 0, 0, 0.85);
+}
+body.light-theme .redis-workspace .stat-card {
+  background: #fff;
+  border-color: rgba(0, 0, 0, 0.07);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+body.light-theme .redis-workspace .stat-val {
+  color: rgba(0, 0, 0, 0.9);
+}
+body.light-theme .redis-workspace .stat-label {
+  color: rgba(0, 0, 0, 0.4);
+}
+body.light-theme .redis-workspace .dist-panel,
+body.light-theme .redis-workspace .info-panel {
+  background: #fff;
+  border-color: rgba(0, 0, 0, 0.07);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+body.light-theme .redis-workspace .panel-title {
+  color: rgba(0, 0, 0, 0.55);
+}
+body.light-theme .redis-workspace .bar-bg {
+  background: rgba(0, 0, 0, 0.08);
+}
+body.light-theme .redis-workspace .bar-count {
+  color: rgba(0, 0, 0, 0.35);
+}
+body.light-theme .redis-workspace .info-k {
+  color: rgba(0, 0, 0, 0.4);
+}
+body.light-theme .redis-workspace .info-v {
+  color: rgba(0, 0, 0, 0.75);
+}
+body.light-theme .redis-workspace .key-header {
+  border-bottom-color: rgba(0, 0, 0, 0.06);
+}
+body.light-theme .redis-workspace .key-name-lg {
+  color: rgba(0, 0, 0, 0.9);
+}
+body.light-theme .redis-workspace .no-ttl {
+  color: rgba(0, 0, 0, 0.3);
+  background: rgba(0, 0, 0, 0.06);
+}
+body.light-theme .redis-workspace .loading-center {
+  color: rgba(0, 0, 0, 0.3);
+}
+body.light-theme .redis-workspace .val-toolbar {
+  border-bottom-color: rgba(0, 0, 0, 0.06);
+}
+body.light-theme .redis-workspace .val-title {
+  color: rgba(0, 0, 0, 0.75);
+}
+body.light-theme .redis-workspace .val-size {
+  color: rgba(0, 0, 0, 0.35);
+}
+body.light-theme .redis-workspace .value-textarea {
+  background: #fafafa;
+  color: #1a1a1a;
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+}
+body.light-theme .redis-workspace .hash-header {
+  color: rgba(0, 0, 0, 0.3);
+  border-bottom-color: rgba(0, 0, 0, 0.06);
+}
+body.light-theme .redis-workspace .hash-row {
+  border-bottom-color: rgba(0, 0, 0, 0.04);
+}
+body.light-theme .redis-workspace .hash-row:hover {
+  background: rgba(245, 158, 11, 0.06);
+}
+body.light-theme .redis-workspace .hash-row code {
+  color: #b45309;
+}
+body.light-theme .redis-workspace .field-val {
+  color: rgba(0, 0, 0, 0.75);
+}
+body.light-theme .redis-workspace .list-header {
+  color: rgba(0, 0, 0, 0.3);
+}
+body.light-theme .redis-workspace .list-row:hover {
+  background: rgba(24, 160, 88, 0.06);
+}
+body.light-theme .redis-workspace .idx-badge {
+  color: #15803d;
+  background: rgba(21, 128, 61, 0.1);
+}
+body.light-theme .redis-workspace .list-val {
+  color: rgba(0, 0, 0, 0.8);
+}
+body.light-theme .redis-workspace .set-item {
+  color: #2563eb;
+  border-color: rgba(37, 99, 235, 0.2);
+  background: rgba(37, 99, 235, 0.06);
+}
+body.light-theme .redis-workspace .zset-header {
+  color: rgba(0, 0, 0, 0.3);
+}
+body.light-theme .redis-workspace .zset-row:hover {
+  background: rgba(167, 139, 250, 0.06);
+}
+body.light-theme .redis-workspace .rank-badge {
+  color: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.06);
+}
+body.light-theme .redis-workspace .score-val {
+  color: #7c3aed;
+}
+body.light-theme .redis-workspace .member-val {
+  color: rgba(0, 0, 0, 0.82);
+}
+
+/* ── Redis Explorer ── */
+body.light-theme .redis-explorer .explorer-toolbar {
+  border-bottom-color: rgba(0, 0, 0, 0.06);
+}
+body.light-theme .redis-explorer .type-filters {
+  border-bottom-color: rgba(0, 0, 0, 0.06);
+}
+body.light-theme .redis-explorer .type-pill {
+  background: rgba(0, 0, 0, 0.05);
+  color: rgba(0, 0, 0, 0.4);
+}
+body.light-theme .redis-explorer .section-hd:hover {
+  background: rgba(0, 0, 0, 0.04);
+}
+body.light-theme .redis-explorer .arrow {
+  color: rgba(0, 0, 0, 0.3);
+}
+body.light-theme .redis-explorer .sec-label {
+  color: rgba(0, 0, 0, 0.65);
+}
+body.light-theme .redis-explorer .badge {
+  color: rgba(0, 0, 0, 0.35);
+  background: rgba(0, 0, 0, 0.06);
+}
+body.light-theme .redis-explorer .key-name {
+  color: rgba(0, 0, 0, 0.82);
+}
+body.light-theme .redis-explorer .key-ttl {
+  color: rgba(0, 0, 0, 0.3);
+}
+body.light-theme .redis-explorer .more-hint {
+  color: rgba(0, 0, 0, 0.3);
+}
+body.light-theme .redis-explorer .info-k {
+  color: rgba(0, 0, 0, 0.4);
+}
+body.light-theme .redis-explorer .info-v {
+  color: rgba(0, 0, 0, 0.75);
+}
+body.light-theme .redis-explorer .loading-hint {
+  color: rgba(0, 0, 0, 0.3);
+}
+body.light-theme .redis-explorer .empty {
+  color: rgba(0, 0, 0, 0.25);
+}
+
+/* ── Data tables (Naive UI) ── */
+body.light-theme .n-data-table {
+  --n-border-color: rgba(0, 0, 0, 0.07);
+}
+body.light-theme .n-data-table-th {
+  background: #f8f8fb !important;
+  color: rgba(0, 0, 0, 0.65) !important;
+}
+body.light-theme .n-data-table-td {
+  color: rgba(0, 0, 0, 0.82) !important;
 }

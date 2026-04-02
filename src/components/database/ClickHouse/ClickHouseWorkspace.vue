@@ -62,7 +62,7 @@
           <span class="pg-info">{{ selectedItem?.engine || 'MergeTree' }} · ORDER BY {{ selectedItem?.orderBy || '—' }}</span>
           <div class="spacer" />
           <n-button text size="tiny" :disabled="browsePage <= 1" @click="browsePage--; loadTableData()">‹</n-button>
-          <span style="font-size:11px;color:rgba(255,255,255,0.4);padding:0 6px">第 {{ browsePage }} 页</span>
+          <span :style="{ fontSize:'11px', color: isDarkTheme ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.4)', padding:'0 6px' }">第 {{ browsePage }} 页</span>
           <n-button text size="tiny" :disabled="browseRows.length < 50" @click="browsePage++; loadTableData()">›</n-button>
         </div>
       </div>
@@ -263,24 +263,18 @@ watch(() => props.selectedItem, () => {
 
 <style scoped>
 .ch-workspace { flex: 1; display: flex; flex-direction: column; overflow: hidden; background: #13131a; color: rgba(255,255,255,0.85); }
-.ch-workspace.light-mode { background: #f5f5f8; color: rgba(0,0,0,0.85); }
 
 .tab-bar { display: flex; align-items: center; height: 38px; flex-shrink: 0; background: rgba(0,0,0,0.25); border-bottom: 1px solid rgba(255,255,255,0.06); padding: 0 12px; gap: 2px; }
-.ch-workspace.light-mode .tab-bar { background: rgba(0,0,0,0.04); border-bottom-color: rgba(0,0,0,0.07); }
 .tab-btn { display: flex; align-items: center; gap: 5px; padding: 0 12px; height: 100%; font-size: 12px; cursor: pointer; border-bottom: 2px solid transparent; color: rgba(255,255,255,0.5); transition: all 0.15s; }
 .tab-btn:hover { color: rgba(255,255,255,0.85); }
 .tab-btn.active { color: #fb923c; border-bottom-color: #fb923c; }
-.ch-workspace.light-mode .tab-btn { color: rgba(0,0,0,0.5); }
-.ch-workspace.light-mode .tab-btn.active { color: #c2410c; border-bottom-color: #c2410c; }
 .tab-content { flex: 1; overflow: hidden; display: flex; flex-direction: column; }
 
 .sql-editor-wrap { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
 .sql-toolbar { display: flex; align-items: center; gap: 8px; padding: 8px 12px; flex-shrink: 0; border-bottom: 1px solid rgba(255,255,255,0.06); }
-.ch-workspace.light-mode .sql-toolbar { border-bottom-color: rgba(0,0,0,0.06); }
 .spacer { flex: 1; }
 .sql-area-wrap { flex: 1; overflow: hidden; min-height: 140px; }
 .sql-textarea { width: 100%; height: 100%; padding: 12px 14px; resize: none; outline: none; background: #1a1a24; color: #e0e0e0; font-family: 'SF Mono','Monaco','Consolas',monospace; font-size: 13px; line-height: 1.6; border: none; box-sizing: border-box; }
-.ch-workspace.light-mode .sql-textarea { background: #fff; color: #1a1a1a; }
 
 .sql-results { flex-shrink: 0; border-top: 1px solid rgba(255,255,255,0.06); }
 .result-bar { display: flex; align-items: center; gap: 8px; padding: 0 12px; height: 34px; background: rgba(0,0,0,0.2); border-bottom: 1px solid rgba(255,255,255,0.05); }
@@ -289,32 +283,23 @@ watch(() => props.selectedItem, () => {
 .result-empty { display: flex; align-items: center; justify-content: center; height: 80px; }
 
 .browse-toolbar { display: flex; align-items: center; gap: 8px; padding: 8px 12px; flex-shrink: 0; border-bottom: 1px solid rgba(255,255,255,0.06); }
-.ch-workspace.light-mode .browse-toolbar { border-bottom-color: rgba(0,0,0,0.06); }
 .browse-info { font-size: 12px; font-weight: 500; color: rgba(255,255,255,0.6); }
-.ch-workspace.light-mode .browse-info { color: rgba(0,0,0,0.6); }
 .pagination-bar { display: flex; align-items: center; gap: 8px; padding: 6px 12px; border-top: 1px solid rgba(255,255,255,0.06); height: 36px; flex-shrink: 0; font-size: 12px; }
 .pg-info { color: rgba(255,255,255,0.4); }
-.ch-workspace.light-mode .pg-info { color: rgba(0,0,0,0.4); }
 
 .schema-header { display: flex; align-items: center; gap: 8px; padding: 10px 14px; flex-shrink: 0; border-bottom: 1px solid rgba(255,255,255,0.06); }
-.ch-workspace.light-mode .schema-header { border-bottom-color: rgba(0,0,0,0.06); }
 .schema-title { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.8); }
-.ch-workspace.light-mode .schema-title { color: rgba(0,0,0,0.8); }
 .schema-info { padding: 8px 14px; display: flex; flex-direction: column; gap: 4px; border-bottom: 1px solid rgba(255,255,255,0.06); }
-.ch-workspace.light-mode .schema-info { border-bottom-color: rgba(0,0,0,0.06); }
 .info-row { display: flex; align-items: center; gap: 10px; font-size: 12px; }
 .info-key { color: rgba(255,255,255,0.4); min-width: 100px; }
-.ch-workspace.light-mode .info-key { color: rgba(0,0,0,0.4); }
 .info-row code { font-family: monospace; font-size: 12px; color: #fb923c; background: rgba(251,146,60,0.1); padding: 1px 6px; border-radius: 3px; }
 
 .col-table { flex: 1; overflow-y: auto; padding: 4px 8px; }
 .col-header, .col-row { display: grid; grid-template-columns: 200px 1fr 100px; align-items: center; gap: 4px; padding: 6px 8px; border-radius: 4px; }
 .col-header { font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.3); text-transform: uppercase; }
-.ch-workspace.light-mode .col-header { color: rgba(0,0,0,0.3); }
 .col-row { border-bottom: 1px solid rgba(255,255,255,0.04); transition: background 0.1s; }
 .col-row:hover { background: rgba(255,255,255,0.03); }
 .col-name-code { font-family: monospace; font-size: 12px; color: rgba(255,255,255,0.85); }
-.ch-workspace.light-mode .col-name-code { color: rgba(0,0,0,0.85); }
 .type-badge { font-size: 11px; color: #fb923c; background: rgba(251,146,60,0.1); padding: 1px 6px; border-radius: 3px; font-family: monospace; }
 .type-badge.lc { color: #a78bfa; background: rgba(167,139,250,0.1); }
 .sort-tag { color: #18a058; font-weight: 700; }

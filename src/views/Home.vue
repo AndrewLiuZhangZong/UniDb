@@ -71,7 +71,7 @@
                 <template #trigger>
                   <n-button text size="tiny" @click="handleConnect">
                     <template #icon>
-                      <n-icon :color="isConnected ? '#18a058' : 'rgba(255,255,255,0.3)'">
+                      <n-icon :color="isConnected ? '#18a058' : (isDarkTheme ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.3)')">
                         <RadioButtonOn v-if="isConnected" /><RadioButtonOffOutline v-else />
                       </n-icon>
                     </template>
@@ -264,14 +264,12 @@ onUnmounted(() => {
 .main-layout { flex: 1; overflow: hidden; }
 
 .conn-sidebar { background: rgba(28, 28, 32, 0.98) !important; }
-.conn-sidebar.light-mode { background: rgba(255,255,255,0.99) !important; }
 
 .content-layout {
   background: #13131a;
   display: flex;
   flex-direction: column;
 }
-.light-theme .content-layout { background: #f4f4f7; }
 
 /* ── Welcome ── */
 .welcome-page {
@@ -293,16 +291,13 @@ onUnmounted(() => {
   font-size: 32px; font-weight: 700; margin: 0;
   color: rgba(255,255,255,0.95); letter-spacing: -0.5px;
 }
-.light-theme .welcome-title { color: rgba(0,0,0,0.9); }
 .welcome-subtitle { font-size: 15px; margin: 0; color: rgba(255,255,255,0.45); }
-.light-theme .welcome-subtitle { color: rgba(0,0,0,0.45); }
 
 .supported-databases { text-align: center; }
 .supported-title {
   font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.3);
   text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 16px;
 }
-.light-theme .supported-title { color: rgba(0,0,0,0.3); }
 .db-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
 .db-card {
   display: flex; flex-direction: column; align-items: center; gap: 10px;
@@ -314,10 +309,7 @@ onUnmounted(() => {
   background: rgba(255,255,255,0.07); border-color: rgba(255,255,255,0.12);
   transform: translateY(-3px);
 }
-.light-theme .db-card { background: rgba(0,0,0,0.02); border-color: rgba(0,0,0,0.06); }
-.light-theme .db-card:hover { background: rgba(0,0,0,0.05); border-color: rgba(0,0,0,0.1); }
 .db-label { font-size: 13px; font-weight: 500; color: rgba(255,255,255,0.75); }
-.light-theme .db-label { color: rgba(0,0,0,0.75); }
 
 /* ── Workspace shell ── */
 .workspace-shell {
@@ -338,10 +330,6 @@ onUnmounted(() => {
   background: rgba(22, 22, 28, 0.95);
   border-right: 1px solid rgba(255,255,255,0.06);
 }
-.db-tree-panel.light-mode {
-  background: rgba(248, 248, 252, 0.98);
-  border-right-color: rgba(0,0,0,0.07);
-}
 
 /* Mini connection header inside DB tree */
 .panel-conn-header {
@@ -352,7 +340,6 @@ onUnmounted(() => {
   border-bottom: 1px solid rgba(255,255,255,0.06);
   flex-shrink: 0;
 }
-.light-mode .panel-conn-header { border-bottom-color: rgba(0,0,0,0.07); }
 
 .panel-conn-info {
   flex: 1;
@@ -369,7 +356,6 @@ onUnmounted(() => {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.light-mode .panel-conn-name { color: rgba(0,0,0,0.9); }
 .panel-conn-host {
   font-size: 10px;
   color: rgba(255,255,255,0.35);
@@ -378,7 +364,6 @@ onUnmounted(() => {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.light-mode .panel-conn-host { color: rgba(0,0,0,0.35); }
 
 /* Column 3: Main workspace */
 .workspace-main {

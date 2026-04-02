@@ -58,7 +58,7 @@
       <div v-if="activeTab === 'browse'" class="tab-content">
         <div class="browse-toolbar">
           <n-input v-model:value="filterQuery" size="small" placeholder='{ "role": "admin" }' style="flex:1;font-family:monospace;font-size:12px">
-            <template #prefix><span style="color:rgba(255,255,255,0.3);font-size:11px;margin-right:4px">filter:</span></template>
+            <template #prefix><span :style="{ color: isDarkTheme ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.3)', fontSize:'11px', marginRight:'4px' }">filter:</span></template>
           </n-input>
           <n-button size="small" type="primary" :loading="browseLoading" @click="loadDocs">
             <template #icon><n-icon><SearchOutline /></n-icon></template>查询
@@ -162,7 +162,7 @@
             <span class="ih keys">Key</span>
             <span class="ih unique">UNIQUE</span>
           </div>
-          <div v-if="!indexes.length" style="padding:20px;text-align:center;color:rgba(255,255,255,0.3);font-size:13px">暂无索引</div>
+          <div v-if="!indexes.length" :style="{ padding:'20px', textAlign:'center', color: isDarkTheme ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.3)', fontSize:'13px' }">暂无索引</div>
           <div v-for="idx in indexes" :key="idx.name" class="idx-row">
             <span class="ih name"><code>{{ idx.name }}</code></span>
             <span class="ih keys"><code class="keys-badge">{{ JSON.stringify(idx.key || idx.keys) }}</code></span>
@@ -466,25 +466,19 @@ watch(() => activeTab.value, (tab) => {
 
 <style scoped>
 .mongo-workspace { flex: 1; display: flex; flex-direction: column; overflow: hidden; background: #13131a; color: rgba(255,255,255,0.85); }
-.mongo-workspace.light-mode { background: #f5f5f8; color: rgba(0,0,0,0.85); }
 
 .tab-bar { display: flex; align-items: center; height: 38px; flex-shrink: 0; background: rgba(0,0,0,0.25); border-bottom: 1px solid rgba(255,255,255,0.06); padding: 0 12px; gap: 2px; }
-.mongo-workspace.light-mode .tab-bar { background: rgba(0,0,0,0.04); border-bottom-color: rgba(0,0,0,0.07); }
 .tab-btn { display: flex; align-items: center; gap: 5px; padding: 0 12px; height: 100%; font-size: 12px; cursor: pointer; border-bottom: 2px solid transparent; color: rgba(255,255,255,0.5); transition: all 0.15s; }
 .tab-btn:hover { color: rgba(255,255,255,0.85); }
 .tab-btn.active { color: #60a5fa; border-bottom-color: #60a5fa; }
-.mongo-workspace.light-mode .tab-btn { color: rgba(0,0,0,0.5); }
-.mongo-workspace.light-mode .tab-btn.active { color: #1d6fa4; border-bottom-color: #1d6fa4; }
 .tab-content { flex: 1; overflow: hidden; display: flex; flex-direction: column; }
 .spacer { flex: 1; }
 
 /* Query editor */
 .query-editor-wrap { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
 .q-toolbar { display: flex; align-items: center; gap: 8px; padding: 8px 12px; flex-shrink: 0; border-bottom: 1px solid rgba(255,255,255,0.06); }
-.mongo-workspace.light-mode .q-toolbar { border-bottom-color: rgba(0,0,0,0.06); }
 .q-area-wrap { flex: 1; overflow: hidden; min-height: 120px; }
 .q-textarea { width: 100%; height: 100%; padding: 12px 14px; resize: none; outline: none; background: #1a1a24; color: #e0e0e0; font-family: 'SF Mono','Monaco','Consolas',monospace; font-size: 12px; line-height: 1.6; border: none; box-sizing: border-box; }
-.mongo-workspace.light-mode .q-textarea { background: #fff; color: #1a1a1a; }
 .agg-area { flex: 1; overflow: hidden; min-height: 120px; }
 
 .q-results { flex-shrink: 0; border-top: 1px solid rgba(255,255,255,0.06); }
@@ -499,7 +493,6 @@ watch(() => activeTab.value, (tab) => {
 
 /* Browse */
 .browse-toolbar { display: flex; align-items: center; gap: 8px; padding: 8px 12px; flex-shrink: 0; border-bottom: 1px solid rgba(255,255,255,0.06); }
-.mongo-workspace.light-mode .browse-toolbar { border-bottom-color: rgba(0,0,0,0.06); }
 .view-toggle-sm { display: flex; gap: 2px; flex-shrink: 0; }
 .vt { padding: 2px 8px; border-radius: 3px; font-size: 11px; cursor: pointer; color: rgba(255,255,255,0.35); }
 .vt.active { color: #60a5fa; background: rgba(96,165,250,0.12); }
@@ -509,37 +502,26 @@ watch(() => activeTab.value, (tab) => {
 .json-scroll::-webkit-scrollbar { width: 4px; }
 .json-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
 .json-doc { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 6px; padding: 10px; position: relative; }
-.mongo-workspace.light-mode .json-doc { background: #fff; border-color: rgba(0,0,0,0.08); }
 .json-doc-actions { position: absolute; top: 6px; right: 8px; display: flex; gap: 4px; opacity: 0; transition: opacity 0.1s; }
 .json-doc:hover .json-doc-actions { opacity: 1; }
 .json-pre { margin: 0; font-family: 'SF Mono',monospace; font-size: 11px; line-height: 1.5; color: rgba(255,255,255,0.75); white-space: pre-wrap; }
-.mongo-workspace.light-mode .json-pre { color: rgba(0,0,0,0.75); }
 .json-pre-sm { margin: 0; font-family: 'SF Mono',monospace; font-size: 11px; line-height: 1.5; color: rgba(255,255,255,0.75); white-space: pre-wrap; }
-.mongo-workspace.light-mode .json-pre-sm { color: rgba(0,0,0,0.75); }
 
 .agg-toolbar { display: flex; align-items: center; gap: 8px; padding: 8px 12px; flex-shrink: 0; border-bottom: 1px solid rgba(255,255,255,0.06); }
-.mongo-workspace.light-mode .agg-toolbar { border-bottom-color: rgba(0,0,0,0.06); }
 
 .pagination-bar { display: flex; align-items: center; gap: 8px; padding: 6px 12px; border-top: 1px solid rgba(255,255,255,0.06); height: 36px; flex-shrink: 0; }
-.mongo-workspace.light-mode .pagination-bar { border-top-color: rgba(0,0,0,0.06); }
 .pg-info { font-size: 12px; color: rgba(255,255,255,0.4); }
-.mongo-workspace.light-mode .pg-info { color: rgba(0,0,0,0.4); }
 .pg-num { font-size: 12px; color: rgba(255,255,255,0.6); padding: 0 4px; }
-.mongo-workspace.light-mode .pg-num { color: rgba(0,0,0,0.6); }
 
 /* Schema */
 .schema-header { display: flex; align-items: center; gap: 8px; padding: 10px 14px; flex-shrink: 0; border-bottom: 1px solid rgba(255,255,255,0.06); }
-.mongo-workspace.light-mode .schema-header { border-bottom-color: rgba(0,0,0,0.06); }
 .schema-title { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.8); }
-.mongo-workspace.light-mode .schema-title { color: rgba(0,0,0,0.8); }
 .schema-list { flex: 1; overflow-y: auto; padding: 4px 8px; }
 .schema-row { display: grid; grid-template-columns: 180px 200px 60px; align-items: center; gap: 4px; padding: 6px 8px; border-radius: 4px; }
 .schema-row.header { font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.3); text-transform: uppercase; }
-.mongo-workspace.light-mode .schema-row.header { color: rgba(0,0,0,0.3); }
 .schema-row:not(.header) { border-bottom: 1px solid rgba(255,255,255,0.04); transition: background 0.1s; }
 .schema-row:not(.header):hover { background: rgba(255,255,255,0.03); }
 .field-name { font-family: monospace; font-size: 12px; color: rgba(255,255,255,0.85); }
-.mongo-workspace.light-mode .field-name { color: rgba(0,0,0,0.85); }
 .type-badge { font-size: 11px; padding: 1px 6px; border-radius: 3px; font-family: monospace; }
 .type-badge.objectid { color: #f59e0b; background: rgba(245,158,11,0.1); }
 .type-badge.string { color: #4db8ff; background: rgba(77,184,255,0.1); }
@@ -549,17 +531,13 @@ watch(() => activeTab.value, (tab) => {
 .type-badge.object { color: #60a5fa; background: rgba(96,165,250,0.1); }
 .req-yes { color: #18a058; font-weight: 700; }
 .req-no { color: rgba(255,255,255,0.2); }
-.mongo-workspace.light-mode .req-no { color: rgba(0,0,0,0.2); }
 
 /* Indexes */
 .idx-toolbar { display: flex; align-items: center; gap: 8px; padding: 10px 14px; flex-shrink: 0; border-bottom: 1px solid rgba(255,255,255,0.06); }
-.mongo-workspace.light-mode .idx-toolbar { border-bottom-color: rgba(0,0,0,0.06); }
 .idx-title { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.8); }
-.mongo-workspace.light-mode .idx-title { color: rgba(0,0,0,0.8); }
 .idx-list { flex: 1; overflow-y: auto; padding: 4px 8px; }
 .idx-row { display: grid; grid-template-columns: 220px 1fr 70px 40px; align-items: center; gap: 4px; padding: 7px 8px; border-radius: 4px; }
 .idx-row.header { font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.3); text-transform: uppercase; }
-.mongo-workspace.light-mode .idx-row.header { color: rgba(0,0,0,0.3); }
 .idx-row:not(.header) { border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 12px; }
 .idx-row:not(.header):hover { background: rgba(255,255,255,0.03); }
 .idx-row code { font-family: monospace; font-size: 11px; color: rgba(255,255,255,0.7); }

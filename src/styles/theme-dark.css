@@ -538,3 +538,6 @@ body.dark-theme {
 .report-card .report-tip { color: rgba(255,255,255,0.6); }
 .report-card .report-form .form-field .field-label { color: rgba(255,255,255,0.8); }
 .report-card .report-version-info .version-tag { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.4); }
+
+/* ── Check Update Dialog ── */
+.check-update-card { background: #1e1e26; border: 1px solid rgba(255,255,255,0.1); }

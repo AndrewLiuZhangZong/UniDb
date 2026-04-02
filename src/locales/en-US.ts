@@ -214,7 +214,9 @@ export default {
       upToDate: 'You are using the latest version',
       upToDateDesc: 'UniDb v{version} is the newest version available',
       newVersion: 'Update Available',
-      newVersionDesc: 'A new version ({version}) is available'
+      newVersionDesc: 'A new version ({version}) is available',
+      download: 'Download Update',
+      checkAgain: 'Check Again'
     }
   },
   explorer: {

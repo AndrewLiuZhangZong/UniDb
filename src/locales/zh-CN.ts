@@ -214,7 +214,9 @@ export default {
       upToDate: '已是最新版本',
       upToDateDesc: 'UniDb v{version} 是目前最新版本',
       newVersion: '发现新版本',
-      newVersionDesc: '有新版本 ({version}) 可供下载'
+      newVersionDesc: '有新版本 ({version}) 可供下载',
+      download: '下载更新',
+      checkAgain: '重新检查'
     }
   },
   explorer: {

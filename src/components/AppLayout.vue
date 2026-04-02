@@ -19,7 +19,6 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { useI18n } from 'vue-i18n'
 import { useMessage } from 'naive-ui'
 import TitleBar from './TitleBar.vue'
 import AppMenuBar from './AppMenuBar.vue'
@@ -28,7 +27,6 @@ import { useConnectionStore } from '../stores/connection'
 
 const router = useRouter()
 const message = useMessage()
-const { t } = useI18n()
 const connectionStore = useConnectionStore()
 const helpDialogsRef = ref<InstanceType<typeof HelpDialogs>>()
 
@@ -146,10 +144,7 @@ const handleMenuAction = (action: string) => {
       helpDialogsRef.value?.showReport()
       break
     case 'checkUpdates':
-      message.info(t('help.checkUpdates.checking'))
-      setTimeout(() => {
-        message.success(t('help.checkUpdates.upToDateDesc', { version: '0.1.0' }))
-      }, 1500)
+      helpDialogsRef.value?.showCheckUpdates()
       break
     case 'about':
       helpDialogsRef.value?.showAbout()

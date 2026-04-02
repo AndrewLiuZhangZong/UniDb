@@ -10,21 +10,27 @@
     <div class="page-content">
       <router-view />
     </div>
+
+    <!-- Help Dialogs -->
+    <HelpDialogs ref="helpDialogsRef" />
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { useMessage, useDialog } from 'naive-ui'
+import { useI18n } from 'vue-i18n'
+import { useMessage } from 'naive-ui'
 import TitleBar from './TitleBar.vue'
 import AppMenuBar from './AppMenuBar.vue'
+import HelpDialogs from './HelpDialogs.vue'
 import { useConnectionStore } from '../stores/connection'
 
 const router = useRouter()
 const message = useMessage()
-const dialog = useDialog()
+const { t } = useI18n()
 const connectionStore = useConnectionStore()
+const helpDialogsRef = ref<InstanceType<typeof HelpDialogs>>()
 
 const isMacOS = computed(() => {
   return window.electronAPI?.platform === 'darwin'
@@ -131,23 +137,22 @@ const handleMenuAction = (action: string) => {
       window.electronAPI?.toggleFullscreen?.()
       break
     case 'documentation':
-      window.open('https://unidb.com/docs', '_blank')
+      helpDialogsRef.value?.showDocs()
       break
     case 'keyboardShortcuts':
-      message.info('Keyboard shortcuts')
+      window.open('https://unidb.com/docs/keyboard', '_blank')
       break
     case 'reportBug':
-      window.open('https://github.com/AndrewLiuZhangZong/UniDb/issues', '_blank')
+      helpDialogsRef.value?.showReport()
       break
     case 'checkUpdates':
-      message.info('Checking for updates...')
+      message.info(t('help.checkUpdates.checking'))
+      setTimeout(() => {
+        message.success(t('help.checkUpdates.upToDateDesc', { version: '0.1.0' }))
+      }, 1500)
       break
     case 'about':
-      dialog.info({
-        title: 'UniDb',
-        content: `Version: 0.1.0\nElectron: ${window.electronAPI?.versions?.electron || 'N/A'}\nNode: ${window.electronAPI?.versions?.node || 'N/A'}`,
-        positiveText: 'OK'
-      })
+      helpDialogsRef.value?.showAbout()
       break
     default:
       console.log('Unhandled action:', action)

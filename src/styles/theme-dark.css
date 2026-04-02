@@ -140,12 +140,6 @@ body.dark-theme {
 .driver-card .driver-name { color: var(--text-primary); }
 .driver-card .driver-version { color: var(--text-disabled); }
 
-/* ── About Card ── */
-.about-card { background: var(--bg-hover); border: 1px solid var(--border-secondary); }
-.about-card .about-name { color: var(--text-primary); }
-.about-card .about-desc { color: var(--text-disabled); }
-.about-card .about-meta { color: var(--text-disabled); }
-
 /* ── Log Viewer ── */
 .log-viewer-container .page-header { border-bottom: 1px solid var(--border-secondary); }
 .log-viewer-container .page-title { color: var(--text-primary); }
@@ -522,7 +516,25 @@ body.dark-theme {
 .settings-container .driver-card { background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.06); }
 .settings-container .driver-name { color: rgba(255, 255, 255, 0.9); }
 .settings-container .driver-version { color: rgba(255, 255, 255, 0.4); }
-.settings-container .about-card { background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.06); }
-.settings-container .about-name { color: rgba(255, 255, 255, 0.95); }
-.settings-container .about-desc { color: rgba(255, 255, 255, 0.5); }
-.settings-container .about-meta { color: rgba(255, 255, 255, 0.4); }
+
+/* ── Help Dialogs (About / Docs / Report Bug) ── */
+.about-card { background: #1e1e26; border: 1px solid rgba(255,255,255,0.1); }
+.about-body .about-name { color: rgba(255,255,255,0.95); }
+.about-body .about-tagline { color: rgba(255,255,255,0.45); }
+.about-body .version-label { color: rgba(255,255,255,0.4); }
+.about-body .about-meta-grid .meta-item { background: rgba(255,255,255,0.04); }
+.about-body .about-meta-grid .meta-label { color: rgba(255,255,255,0.35); }
+.about-body .about-meta-grid .meta-value { color: rgba(255,255,255,0.8); }
+.about-body .about-links .about-link-btn { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); color: rgba(255,255,255,0.75); }
+.about-body .about-copyright { color: rgba(255,255,255,0.25); }
+
+.docs-card { background: #1e1e26; border: 1px solid rgba(255,255,255,0.1); }
+.docs-card .docs-grid .doc-item { background: rgba(255,255,255,0.04); }
+.docs-card .docs-grid .doc-info h4 { color: rgba(255,255,255,0.88); }
+.docs-card .docs-grid .doc-info p { color: rgba(255,255,255,0.4); }
+.docs-card .docs-grid .doc-arrow { color: rgba(255,255,255,0.25); }
+
+.report-card { background: #1e1e26; border: 1px solid rgba(255,255,255,0.1); }
+.report-card .report-tip { color: rgba(255,255,255,0.6); }
+.report-card .report-form .form-field .field-label { color: rgba(255,255,255,0.8); }
+.report-card .report-version-info .version-tag { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.4); }

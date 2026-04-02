@@ -125,9 +125,7 @@ export default {
     sections: {
       general: 'General',
       drivers: 'Drivers',
-      logs: 'Logs',
-      updates: 'Updates',
-      about: 'About'
+      logs: 'Logs'
     },
     language: 'Language',
     languageDesc: 'Select interface display language',
@@ -177,6 +175,47 @@ export default {
     support: 'Support Us',
     lightTheme: 'Switch to Light Theme',
     darkTheme: 'Switch to Dark Theme'
+  },
+  help: {
+    about: {
+      tagline: 'Modern cross-platform database management tool',
+      version: 'Version',
+      electron: 'Electron',
+      node: 'Node.js',
+      chrome: 'Chrome',
+      platform: 'Platform',
+      viewDocs: 'Documentation',
+      reportIssue: 'Report Issue'
+    },
+    docs: {
+      title: 'Documentation',
+      userGuide: 'User Guide',
+      userGuideDesc: 'Get started with UniDb and learn the basics',
+      apiRef: 'API Reference',
+      apiRefDesc: 'Developer documentation and API details',
+      faq: 'FAQ',
+      faqDesc: 'Frequently asked questions and troubleshooting',
+      githubDesc: 'View source code and contribute'
+    },
+    report: {
+      title: 'Report an Issue',
+      tip: 'Thank you for helping improve UniDb! Please describe the issue in detail.',
+      issueTitle: 'Issue Title',
+      titlePlaceholder: 'Briefly describe the problem',
+      description: 'Description',
+      descPlaceholder: 'Describe the steps to reproduce, expected behavior, and actual behavior...',
+      email: 'Email (optional)',
+      emailPlaceholder: 'your email (optional)',
+      submit: 'Open GitHub Issue',
+      submitSuccess: 'GitHub issue page opened in browser'
+    },
+    checkUpdates: {
+      checking: 'Checking for updates...',
+      upToDate: 'You are using the latest version',
+      upToDateDesc: 'UniDb v{version} is the newest version available',
+      newVersion: 'Update Available',
+      newVersionDesc: 'A new version ({version}) is available'
+    }
   },
   explorer: {
     title: 'Database Explorer',

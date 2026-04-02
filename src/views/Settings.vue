@@ -118,34 +118,6 @@
           <LogsPanel />
         </div>
 
-        <!-- About -->
-        <div v-if="activeSection === 'about'" class="settings-section">
-          <h3 class="section-title">{{ t('settings.sections.about') }}</h3>
-
-          <div class="about-card">
-            <div class="about-logo">
-              <svg width="80" height="80" viewBox="0 0 256 256" fill="none">
-                <circle cx="128" cy="128" r="100" fill="url(#aboutGrad)"/>
-                <ellipse cx="128" cy="88" rx="50" ry="20" fill="rgba(255,255,255,0.3)"/>
-                <ellipse cx="128" cy="128" rx="50" ry="20" fill="rgba(255,255,255,0.2)"/>
-                <ellipse cx="128" cy="168" rx="50" ry="20" fill="rgba(255,255,255,0.1)"/>
-                <defs>
-                  <linearGradient id="aboutGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stop-color="#18a058"/>
-                    <stop offset="100%" stop-color="#36b374"/>
-                  </linearGradient>
-                </defs>
-              </svg>
-            </div>
-            <div class="about-info">
-              <h2 class="about-name">UniDb</h2>
-              <p class="about-desc">{{ t('settings.aboutDesc') }}</p>
-              <div class="about-meta">
-                <span>{{ t('settings.version') }}: 0.1.0</span>
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   </div>
@@ -156,7 +128,7 @@ import { ref, computed, defineAsyncComponent } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { NIcon, NSelect, NButton, NTag, useMessage } from 'naive-ui'
 import {
-  SettingsOutline, HardwareChipOutline, InformationCircleOutline,
+  SettingsOutline, HardwareChipOutline,
   ServerOutline, CloudDownloadOutline, ListOutline
 } from '@vicons/ionicons5'
 import { useSettingsStore } from '../stores/settings'
@@ -175,8 +147,7 @@ const activeSection = ref('general')
 const sections = [
   { key: 'general', icon: SettingsOutline },
   { key: 'drivers', icon: HardwareChipOutline },
-  { key: 'logs', icon: ListOutline },
-  { key: 'about', icon: InformationCircleOutline }
+  { key: 'logs', icon: ListOutline }
 ]
 
 const languageOptions = [
@@ -388,45 +359,5 @@ const handleRemoveDriver = (driver: any) => {
 .driver-actions {
   display: flex;
   justify-content: flex-end;
-}
-
-/* About */
-.about-card {
-  display: flex;
-  align-items: center;
-  gap: 24px;
-  padding: 32px;
-  background: rgba(255, 255, 255, 0.02);
-  border-radius: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  margin-bottom: 24px;
-}
-
-.about-logo svg {
-  filter: drop-shadow(0 4px 12px rgba(24, 160, 88, 0.3));
-}
-
-.about-info {
-  flex: 1;
-}
-
-.aboutName {
-  font-size: 28px;
-  font-weight: 700;
-  color: rgba(255, 255, 255, 0.95);
-  margin: 0 0 8px;
-}
-
-.about-desc {
-  font-size: 14px;
-  color: rgba(255, 255, 255, 0.5);
-  margin: 0 0 16px;
-}
-
-.about-meta {
-  display: flex;
-  gap: 24px;
-  font-size: 12px;
-  color: rgba(255, 255, 255, 0.4);
 }
 </style>

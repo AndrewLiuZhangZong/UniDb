@@ -745,7 +745,25 @@ body.light-theme .settings-container .setting-desc { color: rgba(0, 0, 0, 0.4); 
 body.light-theme .settings-container .driver-card { background: rgba(0, 0, 0, 0.02); border-color: rgba(0, 0, 0, 0.06); }
 body.light-theme .settings-container .driver-name { color: rgba(0, 0, 0, 0.9); }
 body.light-theme .settings-container .driver-version { color: rgba(0, 0, 0, 0.4); }
-body.light-theme .settings-container .about-card { background: rgba(0, 0, 0, 0.02); border-color: rgba(0, 0, 0, 0.06); }
-body.light-theme .settings-container .about-name { color: rgba(0, 0, 0, 0.95); }
-body.light-theme .settings-container .about-desc { color: rgba(0, 0, 0, 0.5); }
-body.light-theme .settings-container .about-meta { color: rgba(0, 0, 0, 0.4); }
+
+/* ── Help Dialogs (About / Docs / Report Bug) ── */
+body.light-theme .about-card { background: #ffffff; border: 1px solid rgba(0,0,0,0.1); }
+body.light-theme .about-body .about-name { color: rgba(0,0,0,0.9); }
+body.light-theme .about-body .about-tagline { color: rgba(0,0,0,0.45); }
+body.light-theme .about-body .version-label { color: rgba(0,0,0,0.4); }
+body.light-theme .about-body .about-meta-grid .meta-item { background: rgba(0,0,0,0.03); }
+body.light-theme .about-body .about-meta-grid .meta-label { color: rgba(0,0,0,0.35); }
+body.light-theme .about-body .about-meta-grid .meta-value { color: rgba(0,0,0,0.75); }
+body.light-theme .about-body .about-links .about-link-btn { background: rgba(0,0,0,0.04); border: 1px solid rgba(0,0,0,0.1); color: rgba(0,0,0,0.7); }
+body.light-theme .about-body .about-copyright { color: rgba(0,0,0,0.25); }
+
+body.light-theme .docs-card { background: #ffffff; border: 1px solid rgba(0,0,0,0.1); }
+body.light-theme .docs-card .docs-grid .doc-item { background: rgba(0,0,0,0.03); }
+body.light-theme .docs-card .docs-grid .doc-info h4 { color: rgba(0,0,0,0.85); }
+body.light-theme .docs-card .docs-grid .doc-info p { color: rgba(0,0,0,0.4); }
+body.light-theme .docs-card .docs-grid .doc-arrow { color: rgba(0,0,0,0.25); }
+
+body.light-theme .report-card { background: #ffffff; border: 1px solid rgba(0,0,0,0.1); }
+body.light-theme .report-card .report-tip { color: rgba(0,0,0,0.6); }
+body.light-theme .report-card .report-form .form-field .field-label { color: rgba(0,0,0,0.8); }
+body.light-theme .report-card .report-version-info .version-tag { background: rgba(0,0,0,0.05); color: rgba(0,0,0,0.4); }

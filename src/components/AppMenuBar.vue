@@ -91,15 +91,8 @@
       </div>
 
       <!-- Settings -->
-      <div class="menu-wrapper">
-        <div class="menu-item">
-          <span class="menu-label">{{ t('menu.settings') }}</span>
-        </div>
-        <div class="dropdown-menu">
-          <div class="dropdown-item" @click.stop="handleAction('settings')">
-            <span class="item-label">{{ t('menu.settings') }}</span>
-          </div>
-        </div>
+      <div class="menu-item" @click="handleAction('settings')">
+        <span class="menu-label">{{ t('menu.settings') }}</span>
       </div>
 
       <!-- Help -->
@@ -111,10 +104,6 @@
           <div class="dropdown-item" @click.stop="handleAction('documentation')">
             <n-icon class="item-icon"><BookOutline /></n-icon>
             <span class="item-label">{{ t('menu.documentation') }}</span>
-          </div>
-          <div class="dropdown-item" @click.stop="handleAction('keyboardShortcuts')">
-            <n-icon class="item-icon"><DocumentTextOutline /></n-icon>
-            <span class="item-label">{{ t('menu.keyboardShortcuts') }}</span>
           </div>
           <div class="dropdown-item" @click.stop="handleAction('reportBug')">
             <n-icon class="item-icon"><BugOutline /></n-icon>
@@ -144,8 +133,7 @@ import {
   AddOutline, DownloadOutline, CloudUploadOutline,
   ExitOutline, CloudDoneOutline, CloudOfflineOutline,
   RefreshOutline, SyncOutline, CreateOutline, ServerOutline, BuildOutline,
-  BookOutline, BugOutline, CloudDownloadOutline, InformationCircleOutline,
-  DocumentTextOutline
+  BookOutline, BugOutline, CloudDownloadOutline, InformationCircleOutline
 } from '@vicons/ionicons5'
 import { useSettingsStore } from '../stores/settings'
 

@@ -140,10 +140,12 @@ import RedisWorkspace from '../components/database/Redis/RedisWorkspace.vue'
 
 import { useConnectionStore } from '../stores/connection'
 import { useSettingsStore } from '../stores/settings'
+import { useRouter } from 'vue-router'
 
 const { t } = useI18n()
 const message = useMessage()
 const dialog = useDialog()
+const router = useRouter()
 const connectionStore = useConnectionStore()
 const settingsStore = useSettingsStore()
 
@@ -211,6 +213,7 @@ const handleMenuAction = (action: string) => {
     case 'newConnection': case 'manageConnections': case 'openConnection':
       editingConnection.value = null; showConnectionDialog.value = true; break
     case 'refresh': connectionStore.fetchConnections(); message.success('Refreshed'); break
+    case 'settings': router.push('/settings'); break
     case 'documentation': window.open('https://unidb.com/docs', '_blank'); break
     case 'reportBug': window.open('https://github.com/AndrewLiuZhangZong/UniDb/issues', '_blank'); break
     case 'checkUpdates': message.info('Checking for updates...'); break

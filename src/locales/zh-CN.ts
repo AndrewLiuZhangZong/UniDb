@@ -125,9 +125,7 @@ export default {
     sections: {
       general: '通用',
       drivers: '驱动管理',
-      logs: '日志',
-      updates: '更新',
-      about: '关于'
+      logs: '日志'
     },
     language: '语言',
     languageDesc: '选择界面显示语言',
@@ -177,6 +175,47 @@ export default {
     support: '支持我们',
     lightTheme: '切换到浅色主题',
     darkTheme: '切换到深色主题'
+  },
+  help: {
+    about: {
+      tagline: '现代化跨平台数据库管理工具',
+      version: '版本',
+      electron: 'Electron',
+      node: 'Node.js',
+      chrome: 'Chrome',
+      platform: '平台',
+      viewDocs: '使用文档',
+      reportIssue: '报告问题'
+    },
+    docs: {
+      title: '使用文档',
+      userGuide: '用户指南',
+      userGuideDesc: '快速上手，了解 UniDb 基本用法',
+      apiRef: 'API 参考',
+      apiRefDesc: '开发者文档和 API 接口说明',
+      faq: '常见问题',
+      faqDesc: '常见问题与故障排查指南',
+      githubDesc: '查看源代码，参与贡献'
+    },
+    report: {
+      title: '报告问题',
+      tip: '感谢您帮助改进 UniDb！请详细描述遇到的问题。',
+      issueTitle: '问题标题',
+      titlePlaceholder: '简要描述问题',
+      description: '问题描述',
+      descPlaceholder: '请描述复现步骤、预期行为和实际行为...',
+      email: '邮箱（选填）',
+      emailPlaceholder: 'your email (optional)',
+      submit: '前往 GitHub 提交',
+      submitSuccess: '已在浏览器中打开 GitHub Issue'
+    },
+    checkUpdates: {
+      checking: '正在检查更新...',
+      upToDate: '已是最新版本',
+      upToDateDesc: 'UniDb v{version} 是目前最新版本',
+      newVersion: '发现新版本',
+      newVersionDesc: '有新版本 ({version}) 可供下载'
+    }
   },
   explorer: {
     title: '数据库浏览器',

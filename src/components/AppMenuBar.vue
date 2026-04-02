@@ -61,43 +61,6 @@
         </div>
       </div>
 
-      <!-- Edit -->
-      <div class="menu-wrapper">
-        <div class="menu-item">
-          <span class="menu-label">{{ getMenuLabel('edit') }}</span>
-        </div>
-        <div class="dropdown-menu">
-          <div class="dropdown-item" @click.stop="handleAction('undo')">
-            <n-icon class="item-icon"><ArrowUndoOutline /></n-icon>
-            <span class="item-label">{{ t('menu.undo') }}</span>
-            <span class="item-shortcut">⌘Z</span>
-          </div>
-          <div class="dropdown-item" @click.stop="handleAction('redo')">
-            <n-icon class="item-icon"><ArrowRedoOutline /></n-icon>
-            <span class="item-label">{{ t('menu.redo') }}</span>
-            <span class="item-shortcut">⇧⌘Z</span>
-          </div>
-          <div class="dropdown-divider"></div>
-          <div class="dropdown-item" @click.stop="handleAction('cut')">
-            <span class="item-label">{{ t('menu.cut') }}</span>
-            <span class="item-shortcut">⌘X</span>
-          </div>
-          <div class="dropdown-item" @click.stop="handleAction('copy')">
-            <span class="item-label">{{ t('menu.copy') }}</span>
-            <span class="item-shortcut">⌘C</span>
-          </div>
-          <div class="dropdown-item" @click.stop="handleAction('paste')">
-            <span class="item-label">{{ t('menu.paste') }}</span>
-            <span class="item-shortcut">⌘V</span>
-          </div>
-          <div class="dropdown-divider"></div>
-          <div class="dropdown-item" @click.stop="handleAction('selectAll')">
-            <span class="item-label">{{ t('menu.selectAll') }}</span>
-            <span class="item-shortcut">⌘A</span>
-          </div>
-        </div>
-      </div>
-
       <!-- Database -->
       <div class="menu-wrapper">
         <div class="menu-item">
@@ -170,47 +133,6 @@
         </div>
       </div>
 
-      <!-- View -->
-      <div class="menu-wrapper">
-        <div class="menu-item">
-          <span class="menu-label">{{ getMenuLabel('view') }}</span>
-        </div>
-        <div class="dropdown-menu">
-          <div class="dropdown-item" @click.stop="handleAction('toggleSidebar')">
-            <n-icon class="item-icon"><MenuOutline /></n-icon>
-            <span class="item-label">{{ t('menu.toggleSidebar') }}</span>
-            <span class="item-shortcut">⌘B</span>
-          </div>
-          <div class="dropdown-divider"></div>
-          <div class="dropdown-item" @click.stop="handleAction('zoomIn')">
-            <n-icon class="item-icon"><AddOutline /></n-icon>
-            <span class="item-label">{{ t('menu.zoomIn') }}</span>
-            <span class="item-shortcut">⌘+</span>
-          </div>
-          <div class="dropdown-item" @click.stop="handleAction('zoomOut')">
-            <n-icon class="item-icon"><RemoveOutline /></n-icon>
-            <span class="item-label">{{ t('menu.zoomOut') }}</span>
-            <span class="item-shortcut">⌘-</span>
-          </div>
-          <div class="dropdown-item" @click.stop="handleAction('resetZoom')">
-            <span class="item-label">{{ t('menu.resetZoom') }}</span>
-            <span class="item-shortcut">⌘0</span>
-          </div>
-          <div class="dropdown-divider"></div>
-          <div class="dropdown-item" @click.stop="handleAction('toggleFullscreen')">
-            <n-icon class="item-icon"><ExpandOutline /></n-icon>
-            <span class="item-label">{{ t('menu.toggleFullscreen') }}</span>
-            <span class="item-shortcut">F11</span>
-          </div>
-          <div class="dropdown-divider"></div>
-          <div class="dropdown-item" @click.stop="handleAction('openConsolePanel')">
-            <n-icon class="item-icon"><TerminalOutline /></n-icon>
-            <span class="item-label">{{ t('menu.openConsolePanel') }}</span>
-            <span class="item-shortcut">⌘J</span>
-          </div>
-        </div>
-      </div>
-
       <!-- Settings -->
       <div class="menu-wrapper">
         <div class="menu-item">
@@ -263,10 +185,9 @@ import { useI18n } from 'vue-i18n'
 import { NIcon } from 'naive-ui'
 import {
   AddOutline, FolderOutline, DocumentTextOutline, DownloadOutline, CloudUploadOutline,
-  ExitOutline, ArrowUndoOutline, ArrowRedoOutline, CloudDoneOutline, CloudOfflineOutline,
+  ExitOutline, CloudDoneOutline, CloudOfflineOutline,
   RefreshOutline, SyncOutline, CreateOutline, ServerOutline, BuildOutline,
-  PlayCircleOutline, ConstructOutline, BrushOutline, TerminalOutline,
-  MenuOutline, RemoveOutline, ExpandOutline,
+  PlayCircleOutline, ConstructOutline, BrushOutline,
   BookOutline, BugOutline, CloudDownloadOutline, InformationCircleOutline
 } from '@vicons/ionicons5'
 import { useSettingsStore } from '../stores/settings'
@@ -287,9 +208,7 @@ const getMenuLabel = (key: string): string => {
   if (translation === `menu.${key}`) {
     const fallbacks: Record<string, string> = {
       file: 'File',
-      edit: 'Edit',
       database: 'Database',
-      view: 'View',
       help: 'Help'
     }
     return fallbacks[key] || key

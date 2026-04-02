@@ -442,3 +442,87 @@ body.dark-theme {
 .redis-explorer .info-v { color: rgba(255, 255, 255, 0.75); }
 .redis-explorer .loading-hint { color: rgba(255, 255, 255, 0.3); }
 .redis-explorer .empty { color: rgba(255, 255, 255, 0.25); }
+
+/* ── Connection Dialog ── */
+.connection-form .section-label { color: rgba(255, 255, 255, 0.9); }
+.connection-form .db-type-card { background: rgba(255, 255, 255, 0.03); border-color: rgba(255, 255, 255, 0.08); }
+.connection-form .db-type-card:hover { background: rgba(255, 255, 255, 0.06); border-color: rgba(255, 255, 255, 0.15); }
+.connection-form .db-type-name { color: rgba(255, 255, 255, 0.8); }
+.connection-form .config-section { background: rgba(255, 255, 255, 0.02); border-color: rgba(255, 255, 255, 0.06); }
+.connection-form .config-label { color: rgba(255, 255, 255, 0.6); }
+.connection-form .config-divider { color: rgba(255, 255, 255, 0.4); }
+.connection-form .config-divider::before,
+.connection-form .config-divider::after { background: rgba(255, 255, 255, 0.1); }
+.connection-form .advanced-section { border-top-color: rgba(255, 255, 255, 0.08); }
+.connection-form .advanced-toggle { color: rgba(255, 255, 255, 0.5); }
+.connection-form .advanced-toggle:hover { color: rgba(255, 255, 255, 0.8); }
+
+/* ── Connection Tree ── */
+.connection-tree {
+  background: linear-gradient(180deg, rgba(30, 30, 35, 1) 0%, rgba(25, 25, 30, 1) 100%);
+}
+.connection-tree .tree-header { border-bottom: 1px solid rgba(255, 255, 255, 0.06); }
+.connection-tree .tree-title { color: rgba(255, 255, 255, 0.35); }
+.connection-tree .empty-icon { color: rgba(255, 255, 255, 0.15); }
+.connection-tree .empty-text { color: rgba(255, 255, 255, 0.35); }
+.connection-tree .empty-hint { color: rgba(255, 255, 255, 0.25); }
+.connection-tree .connection-item:hover { background: rgba(255, 255, 255, 0.05); border-color: rgba(255, 255, 255, 0.06); }
+.connection-tree .connection-item.is-selected { background: linear-gradient(135deg, rgba(24, 160, 88, 0.15) 0%, rgba(24, 160, 88, 0.08) 100%); border-color: rgba(24, 160, 88, 0.3); }
+.connection-tree .connection-name { color: rgba(255, 255, 255, 0.9); }
+.connection-tree .connection-type { color: rgba(255, 255, 255, 0.4); }
+.connection-tree .action-icon { color: rgba(255, 255, 255, 0.4); }
+.connection-tree .action-icon:hover { color: rgba(255, 255, 255, 0.9); background: rgba(255, 255, 255, 0.1); }
+.connection-tree .tree-footer { border-top: 1px solid rgba(255, 255, 255, 0.06); }
+.connection-tree .footer-item { color: rgba(255, 255, 255, 0.5); }
+.connection-tree .footer-item:hover { background: rgba(255, 255, 255, 0.06); color: rgba(255, 255, 255, 0.9); }
+
+/* ── App Menu Bar ── */
+.app-menu-bar {
+  background: rgba(22, 22, 28, 0.97);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+.app-menu-bar .menu-label { color: rgba(255, 255, 255, 0.82); }
+.app-menu-bar .home-name { color: rgba(255, 255, 255, 0.9); }
+.app-menu-bar .menu-divider-v { background: rgba(255, 255, 255, 0.1); }
+.app-menu-bar .menu-item:hover { background: rgba(255, 255, 255, 0.07); }
+.app-menu-bar .menu-item.is-active { background: rgba(24, 160, 88, 0.15); }
+.app-menu-bar .dropdown-menu { background: #1e1e26; border-color: rgba(255, 255, 255, 0.1); box-shadow: 0 8px 28px rgba(0,0,0,0.5); }
+.app-menu-bar .dropdown-item:hover { background: rgba(24, 160, 88, 0.18); }
+.app-menu-bar .dropdown-item.is-selected { background: rgba(24, 160, 88, 0.12); }
+.app-menu-bar .item-icon { color: rgba(255, 255, 255, 0.55); }
+.app-menu-bar .dropdown-item:hover .item-icon { color: rgba(255, 255, 255, 0.9); }
+.app-menu-bar .item-label { color: rgba(255, 255, 255, 0.85); }
+.app-menu-bar .dropdown-item:hover .item-label { color: rgba(255, 255, 255, 0.95); }
+.app-menu-bar .item-shortcut { color: rgba(255, 255, 255, 0.3); }
+.app-menu-bar .dropdown-divider { background: rgba(255, 255, 255, 0.08); }
+
+/* ── Logs Panel ── */
+.logs-panel .logs-toolbar { border-bottom: 1px solid rgba(255, 255, 255, 0.06); }
+.logs-panel .log-count { color: rgba(255, 255, 255, 0.35); }
+.logs-panel .log-list::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); }
+.logs-panel .log-entry { background: rgba(255, 255, 255, 0.02); }
+.logs-panel .log-entry:hover { background: rgba(255, 255, 255, 0.04); }
+.logs-panel .log-ts { color: rgba(255, 255, 255, 0.4); }
+.logs-panel .log-src { color: rgba(255, 255, 255, 0.35); }
+.logs-panel .log-msg { color: rgba(255, 255, 255, 0.8); }
+
+/* ── Settings ── */
+.settings-container { background: #12121a; color: rgba(255, 255, 255, 0.9); }
+.settings-container .settings-sidebar { background: #1e1e23; border-right: 1px solid rgba(255, 255, 255, 0.06); }
+.settings-container .sidebar-header { border-bottom: 1px solid rgba(255, 255, 255, 0.06); }
+.settings-container .sidebar-title { color: rgba(255, 255, 255, 0.9); }
+.settings-container .nav-item { color: rgba(255, 255, 255, 0.7); }
+.settings-container .nav-item:hover { background: rgba(255, 255, 255, 0.06); }
+.settings-container .nav-item.is-active { background: rgba(24, 160, 88, 0.15); color: #18a058; }
+.settings-container .section-title { color: rgba(255, 255, 255, 0.95); }
+.settings-container .section-desc { color: rgba(255, 255, 255, 0.5); }
+.settings-container .setting-item { background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.06); }
+.settings-container .setting-label { color: rgba(255, 255, 255, 0.9); }
+.settings-container .setting-desc { color: rgba(255, 255, 255, 0.4); }
+.settings-container .driver-card { background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.06); }
+.settings-container .driver-name { color: rgba(255, 255, 255, 0.9); }
+.settings-container .driver-version { color: rgba(255, 255, 255, 0.4); }
+.settings-container .about-card { background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.06); }
+.settings-container .about-name { color: rgba(255, 255, 255, 0.95); }
+.settings-container .about-desc { color: rgba(255, 255, 255, 0.5); }
+.settings-container .about-meta { color: rgba(255, 255, 255, 0.4); }

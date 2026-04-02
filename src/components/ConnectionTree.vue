@@ -1,5 +1,5 @@
 <template>
-  <div class="connection-tree" :class="{ 'light-mode': !isDarkTheme }">
+  <div class="connection-tree" :class="{ 'light-theme': !isDarkTheme }">
     <div class="tree-header">
       <n-space justify="space-between" align="center">
         <span class="tree-title">{{ t('sidebar.connections') }}</span>
@@ -205,19 +205,9 @@ onMounted(() => {
   transition: background 0.3s ease;
 }
 
-/* Light theme styles */
-:global(.light-theme) .connection-tree,
-.connection-tree.light-mode {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 1) 0%, rgba(248, 248, 248, 1) 100%);
-}
-
 .tree-header {
   padding: 16px 16px 12px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-}
-
-.light-mode .tree-header {
-  border-bottom-color: rgba(0, 0, 0, 0.08);
 }
 
 .tree-title {
@@ -226,10 +216,6 @@ onMounted(() => {
   color: rgba(255, 255, 255, 0.35);
   text-transform: uppercase;
   letter-spacing: 1px;
-}
-
-.light-mode .tree-title {
-  color: rgba(0, 0, 0, 0.45);
 }
 
 .tree-content {
@@ -270,18 +256,10 @@ onMounted(() => {
   color: rgba(255, 255, 255, 0.15);
 }
 
-.light-mode .empty-icon {
-  color: rgba(0, 0, 0, 0.15);
-}
-
 .empty-text {
   font-size: 13px;
   color: rgba(255, 255, 255, 0.35);
   margin: 0;
-}
-
-.light-mode .empty-text {
-  color: rgba(0, 0, 0, 0.45);
 }
 
 .empty-hint {
@@ -289,10 +267,6 @@ onMounted(() => {
   color: rgba(255, 255, 255, 0.25);
   margin: 0;
   text-align: center;
-}
-
-.light-mode .empty-hint {
-  color: rgba(0, 0, 0, 0.35);
 }
 
 /* Connection List */
@@ -318,11 +292,6 @@ onMounted(() => {
   border-color: rgba(255, 255, 255, 0.06);
 }
 
-.light-mode .connection-item:hover {
-  background: rgba(0, 0, 0, 0.03);
-  border-color: rgba(0, 0, 0, 0.06);
-}
-
 .connection-item:hover .connection-actions {
   opacity: 1;
 }
@@ -330,11 +299,6 @@ onMounted(() => {
 .connection-item.is-selected {
   background: linear-gradient(135deg, rgba(24, 160, 88, 0.15) 0%, rgba(24, 160, 88, 0.08) 100%);
   border-color: rgba(24, 160, 88, 0.3);
-}
-
-.light-mode .connection-item.is-selected {
-  background: linear-gradient(135deg, rgba(24, 160, 88, 0.12) 0%, rgba(24, 160, 88, 0.05) 100%);
-  border-color: rgba(24, 160, 88, 0.25);
 }
 
 .connection-item.is-selected::before {
@@ -366,17 +330,9 @@ onMounted(() => {
   text-overflow: ellipsis;
 }
 
-.light-mode .connection-name {
-  color: rgba(0, 0, 0, 0.9);
-}
-
 .connection-type {
   font-size: 11px;
   color: rgba(255, 255, 255, 0.4);
-}
-
-.light-mode .connection-type {
-  color: rgba(0, 0, 0, 0.4);
 }
 
 .connection-actions {
@@ -393,28 +349,15 @@ onMounted(() => {
   transition: all 0.15s ease;
 }
 
-.light-mode .action-icon {
-  color: rgba(0, 0, 0, 0.4);
-}
-
 .action-icon:hover {
   color: rgba(255, 255, 255, 0.9);
   background: rgba(255, 255, 255, 0.1);
-}
-
-.light-mode .action-icon:hover {
-  color: rgba(0, 0, 0, 0.9);
-  background: rgba(0, 0, 0, 0.06);
 }
 
 /* Footer */
 .tree-footer {
   padding: 8px 12px;
   border-top: 1px solid rgba(255, 255, 255, 0.06);
-}
-
-.light-mode .tree-footer {
-  border-top-color: rgba(0, 0, 0, 0.08);
 }
 
 .footer-item {
@@ -429,17 +372,8 @@ onMounted(() => {
   transition: all 0.2s ease;
 }
 
-.light-mode .footer-item {
-  color: rgba(0, 0, 0, 0.5);
-}
-
 .footer-item:hover {
   background: rgba(255, 255, 255, 0.06);
   color: rgba(255, 255, 255, 0.9);
-}
-
-.light-mode .footer-item:hover {
-  background: rgba(0, 0, 0, 0.04);
-  color: rgba(0, 0, 0, 0.9);
 }
 </style>

@@ -643,3 +643,109 @@ body.light-theme .n-data-table-th {
 body.light-theme .n-data-table-td {
   color: rgba(0, 0, 0, 0.82) !important;
 }
+
+/* ── Connection Dialog ── */
+body.light-theme .connection-form .section-label {
+  color: rgba(0, 0, 0, 0.9);
+}
+body.light-theme .connection-form .db-type-card {
+  background: rgba(0, 0, 0, 0.03);
+  border-color: rgba(0, 0, 0, 0.1);
+}
+body.light-theme .connection-form .db-type-card:hover {
+  background: rgba(0, 0, 0, 0.05);
+  border-color: rgba(0, 0, 0, 0.15);
+}
+body.light-theme .connection-form .db-type-name {
+  color: rgba(0, 0, 0, 0.8);
+}
+body.light-theme .connection-form .config-section {
+  background: rgba(0, 0, 0, 0.02);
+  border-color: rgba(0, 0, 0, 0.06);
+}
+body.light-theme .connection-form .config-label {
+  color: rgba(0, 0, 0, 0.6);
+}
+body.light-theme .connection-form .config-divider {
+  color: rgba(0, 0, 0, 0.4);
+}
+body.light-theme .connection-form .config-divider::before,
+body.light-theme .connection-form .config-divider::after {
+  background: rgba(0, 0, 0, 0.08);
+}
+body.light-theme .connection-form .advanced-section {
+  border-top-color: rgba(0, 0, 0, 0.06);
+}
+body.light-theme .connection-form .advanced-toggle {
+  color: rgba(0, 0, 0, 0.5);
+}
+body.light-theme .connection-form .advanced-toggle:hover {
+  color: rgba(0, 0, 0, 0.8);
+}
+
+/* ── Connection Tree ── */
+body.light-theme .connection-tree {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 1) 0%, rgba(248, 248, 248, 1) 100%);
+}
+body.light-theme .connection-tree .tree-header { border-bottom-color: rgba(0, 0, 0, 0.08); }
+body.light-theme .connection-tree .tree-title { color: rgba(0, 0, 0, 0.45); }
+body.light-theme .connection-tree .empty-icon { color: rgba(0, 0, 0, 0.15); }
+body.light-theme .connection-tree .empty-text { color: rgba(0, 0, 0, 0.45); }
+body.light-theme .connection-tree .empty-hint { color: rgba(0, 0, 0, 0.35); }
+body.light-theme .connection-tree .connection-item:hover { background: rgba(0, 0, 0, 0.03); border-color: rgba(0, 0, 0, 0.06); }
+body.light-theme .connection-tree .connection-item.is-selected { background: linear-gradient(135deg, rgba(24, 160, 88, 0.12) 0%, rgba(24, 160, 88, 0.05) 100%); border-color: rgba(24, 160, 88, 0.25); }
+body.light-theme .connection-tree .connection-name { color: rgba(0, 0, 0, 0.9); }
+body.light-theme .connection-tree .connection-type { color: rgba(0, 0, 0, 0.4); }
+body.light-theme .connection-tree .action-icon { color: rgba(0, 0, 0, 0.4); }
+body.light-theme .connection-tree .action-icon:hover { color: rgba(0, 0, 0, 0.9); background: rgba(0, 0, 0, 0.06); }
+body.light-theme .connection-tree .tree-footer { border-top-color: rgba(0, 0, 0, 0.08); }
+body.light-theme .connection-tree .footer-item { color: rgba(0, 0, 0, 0.5); }
+body.light-theme .connection-tree .footer-item:hover { background: rgba(0, 0, 0, 0.04); color: rgba(0, 0, 0, 0.9); }
+
+/* ── App Menu Bar ── */
+body.light-theme .app-menu-bar { background: rgba(246, 246, 250, 0.99); border-bottom: 1px solid rgba(0, 0, 0, 0.09); }
+body.light-theme .app-menu-bar .menu-label { color: rgba(0, 0, 0, 0.78); }
+body.light-theme .app-menu-bar .home-name { color: #18a058; }
+body.light-theme .app-menu-bar .menu-divider-v { background: rgba(0, 0, 0, 0.1); }
+body.light-theme .app-menu-bar .menu-item:hover { background: rgba(0, 0, 0, 0.05); }
+body.light-theme .app-menu-bar .menu-item.is-active { background: rgba(24, 160, 88, 0.1); }
+body.light-theme .app-menu-bar .dropdown-menu { background: #ffffff; border-color: rgba(0, 0, 0, 0.1); box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12); }
+body.light-theme .app-menu-bar .dropdown-item:hover { background: rgba(24, 160, 88, 0.1); }
+body.light-theme .app-menu-bar .dropdown-item.is-selected { background: rgba(24, 160, 88, 0.08); }
+body.light-theme .app-menu-bar .item-icon { color: rgba(0, 0, 0, 0.5); }
+body.light-theme .app-menu-bar .dropdown-item:hover .item-icon { color: rgba(0, 0, 0, 0.85); }
+body.light-theme .app-menu-bar .item-label { color: rgba(0, 0, 0, 0.82); }
+body.light-theme .app-menu-bar .dropdown-item:hover .item-label { color: rgba(0, 0, 0, 0.92); }
+body.light-theme .app-menu-bar .item-shortcut { color: rgba(0, 0, 0, 0.3); }
+body.light-theme .app-menu-bar .dropdown-divider { background: rgba(0, 0, 0, 0.08); }
+
+/* ── Logs Panel ── */
+body.light-theme .logs-panel .logs-toolbar { border-bottom: 1px solid rgba(0, 0, 0, 0.08); }
+body.light-theme .logs-panel .log-count { color: rgba(0, 0, 0, 0.45); }
+body.light-theme .logs-panel .log-list::-webkit-scrollbar-thumb { background: rgba(0, 0, 0, 0.1); }
+body.light-theme .logs-panel .log-entry { background: rgba(0, 0, 0, 0.02); }
+body.light-theme .logs-panel .log-entry:hover { background: rgba(0, 0, 0, 0.04); }
+body.light-theme .logs-panel .log-ts { color: rgba(0, 0, 0, 0.4); }
+body.light-theme .logs-panel .log-src { color: rgba(0, 0, 0, 0.35); }
+body.light-theme .logs-panel .log-msg { color: rgba(0, 0, 0, 0.82); }
+
+/* ── Settings ── */
+body.light-theme .settings-container { background: #f5f5f5; color: rgba(0, 0, 0, 0.9); }
+body.light-theme .settings-container .settings-sidebar { background: #ffffff; border-right-color: rgba(0, 0, 0, 0.08); }
+body.light-theme .settings-container .sidebar-header { border-bottom-color: rgba(0, 0, 0, 0.08); }
+body.light-theme .settings-container .sidebar-title { color: rgba(0, 0, 0, 0.9); }
+body.light-theme .settings-container .nav-item { color: rgba(0, 0, 0, 0.7); }
+body.light-theme .settings-container .nav-item:hover { background: rgba(0, 0, 0, 0.04); }
+body.light-theme .settings-container .nav-item.is-active { background: rgba(24, 160, 88, 0.1); }
+body.light-theme .settings-container .section-title { color: rgba(0, 0, 0, 0.95); }
+body.light-theme .settings-container .section-desc { color: rgba(0, 0, 0, 0.5); }
+body.light-theme .settings-container .setting-item { background: rgba(0, 0, 0, 0.02); border-color: rgba(0, 0, 0, 0.06); }
+body.light-theme .settings-container .setting-label { color: rgba(0, 0, 0, 0.9); }
+body.light-theme .settings-container .setting-desc { color: rgba(0, 0, 0, 0.4); }
+body.light-theme .settings-container .driver-card { background: rgba(0, 0, 0, 0.02); border-color: rgba(0, 0, 0, 0.06); }
+body.light-theme .settings-container .driver-name { color: rgba(0, 0, 0, 0.9); }
+body.light-theme .settings-container .driver-version { color: rgba(0, 0, 0, 0.4); }
+body.light-theme .settings-container .about-card { background: rgba(0, 0, 0, 0.02); border-color: rgba(0, 0, 0, 0.06); }
+body.light-theme .settings-container .about-name { color: rgba(0, 0, 0, 0.95); }
+body.light-theme .settings-container .about-desc { color: rgba(0, 0, 0, 0.5); }
+body.light-theme .settings-container .about-meta { color: rgba(0, 0, 0, 0.4); }

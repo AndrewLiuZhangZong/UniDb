@@ -111,7 +111,7 @@
           </div>
         </div>
 
-        <!-- Logs -->
+        <!-- logs -->
         <div v-if="activeSection === 'logs'" class="settings-section">
           <h3 class="section-title">{{ t('settings.sections.logs') }}</h3>
           <p class="section-desc">{{ t('settings.logsDesc') }}</p>
@@ -219,11 +219,6 @@ const handleRemoveDriver = (driver: any) => {
   transition: background 0.3s ease, color 0.3s ease;
 }
 
-.settings-container.light-theme {
-  background: #f5f5f5;
-  color: rgba(0, 0, 0, 0.9);
-}
-
 .settings-layout {
   display: flex;
   flex: 1;
@@ -239,11 +234,6 @@ const handleRemoveDriver = (driver: any) => {
   transition: background 0.3s ease;
 }
 
-.light-theme .settings-sidebar {
-  background: #ffffff;
-  border-right-color: rgba(0, 0, 0, 0.08);
-}
-
 .sidebar-header {
   padding: 16px 20px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
@@ -251,19 +241,11 @@ const handleRemoveDriver = (driver: any) => {
   align-items: center;
 }
 
-.light-theme .sidebar-header {
-  border-bottom-color: rgba(0, 0, 0, 0.08);
-}
-
 .sidebar-title {
   font-size: 16px;
   font-weight: 600;
   color: rgba(255, 255, 255, 0.9);
   margin: 0;
-}
-
-.light-theme .sidebar-title {
-  color: rgba(0, 0, 0, 0.9);
 }
 
 .settings-nav {
@@ -283,25 +265,13 @@ const handleRemoveDriver = (driver: any) => {
   color: rgba(255, 255, 255, 0.7);
 }
 
-.light-theme .nav-item {
-  color: rgba(0, 0, 0, 0.7);
-}
-
 .nav-item:hover {
   background: rgba(255, 255, 255, 0.06);
-}
-
-.light-theme .nav-item:hover {
-  background: rgba(0, 0, 0, 0.04);
 }
 
 .nav-item.is-active {
   background: rgba(24, 160, 88, 0.15);
   color: #18a058;
-}
-
-.light-theme .nav-item.is-active {
-  background: rgba(24, 160, 88, 0.1);
 }
 
 .nav-icon {
@@ -330,18 +300,10 @@ const handleRemoveDriver = (driver: any) => {
   margin: 0 0 8px;
 }
 
-.light-theme .section-title {
-  color: rgba(0, 0, 0, 0.95);
-}
-
 .section-desc {
   font-size: 14px;
   color: rgba(255, 255, 255, 0.5);
   margin: 0 0 24px;
-}
-
-.light-theme .section-desc {
-  color: rgba(0, 0, 0, 0.5);
 }
 
 .setting-group {
@@ -362,11 +324,6 @@ const handleRemoveDriver = (driver: any) => {
   transition: all 0.2s ease;
 }
 
-.light-theme .setting-item {
-  background: rgba(0, 0, 0, 0.02);
-  border-color: rgba(0, 0, 0, 0.06);
-}
-
 .setting-info {
   flex: 1;
 }
@@ -379,18 +336,10 @@ const handleRemoveDriver = (driver: any) => {
   margin-bottom: 4px;
 }
 
-.light-theme .setting-label {
-  color: rgba(0, 0, 0, 0.9);
-}
-
 .setting-desc {
   font-size: 12px;
   color: rgba(255, 255, 255, 0.4);
   margin: 0;
-}
-
-.light-theme .setting-desc {
-  color: rgba(0, 0, 0, 0.4);
 }
 
 /* Drivers */
@@ -409,11 +358,6 @@ const handleRemoveDriver = (driver: any) => {
   transition: all 0.2s ease;
 }
 
-.light-theme .driver-card {
-  background: rgba(0, 0, 0, 0.02);
-  border-color: rgba(0, 0, 0, 0.06);
-}
-
 .driver-header {
   display: flex;
   align-items: center;
@@ -429,24 +373,16 @@ const handleRemoveDriver = (driver: any) => {
   flex: 1;
 }
 
-.driver-name {
+.driverName {
   font-size: 14px;
   font-weight: 500;
   color: rgba(255, 255, 255, 0.9);
   margin: 0 0 2px;
 }
 
-.light-theme .driver-name {
-  color: rgba(0, 0, 0, 0.9);
-}
-
 .driver-version {
   font-size: 12px;
   color: rgba(255, 255, 255, 0.4);
-}
-
-.light-theme .driver-version {
-  color: rgba(0, 0, 0, 0.4);
 }
 
 .driver-actions {
@@ -466,11 +402,6 @@ const handleRemoveDriver = (driver: any) => {
   margin-bottom: 24px;
 }
 
-.light-theme .about-card {
-  background: rgba(0, 0, 0, 0.02);
-  border-color: rgba(0, 0, 0, 0.06);
-}
-
 .about-logo svg {
   filter: drop-shadow(0 4px 12px rgba(24, 160, 88, 0.3));
 }
@@ -479,15 +410,11 @@ const handleRemoveDriver = (driver: any) => {
   flex: 1;
 }
 
-.about-name {
+.aboutName {
   font-size: 28px;
   font-weight: 700;
   color: rgba(255, 255, 255, 0.95);
   margin: 0 0 8px;
-}
-
-.light-theme .about-name {
-  color: rgba(0, 0, 0, 0.95);
 }
 
 .about-desc {
@@ -496,18 +423,10 @@ const handleRemoveDriver = (driver: any) => {
   margin: 0 0 16px;
 }
 
-.light-theme .about-desc {
-  color: rgba(0, 0, 0, 0.5);
-}
-
 .about-meta {
   display: flex;
   gap: 24px;
   font-size: 12px;
   color: rgba(255, 255, 255, 0.4);
-}
-
-.light-theme .about-meta {
-  color: rgba(0, 0, 0, 0.4);
 }
 </style>

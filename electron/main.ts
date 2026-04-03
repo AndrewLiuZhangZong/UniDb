@@ -9,10 +9,8 @@ let serverPort: number = 3000
 const VITE_DEV_SERVER_URL = process.env.VITE_DEV_SERVER_URL || 'http://localhost:5173'
 
 const createWindow = () => {
-  // macOS 应用图标
-  const iconPath = process.platform === 'darwin'
-    ? join(__dirname, '../resources/icon.icns')
-    : join(__dirname, '../resources/icon.png')
+  // macOS 应用图标（窗口内图标 + Dock 图标均使用 png）
+  const iconPath = join(__dirname, '../resources/icon.png')
 
   mainWindow = new BrowserWindow({
     width: 1400,
@@ -73,6 +71,10 @@ app.whenReady().then(async () => {
   console.log(`Driver manager initialized at: ${driverManager.getDriverDirectory()}`)
 
   createWindow()
+
+  if (process.platform === 'darwin') {
+    app.dock.setIcon(join(__dirname, '../resources/icon.png'))
+  }
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {

@@ -241,8 +241,8 @@ const handleRemoveDriver = (driver: any) => {
 }
 
 .nav-item.is-active {
-  background: rgba(24, 160, 88, 0.15);
-  color: #18a058;
+  background: rgba(255, 107, 0, 0.15);
+  color: #FF6B00;
 }
 
 .nav-icon {
@@ -337,7 +337,7 @@ const handleRemoveDriver = (driver: any) => {
 }
 
 .driver-icon {
-  color: #18a058;
+  color: #FF6B00;
 }
 
 .driver-info {

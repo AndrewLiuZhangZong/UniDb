@@ -297,8 +297,8 @@ onMounted(() => {
 }
 
 .connection-item.is-selected {
-  background: linear-gradient(135deg, rgba(24, 160, 88, 0.15) 0%, rgba(24, 160, 88, 0.08) 100%);
-  border-color: rgba(24, 160, 88, 0.3);
+  background: linear-gradient(135deg, rgba(255, 107, 0, 0.15) 0%, rgba(255, 107, 0, 0.08) 100%);
+  border-color: rgba(255, 107, 0, 0.3);
 }
 
 .connection-item.is-selected::before {
@@ -309,7 +309,7 @@ onMounted(() => {
   transform: translateY(-50%);
   width: 3px;
   height: 24px;
-  background: linear-gradient(180deg, #18a058, #36b374);
+  background: linear-gradient(180deg, #FF6B00, #FF8C42);
   border-radius: 0 2px 2px 0;
 }
 

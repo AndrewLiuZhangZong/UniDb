@@ -24,15 +24,15 @@
   --border-hover: rgba(255, 255, 255, 0.1);
 
   /* Accent colors */
-  --accent-primary: #18a058;
-  --accent-primary-hover: #36b374;
+  --accent-primary: #FF6B00;
+  --accent-primary-hover: #FF8C42;
   --accent-primary-pressed: #0d7a47;
 
   /* Status colors */
   --status-error: #d03050;
   --status-warning: #f0a020;
   --status-info: #2080f0;
-  --status-success: #18a058;
+  --status-success: #FF6B00;
 
   /* Layout */
   --sidebar-width: 260px;
@@ -65,7 +65,7 @@ body.dark-theme {
   border: 1px solid var(--border-primary);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4), 0 2px 8px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
-.dropdown-item:hover { background: rgba(24, 160, 88, 0.25); }
+.dropdown-item:hover { background: rgba(255, 107, 0, 0.25); }
 .dropdown-item .item-icon { color: var(--text-tertiary); }
 .dropdown-item:hover .item-icon { color: var(--text-primary); }
 .dropdown-item .item-label { color: var(--text-secondary); }
@@ -78,7 +78,7 @@ body.dark-theme {
 .connection-tree .tree-title { color: var(--text-secondary); }
 .connection-tree .nav-item { color: var(--text-secondary); }
 .connection-tree .nav-item:hover { background: var(--bg-hover); }
-.connection-tree .nav-item.is-active { background: rgba(24, 160, 88, 0.15); color: var(--accent-primary); }
+.connection-tree .nav-item.is-active { background: rgba(255, 107, 0, 0.15); color: var(--accent-primary); }
 
 /* ── Content Layout ── */
 .content-layout,
@@ -125,7 +125,7 @@ body.dark-theme {
 .settings-sidebar .sidebar-header { border-bottom: 1px solid var(--border-secondary); }
 .settings-nav .nav-item { color: var(--text-secondary); }
 .settings-nav .nav-item:hover { background: var(--bg-hover); }
-.settings-nav .nav-item.is-active { background: rgba(24, 160, 88, 0.15); color: var(--accent-primary); }
+.settings-nav .nav-item.is-active { background: rgba(255, 107, 0, 0.15); color: var(--accent-primary); }
 .settings-nav .nav-icon { color: var(--text-tertiary); }
 .settings-nav .nav-item.is-active .nav-icon { color: var(--accent-primary); }
 .settings-content .section-title { color: var(--text-primary); }
@@ -161,7 +161,7 @@ body.dark-theme {
 /* ── Tree Node ── */
 .tree-node-content { color: var(--text-secondary); }
 .tree-node-content:hover { background: var(--bg-hover); }
-.tree-node-content.selected { background: rgba(24, 160, 88, 0.15); }
+.tree-node-content.selected { background: rgba(255, 107, 0, 0.15); }
 
 /* ============================================================
    Workspace Components - Dark Theme Defaults
@@ -297,7 +297,7 @@ body.dark-theme {
 .ch-workspace .col-name-code { color: rgba(255, 255, 255, 0.85); }
 .ch-workspace .type-badge { color: #fb923c; background: rgba(251, 146, 60, 0.1); }
 .ch-workspace .type-badge.lc { color: #a78bfa; background: rgba(167, 139, 250, 0.1); }
-.ch-workspace .sort-tag { color: #18a058; }
+.ch-workspace .sort-tag { color: #FF6B00; }
 
 /* ── ClickHouse Explorer ── */
 .ch-explorer .explorer-toolbar { border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
@@ -411,7 +411,7 @@ body.dark-theme {
 .redis-workspace .field-val { color: rgba(255, 255, 255, 0.75); }
 .redis-workspace .list-header { color: rgba(255, 255, 255, 0.3); border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
 .redis-workspace .list-row { border-bottom: 1px solid rgba(255, 255, 255, 0.04); }
-.redis-workspace .list-row:hover { background: rgba(24, 160, 88, 0.07); }
+.redis-workspace .list-row:hover { background: rgba(255, 107, 0, 0.07); }
 .redis-workspace .list-val { color: rgba(255, 255, 255, 0.8); }
 .redis-workspace .set-item { color: #60a5fa; background: rgba(96, 165, 250, 0.1); border: 1px solid rgba(96, 165, 250, 0.2); }
 .redis-workspace .zset-header { color: rgba(255, 255, 255, 0.3); border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
@@ -461,7 +461,7 @@ body.dark-theme {
 .connection-tree .empty-text { color: rgba(255, 255, 255, 0.35); }
 .connection-tree .empty-hint { color: rgba(255, 255, 255, 0.25); }
 .connection-tree .connection-item:hover { background: rgba(255, 255, 255, 0.05); border-color: rgba(255, 255, 255, 0.06); }
-.connection-tree .connection-item.is-selected { background: linear-gradient(135deg, rgba(24, 160, 88, 0.15) 0%, rgba(24, 160, 88, 0.08) 100%); border-color: rgba(24, 160, 88, 0.3); }
+.connection-tree .connection-item.is-selected { background: linear-gradient(135deg, rgba(255, 107, 0, 0.15) 0%, rgba(255, 107, 0, 0.08) 100%); border-color: rgba(255, 107, 0, 0.3); }
 .connection-tree .connection-name { color: rgba(255, 255, 255, 0.9); }
 .connection-tree .connection-type { color: rgba(255, 255, 255, 0.4); }
 .connection-tree .action-icon { color: rgba(255, 255, 255, 0.4); }
@@ -479,10 +479,10 @@ body.dark-theme {
 .app-menu-bar .home-name { color: rgba(255, 255, 255, 0.9); }
 .app-menu-bar .menu-divider-v { background: rgba(255, 255, 255, 0.1); }
 .app-menu-bar .menu-item:hover { background: rgba(255, 255, 255, 0.07); }
-.app-menu-bar .menu-item.is-active { background: rgba(24, 160, 88, 0.15); }
+.app-menu-bar .menu-item.is-active { background: rgba(255, 107, 0, 0.15); }
 .app-menu-bar .dropdown-menu { background: #1e1e26; border-color: rgba(255, 255, 255, 0.1); box-shadow: 0 8px 28px rgba(0,0,0,0.5); }
-.app-menu-bar .dropdown-item:hover { background: rgba(24, 160, 88, 0.18); }
-.app-menu-bar .dropdown-item.is-selected { background: rgba(24, 160, 88, 0.12); }
+.app-menu-bar .dropdown-item:hover { background: rgba(255, 107, 0, 0.18); }
+.app-menu-bar .dropdown-item.is-selected { background: rgba(255, 107, 0, 0.12); }
 .app-menu-bar .item-icon { color: rgba(255, 255, 255, 0.55); }
 .app-menu-bar .dropdown-item:hover .item-icon { color: rgba(255, 255, 255, 0.9); }
 .app-menu-bar .item-label { color: rgba(255, 255, 255, 0.85); }
@@ -507,7 +507,7 @@ body.dark-theme {
 .settings-container .sidebar-title { color: rgba(255, 255, 255, 0.9); }
 .settings-container .nav-item { color: rgba(255, 255, 255, 0.7); }
 .settings-container .nav-item:hover { background: rgba(255, 255, 255, 0.06); }
-.settings-container .nav-item.is-active { background: rgba(24, 160, 88, 0.15); color: #18a058; }
+.settings-container .nav-item.is-active { background: rgba(255, 107, 0, 0.15); color: #FF6B00; }
 .settings-container .section-title { color: rgba(255, 255, 255, 0.95); }
 .settings-container .section-desc { color: rgba(255, 255, 255, 0.5); }
 .settings-container .setting-item { background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.06); }

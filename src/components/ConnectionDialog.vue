@@ -623,9 +623,9 @@ const handleSave = async () => {
 }
 
 .db-type-card.is-selected {
-  background: rgba(24, 160, 88, 0.1);
-  border-color: #18a058;
-  box-shadow: 0 0 20px rgba(24, 160, 88, 0.2);
+  background: rgba(255, 107, 0, 0.1);
+  border-color: #FF6B00;
+  box-shadow: 0 0 20px rgba(255, 107, 0, 0.2);
 }
 
 .db-type-name {
@@ -638,7 +638,7 @@ const handleSave = async () => {
   position: absolute;
   top: 8px;
   right: 8px;
-  color: #18a058;
+  color: #FF6B00;
 }
 
 /* Config Section */

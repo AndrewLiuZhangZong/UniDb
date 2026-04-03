@@ -227,7 +227,7 @@ watch(() => props.connection?.id, () => {
 .type-pill { padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: 700; cursor: pointer; transition: all 0.15s; background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.4); }
 .type-pill.active.str, .type-pill.str:hover { background: rgba(239,68,68,0.2); color: #ef4444; }
 .type-pill.active.hash, .type-pill.hash:hover { background: rgba(245,158,11,0.2); color: #f59e0b; }
-.type-pill.active.list, .type-pill.list:hover { background: rgba(24,160,88,0.2); color: #18a058; }
+.type-pill.active.list, .type-pill.list:hover { background: rgba(255,107,0,0.2); color: #FF6B00; }
 .type-pill.active.set, .type-pill.set:hover { background: rgba(96,165,250,0.2); color: #60a5fa; }
 .type-pill.active.zset, .type-pill.zset:hover { background: rgba(167,139,250,0.2); color: #a78bfa; }
 
@@ -259,7 +259,7 @@ watch(() => props.connection?.id, () => {
 .type-dot { width: 18px; height: 18px; border-radius: 3px; font-size: 9px; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 .type-dot.string { background: rgba(239,68,68,0.25); color: #ef4444; }
 .type-dot.hash { background: rgba(245,158,11,0.25); color: #f59e0b; }
-.type-dot.list { background: rgba(24,160,88,0.25); color: #18a058; }
+.type-dot.list { background: rgba(255,107,0,0.25); color: #FF6B00; }
 .type-dot.set { background: rgba(96,165,250,0.25); color: #60a5fa; }
 .type-dot.zset { background: rgba(167,139,250,0.25); color: #a78bfa; }
 

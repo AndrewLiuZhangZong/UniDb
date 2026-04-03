@@ -192,7 +192,7 @@ watch(() => props.connection, () => { sel.value = null; loadData() }, { immediat
 .sec-icon { font-size: 13px; flex-shrink: 0; }
 .db-c { color: #f59e0b; }
 .tbl-c { color: #fb923c; }
-.query-c { color: #18a058; }
+.query-c { color: #FF6B00; }
 .sec-label { flex: 1; font-weight: 500; color: rgba(255,255,255,0.65); }
 .badge { font-size: 10px; color: rgba(255,255,255,0.35); background: rgba(255,255,255,0.07); padding: 1px 5px; border-radius: 7px; }
 .sec-body { padding-left: 18px; }

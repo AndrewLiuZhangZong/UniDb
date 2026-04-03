@@ -305,5 +305,5 @@ watch(() => props.selectedItem, () => {
 .col-name-code { font-family: monospace; font-size: 12px; color: rgba(255,255,255,0.85); }
 .type-badge { font-size: 11px; color: #fb923c; background: rgba(251,146,60,0.1); padding: 1px 6px; border-radius: 3px; font-family: monospace; }
 .type-badge.lc { color: #a78bfa; background: rgba(167,139,250,0.1); }
-.sort-tag { color: #18a058; font-weight: 700; }
+.sort-tag { color: #FF6B00; font-weight: 700; }
 </style>

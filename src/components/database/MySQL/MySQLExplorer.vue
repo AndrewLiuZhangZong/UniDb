@@ -328,7 +328,7 @@ watch(() => props.connection?.id, () => {
 .sec-icon { font-size: 13px; flex-shrink: 0; }
 .tbl-c { color: #4db8ff; }
 .view-c { color: #a78bfa; }
-.query-c { color: #18a058; }
+.query-c { color: #FF6B00; }
 
 .sec-label { flex: 1; font-weight: 500; color: rgba(255,255,255,0.65); }
 

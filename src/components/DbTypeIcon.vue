@@ -7,114 +7,59 @@
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
   >
+    <!-- MySQL - Blue rounded rectangle with stylized lines -->
     <template v-if="type === 'mysql'">
-      <!-- MySQL Icon - Blue Dolphin inspired -->
-      <defs>
-        <linearGradient id="mysqlGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" :stop-color="colors[0]" />
-          <stop offset="100%" :stop-color="colors[1]" />
-        </linearGradient>
-      </defs>
-      <rect x="4" y="8" width="24" height="16" rx="2" fill="url(#mysqlGrad)" />
-      <ellipse cx="16" cy="12" rx="8" ry="2" fill="rgba(255,255,255,0.3)" />
-      <ellipse cx="16" cy="16" rx="8" ry="2" fill="rgba(255,255,255,0.2)" />
-      <ellipse cx="16" cy="20" rx="8" ry="2" fill="rgba(255,255,255,0.1)" />
-      <path d="M10 14h12M10 18h12" stroke="rgba(255,255,255,0.4)" stroke-width="1" />
+      <rect x="2" y="6" width="22" height="20" rx="3" fill="#00758F"/>
+      <rect x="2" y="6" width="22" height="8" rx="3" fill="#4479A1"/>
+      <rect x="6" y="10" width="14" height="2" rx="1" fill="rgba(255,255,255,0.9)"/>
+      <rect x="6" y="14" width="10" height="2" rx="1" fill="rgba(255,255,255,0.6)"/>
+      <rect x="6" y="18" width="12" height="2" rx="1" fill="rgba(255,255,255,0.4)"/>
+      <rect x="6" y="22" width="8" height="2" rx="1" fill="rgba(255,255,255,0.3)"/>
+      <path d="M26 12C28 12 30 14 30 17C30 20 28 22 26 22C24 22 23 20 24 18L26 16L25 15L26 12Z" fill="#F29111"/>
+      <path d="M24.5 17C24.5 17 24 17.5 24 18C24 18.5 25 19.5 25.5 20C25.8 20.3 26 21 26 21.5" stroke="#F29111" stroke-width="1" stroke-linecap="round"/>
     </template>
 
+    <!-- ClickHouse - Orange hexagon with stylized K -->
     <template v-else-if="type === 'clickhouse'">
-      <!-- ClickHouse Icon - Orange/Yellow hexagon -->
-      <defs>
-        <linearGradient id="chGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" :stop-color="colors[0]" />
-          <stop offset="100%" :stop-color="colors[1]" />
-        </linearGradient>
-      </defs>
-      <path
-        d="M16 4L26 10V22L16 28L6 22V10L16 4Z"
-        fill="url(#chGrad)"
-      />
-      <path d="M16 4L26 10L16 16L6 10L16 4Z" fill="rgba(255,255,255,0.2)" />
-      <path d="M16 16V28L26 22V10L16 16Z" fill="rgba(0,0,0,0.15)" />
-      <circle cx="16" cy="14" r="3" fill="rgba(255,255,255,0.9)" />
-      <path d="M13 20h6M13 23h4" stroke="rgba(255,255,255,0.7)" stroke-width="1.5" stroke-linecap="round" />
+      <path d="M16 3L27 10V22L16 29L5 22V10L16 3Z" fill="#FF9900"/>
+      <path d="M16 3L27 10L16 17L5 10L16 3Z" fill="#FFCC00"/>
+      <path d="M16 17V29L27 22V10L16 17Z" fill="rgba(0,0,0,0.12)"/>
+      <path d="M21 11V21M21 11L14 16L21 21M21 11L15 21" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
     </template>
 
+    <!-- MongoDB - Green leaf shape -->
     <template v-else-if="type === 'mongodb'">
-      <!-- MongoDB Icon - Green leaf/seed shape -->
-      <defs>
-        <linearGradient id="mongoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" :stop-color="colors[0]" />
-          <stop offset="100%" :stop-color="colors[1]" />
-        </linearGradient>
-      </defs>
-      <path
-        d="M20 6C14 6 8 10 8 16C8 22 14 26 20 26C22 26 24 25 25 24L20 19L16 23C14 25 12 26 10 26C10 26 10 25 10 24C10 23 12 22 14 21L18 17L22 21C24 23 24 25 24 25C24 24 24 23 24 22C24 19 22 17 20 16L24 12C26 10 28 8 28 8C28 7 27 6 26 6C24 6 22 6 20 6Z"
-        fill="url(#mongoGrad)"
-      />
-      <ellipse cx="14" cy="14" rx="2" ry="3" fill="rgba(255,255,255,0.4)" transform="rotate(-30 14 14)" />
+      <path d="M16 2C8 2 2 8 2 16C2 20 4 24 8 26C10 27 12 27 14 26L18 22C20 20 20 18 20 16C20 14 20 12 18 10C16 8 14 7 14 7C14 7 14 5 16 4C17 3 16 2 16 2Z" fill="#47A248"/>
+      <path d="M16 4C18 5 19 7 20 9C20 9 21 11 20 14C19 17 17 19 16 20C15 19 14 17 14 15C14 13 15 11 16 10" fill="#00ED64"/>
+      <path d="M10 26C12 27 14 28 16 28C22 28 27 24 29 18C25 20 21 18 18 14" stroke="#00684A" stroke-width="1.5" stroke-linecap="round" fill="none" opacity="0.5"/>
     </template>
 
+    <!-- Redis - Red rounded square with R -->
     <template v-else-if="type === 'redis'">
-      <!-- Redis Icon - Red/Orange redis logo style -->
-      <defs>
-        <linearGradient id="redisGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" :stop-color="colors[0]" />
-          <stop offset="100%" :stop-color="colors[1]" />
-        </linearGradient>
-      </defs>
-      <circle cx="16" cy="16" r="11" fill="url(#redisGrad)" />
-      <path
-        d="M16 8C12 8 9 11 9 15C9 19 12 22 16 22"
-        stroke="rgba(255,255,255,0.3)"
-        stroke-width="2"
-        fill="none"
-      />
-      <path
-        d="M16 8C20 8 23 11 23 15C23 19 20 22 16 22"
-        stroke="rgba(255,255,255,0.8)"
-        stroke-width="2"
-        fill="none"
-      />
-      <circle cx="12" cy="13" r="1.5" fill="rgba(255,255,255,0.9)" />
-      <circle cx="16" cy="11" r="1.5" fill="rgba(255,255,255,0.9)" />
-      <circle cx="20" cy="13" r="1.5" fill="rgba(255,255,255,0.9)" />
+      <rect x="2" y="4" width="28" height="24" rx="5" fill="#DC382D"/>
+      <rect x="2" y="4" width="28" height="8" rx="5" fill="#E85A4F"/>
+      <text x="16" y="22" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="white">R</text>
+      <circle cx="10" cy="6" r="2" fill="#FF6B6B" opacity="0.8"/>
+      <circle cx="22" cy="6" r="2" fill="#FF6B6B" opacity="0.8"/>
     </template>
 
+    <!-- Default -->
     <template v-else>
-      <!-- Default database icon -->
-      <defs>
-        <linearGradient id="defaultGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" :stop-color="colors[0]" />
-          <stop offset="100%" :stop-color="colors[1]" />
-        </linearGradient>
-      </defs>
-      <ellipse cx="16" cy="10" rx="10" ry="4" fill="url(#defaultGrad)" />
-      <path d="M6 10V22C6 23.657 10.477 25 16 25C21.523 25 26 23.657 26 22V10" fill="url(#defaultGrad)" opacity="0.8" />
-      <ellipse cx="16" cy="16" rx="10" ry="4" fill="rgba(255,255,255,0.1)" />
+      <rect x="4" y="6" width="24" height="20" rx="3" fill="#6B7280"/>
+      <rect x="8" y="10" width="16" height="2" rx="1" fill="rgba(255,255,255,0.8)"/>
+      <rect x="8" y="14" width="12" height="2" rx="1" fill="rgba(255,255,255,0.5)"/>
+      <rect x="8" y="18" width="14" height="2" rx="1" fill="rgba(255,255,255,0.3)"/>
     </template>
   </svg>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
-
-const props = withDefaults(defineProps<{
+withDefaults(defineProps<{
   type: string
   size?: number
 }>(), {
   size: 32
 })
-
-// Color palettes for each database type
-const colorMap: Record<string, [string, string]> = {
-  mysql: ['#00758F', '#F29111'],      // Teal to Orange
-  clickhouse: ['#FF9900', '#FFCC00'],   // Orange to Yellow
-  mongodb: ['#47A248', '#00ED64'],      // Forest green to bright green
-  redis: ['#DC382D', '#FF6B6B']         // Deep red to light red
-}
-
-const colors = computed(() => colorMap[props.type] || ['#6B7280', '#9CA3AF'])
 </script>
 
 <style scoped>

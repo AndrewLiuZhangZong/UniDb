@@ -3,6 +3,7 @@
     :theme="currentTheme"
     :locale="currentLocale"
     :date-locale="currentDateLocale"
+    :theme-overrides="themeOverrides"
   >
     <n-message-provider>
       <n-dialog-provider>
@@ -15,7 +16,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, watch, onMounted, ref } from 'vue'
+import { computed, watch, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import {
   NConfigProvider,
@@ -33,6 +34,7 @@ import { useSettingsStore } from './stores/settings'
 import AppLayout from './components/AppLayout.vue'
 import darkThemeCSS from './styles/theme-dark.css?inline'
 import lightThemeCSS from './styles/theme-light.css?inline'
+import { createThemeOverrides } from './styles/theme-config'
 
 const { locale } = useI18n()
 const settingsStore = useSettingsStore()
@@ -49,6 +51,11 @@ const currentLocale = computed(() => {
 
 const currentDateLocale = computed(() => {
   return settingsStore.settings.language === 'zh-CN' ? dateZhCN : dateEnUS
+})
+
+const themeOverrides = computed(() => {
+  const isDark = settingsStore.settings.theme === 'dark'
+  return createThemeOverrides(isDark)
 })
 
 // Apply theme CSS to document

@@ -30,7 +30,7 @@
                 <circle cx="60" cy="60" r="22" fill="url(#heroGrad)"/>
                 <defs>
                   <linearGradient id="heroGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stop-color="#18a058"/><stop offset="100%" stop-color="#36b374"/>
+                    <stop offset="0%" stop-color="#FF6B00"/><stop offset="100%" stop-color="#36b374"/>
                   </linearGradient>
                 </defs>
               </svg>
@@ -71,7 +71,7 @@
                 <template #trigger>
                   <n-button text size="tiny" @click="handleConnect">
                     <template #icon>
-                      <n-icon :color="isConnected ? '#18a058' : (isDarkTheme ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.3)')">
+                      <n-icon :color="isConnected ? '#FF6B00' : (isDarkTheme ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.3)')">
                         <RadioButtonOn v-if="isConnected" /><RadioButtonOffOutline v-else />
                       </n-icon>
                     </template>
@@ -289,7 +289,7 @@ onUnmounted(() => {
   display: flex; flex-direction: column; align-items: center; gap: 20px;
 }
 .welcome-icon { position: relative; display: flex; align-items: center; justify-content: center; }
-.hero-center-icon { position: absolute; font-size: 44px; color: #18a058; }
+.hero-center-icon { position: absolute; font-size: 44px; color: #FF6B00; }
 .welcome-title {
   font-size: 32px; font-weight: 700; margin: 0;
   color: rgba(255,255,255,0.95); letter-spacing: -0.5px;

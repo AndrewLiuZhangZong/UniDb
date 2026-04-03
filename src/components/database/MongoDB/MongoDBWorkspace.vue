@@ -525,11 +525,11 @@ watch(() => activeTab.value, (tab) => {
 .type-badge { font-size: 11px; padding: 1px 6px; border-radius: 3px; font-family: monospace; }
 .type-badge.objectid { color: #f59e0b; background: rgba(245,158,11,0.1); }
 .type-badge.string { color: #4db8ff; background: rgba(77,184,255,0.1); }
-.type-badge.number { color: #18a058; background: rgba(24,160,88,0.1); }
+.type-badge.number { color: #FF6B00; background: rgba(255,107,0,0.1); }
 .type-badge.date { color: #a78bfa; background: rgba(167,139,250,0.1); }
 .type-badge.array { color: #fb923c; background: rgba(251,146,60,0.1); }
 .type-badge.object { color: #60a5fa; background: rgba(96,165,250,0.1); }
-.req-yes { color: #18a058; font-weight: 700; }
+.req-yes { color: #FF6B00; font-weight: 700; }
 .req-no { color: rgba(255,255,255,0.2); }
 
 /* Indexes */

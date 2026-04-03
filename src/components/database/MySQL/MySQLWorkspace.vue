@@ -813,7 +813,7 @@ const TableIndexes = defineComponent({
 
 .col-name-val { font-weight: 500; color: rgba(255,255,255,0.85); font-family: monospace; font-size: 12px; }
 .type-badge { font-size: 11px; color: #4db8ff; background: rgba(77,184,255,0.1); padding: 1px 6px; border-radius: 3px; font-family: monospace; }
-.nn-yes { color: #18a058; font-weight: 700; }
+.nn-yes { color: #FF6B00; font-weight: 700; }
 .nn-no { color: rgba(255,255,255,0.2); }
 .comment-text { font-size: 11px; color: rgba(255,255,255,0.4); }
 .def-val { font-size: 11px; color: rgba(255,255,255,0.45); background: rgba(255,255,255,0.06); padding: 1px 5px; border-radius: 3px; font-family: monospace; }

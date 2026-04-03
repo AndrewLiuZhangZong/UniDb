@@ -486,7 +486,7 @@ watch(() => props.connection?.id, () => {
 .stat-icon { width: 34px; height: 34px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 .stat-icon.red { background: rgba(239,68,68,0.15); color: #ef4444; }
 .stat-icon.yellow { background: rgba(245,158,11,0.15); color: #f59e0b; }
-.stat-icon.green { background: rgba(24,160,88,0.15); color: #18a058; }
+.stat-icon.green { background: rgba(255,107,0,0.15); color: #FF6B00; }
 .stat-icon.purple { background: rgba(167,139,250,0.15); color: #a78bfa; }
 .stat-val { font-size: 16px; font-weight: 700; color: rgba(255,255,255,0.9); }
 .stat-label { font-size: 11px; color: rgba(255,255,255,0.4); }
@@ -500,11 +500,11 @@ watch(() => props.connection?.id, () => {
 .type-bar-row { display: flex; align-items: center; gap: 10px; font-size: 11px; }
 .type-label { min-width: 42px; font-weight: 700; font-size: 10px; }
 .type-label.string { color: #ef4444; } .type-label.hash { color: #f59e0b; }
-.type-label.list { color: #18a058; } .type-label.set { color: #60a5fa; } .type-label.zset { color: #a78bfa; }
+.type-label.list { color: #FF6B00; } .type-label.set { color: #60a5fa; } .type-label.zset { color: #a78bfa; }
 .bar-bg { flex: 1; height: 5px; background: rgba(255,255,255,0.08); border-radius: 3px; overflow: hidden; }
 .bar-fill { height: 100%; border-radius: 3px; transition: width 0.4s ease; }
 .bar-fill.string { background: #ef4444; } .bar-fill.hash { background: #f59e0b; }
-.bar-fill.list { background: #18a058; } .bar-fill.set { background: #60a5fa; } .bar-fill.zset { background: #a78bfa; }
+.bar-fill.list { background: #FF6B00; } .bar-fill.set { background: #60a5fa; } .bar-fill.zset { background: #a78bfa; }
 .bar-count { font-size: 11px; color: rgba(255,255,255,0.35); min-width: 24px; text-align: right; }
 
 .info-rows { display: flex; flex-direction: column; gap: 3px; }
@@ -517,7 +517,7 @@ watch(() => props.connection?.id, () => {
 .type-badge-lg { font-size: 11px; font-weight: 800; padding: 3px 8px; border-radius: 4px; flex-shrink: 0; }
 .type-badge-lg.string { color: #ef4444; background: rgba(239,68,68,0.15); }
 .type-badge-lg.hash { color: #f59e0b; background: rgba(245,158,11,0.15); }
-.type-badge-lg.list { color: #18a058; background: rgba(24,160,88,0.15); }
+.type-badge-lg.list { color: #FF6B00; background: rgba(255,107,0,0.15); }
 .type-badge-lg.set { color: #60a5fa; background: rgba(96,165,250,0.15); }
 .type-badge-lg.zset { color: #a78bfa; background: rgba(167,139,250,0.15); }
 .key-name-lg { font-family: monospace; font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.9); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -536,7 +536,7 @@ watch(() => props.connection?.id, () => {
 .value-textarea { flex: 1; width: 100%; padding: 12px 14px; resize: none; outline: none; background: #1a1a24; color: #e0e0e0; font-family: 'SF Mono','Monaco',monospace; font-size: 13px; line-height: 1.6; border: none; box-sizing: border-box; }
 
 /* Hash */
-.add-hash-row { display: flex; align-items: center; gap: 6px; padding: 6px 12px; background: rgba(24,160,88,0.06); border-bottom: 1px solid rgba(255,255,255,0.05); flex-shrink: 0; }
+.add-hash-row { display: flex; align-items: center; gap: 6px; padding: 6px 12px; background: rgba(255,107,0,0.06); border-bottom: 1px solid rgba(255,255,255,0.05); flex-shrink: 0; }
 .hash-table { flex: 1; overflow-y: auto; }
 .hash-header, .hash-row { display: grid; grid-template-columns: 180px 1fr 36px; align-items: center; gap: 4px; padding: 6px 14px; }
 .hash-header { font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.3); text-transform: uppercase; border-bottom: 1px solid rgba(255,255,255,0.05); }
@@ -550,8 +550,8 @@ watch(() => props.connection?.id, () => {
 .list-header, .list-row { display: grid; grid-template-columns: 56px 1fr 36px; align-items: center; gap: 4px; padding: 6px 14px; }
 .list-header { font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.3); text-transform: uppercase; border-bottom: 1px solid rgba(255,255,255,0.05); }
 .list-row { border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 12px; }
-.list-row:hover { background: rgba(24,160,88,0.07); }
-.idx-badge { font-size: 10px; color: #18a058; background: rgba(24,160,88,0.12); padding: 1px 5px; border-radius: 3px; }
+.list-row:hover { background: rgba(255,107,0,0.07); }
+.idx-badge { font-size: 10px; color: #FF6B00; background: rgba(255,107,0,0.12); padding: 1px 5px; border-radius: 3px; }
 .list-val { color: rgba(255,255,255,0.8); font-family: monospace; font-size: 12px; }
 
 /* Set */

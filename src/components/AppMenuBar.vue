@@ -11,7 +11,7 @@
           <ellipse cx="128" cy="166" rx="46" ry="18" fill="rgba(255,255,255,0.12)"/>
           <defs>
             <linearGradient id="logoG" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="#18a058"/>
+              <stop offset="0%" stop-color="#FF6B00"/>
               <stop offset="100%" stop-color="#36b374"/>
             </linearGradient>
           </defs>
@@ -211,8 +211,8 @@ const getMenuLabel = (key: string): string => {
 
 .menu-item:hover { background: rgba(255,255,255,0.07); }
 .light-mode .menu-item:hover { background: rgba(0,0,0,0.05); }
-.menu-item.is-active { background: rgba(24,160,88,0.15); }
-.light-mode .menu-item.is-active { background: rgba(24,160,88,0.1); }
+.menu-item.is-active { background: rgba(255,107,0,0.15); }
+.light-mode .menu-item.is-active { background: rgba(255,107,0,0.1); }
 
 .menu-label {
   font-size: 13px;
@@ -229,7 +229,7 @@ const getMenuLabel = (key: string): string => {
   color: rgba(255,255,255,0.9);
   letter-spacing: 0.3px;
 }
-.light-mode .home-name { color: #18a058; }
+.light-mode .home-name { color: #FF6B00; }
 
 .menu-divider-v {
   width: 1px;
@@ -272,11 +272,11 @@ const getMenuLabel = (key: string): string => {
   transition: background-color 0.1s ease;
 }
 
-.dropdown-item:hover { background: rgba(24,160,88,0.18); }
-.light-mode .dropdown-item:hover { background: rgba(24,160,88,0.1); }
+.dropdown-item:hover { background: rgba(255,107,0,0.18); }
+.light-mode .dropdown-item:hover { background: rgba(255,107,0,0.1); }
 
-.dropdown-item.is-selected { background: rgba(24,160,88,0.12); }
-.light-mode .dropdown-item.is-selected { background: rgba(24,160,88,0.08); }
+.dropdown-item.is-selected { background: rgba(255,107,0,0.12); }
+.light-mode .dropdown-item.is-selected { background: rgba(255,107,0,0.08); }
 
 .item-icon {
   font-size: 15px;

@@ -10,8 +10,8 @@
       <div class="check-update-body">
         <div class="update-icon-wrap" :class="{ 'checking': isChecking }">
           <n-icon v-if="isChecking" class="spinning" size="36"><ReloadOutline /></n-icon>
-          <n-icon v-else-if="hasUpdate" size="36" color="#18a058"><CloudDoneOutline /></n-icon>
-          <n-icon v-else size="36" color="#18a058"><CheckmarkCircleOutline /></n-icon>
+          <n-icon v-else-if="hasUpdate" size="36" color="#FF6B00"><CloudDoneOutline /></n-icon>
+          <n-icon v-else size="36" color="#FF6B00"><CheckmarkCircleOutline /></n-icon>
         </div>
 
         <div v-if="isChecking" class="update-checking">
@@ -66,7 +66,7 @@
             <ellipse cx="128" cy="168" rx="50" ry="20" fill="rgba(255,255,255,0.1)"/>
             <defs>
               <linearGradient id="aboutGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stop-color="#18a058"/>
+                <stop offset="0%" stop-color="#FF6B00"/>
                 <stop offset="100%" stop-color="#36b374"/>
               </linearGradient>
             </defs>
@@ -131,7 +131,7 @@
     >
       <div class="docs-grid">
         <div class="doc-item" :style="docItemStyle" @click="openLink('docs')">
-          <n-icon class="doc-icon" size="28" :style="{ color: isDarkTheme ? '#18a058' : '#2080f0' }"><BookOutline /></n-icon>
+          <n-icon class="doc-icon" size="28" :style="{ color: isDarkTheme ? '#FF6B00' : '#2080f0' }"><BookOutline /></n-icon>
           <div class="doc-info">
             <h4 :style="{ color: isDarkTheme ? 'rgba(255,255,255,0.88)' : 'rgba(0,0,0,0.85)' }">{{ t('help.docs.userGuide') }}</h4>
             <p :style="{ color: isDarkTheme ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.4)' }">{{ t('help.docs.userGuideDesc') }}</p>
@@ -139,7 +139,7 @@
           <n-icon class="doc-arrow" :style="{ color: isDarkTheme ? 'rgba(255,255,255,0.25)' : 'rgba(0,0,0,0.25)' }"><ChevronForwardOutline /></n-icon>
         </div>
         <div class="doc-item" :style="docItemStyle" @click="openLink('api')">
-          <n-icon class="doc-icon" size="28" :style="{ color: isDarkTheme ? '#18a058' : '#2080f0' }"><CodeSlashOutline /></n-icon>
+          <n-icon class="doc-icon" size="28" :style="{ color: isDarkTheme ? '#FF6B00' : '#2080f0' }"><CodeSlashOutline /></n-icon>
           <div class="doc-info">
             <h4 :style="{ color: isDarkTheme ? 'rgba(255,255,255,0.88)' : 'rgba(0,0,0,0.85)' }">{{ t('help.docs.apiRef') }}</h4>
             <p :style="{ color: isDarkTheme ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.4)' }">{{ t('help.docs.apiRefDesc') }}</p>
@@ -147,7 +147,7 @@
           <n-icon class="doc-arrow" :style="{ color: isDarkTheme ? 'rgba(255,255,255,0.25)' : 'rgba(0,0,0,0.25)' }"><ChevronForwardOutline /></n-icon>
         </div>
         <div class="doc-item" :style="docItemStyle" @click="openLink('faq')">
-          <n-icon class="doc-icon" size="28" :style="{ color: isDarkTheme ? '#18a058' : '#2080f0' }"><HelpCircleOutline /></n-icon>
+          <n-icon class="doc-icon" size="28" :style="{ color: isDarkTheme ? '#FF6B00' : '#2080f0' }"><HelpCircleOutline /></n-icon>
           <div class="doc-info">
             <h4 :style="{ color: isDarkTheme ? 'rgba(255,255,255,0.88)' : 'rgba(0,0,0,0.85)' }">{{ t('help.docs.faq') }}</h4>
             <p :style="{ color: isDarkTheme ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.4)' }">{{ t('help.docs.faqDesc') }}</p>
@@ -155,7 +155,7 @@
           <n-icon class="doc-arrow" :style="{ color: isDarkTheme ? 'rgba(255,255,255,0.25)' : 'rgba(0,0,0,0.25)' }"><ChevronForwardOutline /></n-icon>
         </div>
         <div class="doc-item" :style="docItemStyle" @click="openLink('github')">
-          <n-icon class="doc-icon" size="28" :style="{ color: isDarkTheme ? '#18a058' : '#2080f0' }"><LogoGithub /></n-icon>
+          <n-icon class="doc-icon" size="28" :style="{ color: isDarkTheme ? '#FF6B00' : '#2080f0' }"><LogoGithub /></n-icon>
           <div class="doc-info">
             <h4 :style="{ color: isDarkTheme ? 'rgba(255,255,255,0.88)' : 'rgba(0,0,0,0.85)' }">GitHub</h4>
             <p :style="{ color: isDarkTheme ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.4)' }">{{ t('help.docs.githubDesc') }}</p>
@@ -178,7 +178,7 @@
     >
       <div class="report-form">
         <div class="report-tip" :style="tipStyle">
-          <n-icon size="16" :style="{ color: isDarkTheme ? '#18a058' : '#2080f0' }"><InformationCircleOutline /></n-icon>
+          <n-icon size="16" :style="{ color: isDarkTheme ? '#FF6B00' : '#2080f0' }"><InformationCircleOutline /></n-icon>
           {{ t('help.report.tip') }}
         </div>
 
@@ -261,11 +261,11 @@ const isDarkTheme = computed(() => settingsStore.settings.theme === 'dark')
 const cardBgDark = '#1e1e26'
 const cardBgLight = '#ffffff'
 
-const accentColor = computed(() => isDarkTheme.value ? '#18a058' : '#2080f0')
+const accentColor = computed(() => isDarkTheme.value ? '#FF6B00' : '#2080f0')
 
 const versionBadgeStyle = computed(() => ({
   color: accentColor.value,
-  background: isDarkTheme.value ? 'rgba(24,160,88,0.12)' : 'rgba(32,128,240,0.1)',
+  background: isDarkTheme.value ? 'rgba(255,107,0,0.12)' : 'rgba(32,128,240,0.1)',
 }))
 
 const linkBtnStyle = computed(() => ({
@@ -280,7 +280,7 @@ const docItemStyle = computed(() => ({
 }))
 
 const tipStyle = computed(() => ({
-  background: isDarkTheme.value ? 'rgba(24,160,88,0.08)' : 'rgba(32,128,240,0.07)',
+  background: isDarkTheme.value ? 'rgba(255,107,0,0.08)' : 'rgba(32,128,240,0.07)',
   color: isDarkTheme.value ? 'rgba(255,255,255,0.6)' : 'rgba(0,0,0,0.6)',
 }))
 
@@ -368,13 +368,13 @@ defineExpose({ showAbout, showDocs, showReport, showCheckUpdates })
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(24, 160, 88, 0.1);
-  color: #18a058;
+  background: rgba(255, 107, 0, 0.1);
+  color: #FF6B00;
   margin-bottom: 4px;
 }
 .update-icon-wrap.checking {
-  background: rgba(24, 160, 88, 0.08);
-  color: #18a058;
+  background: rgba(255, 107, 0, 0.08);
+  color: #FF6B00;
 }
 
 .spinning {
@@ -400,7 +400,7 @@ defineExpose({ showAbout, showDocs, showReport, showCheckUpdates })
   margin: 0 0 8px;
 }
 .update-title.new-version {
-  color: #18a058;
+  color: #FF6B00;
 }
 
 .update-desc {
@@ -450,7 +450,7 @@ defineExpose({ showAbout, showDocs, showReport, showCheckUpdates })
 }
 
 .about-logo svg {
-  filter: drop-shadow(0 4px 16px rgba(24, 160, 88, 0.35));
+  filter: drop-shadow(0 4px 16px rgba(255, 107, 0, 0.35));
   margin-bottom: 12px;
 }
 
@@ -528,9 +528,9 @@ defineExpose({ showAbout, showDocs, showReport, showCheckUpdates })
   border: none;
 }
 .about-link-btn:hover {
-  background: rgba(24,160,88,0.15) !important;
-  border-color: rgba(24,160,88,0.4) !important;
-  color: #18a058 !important;
+  background: rgba(255,107,0,0.15) !important;
+  border-color: rgba(255,107,0,0.4) !important;
+  color: #FF6B00 !important;
 }
 .about-link-btn n-icon { font-size: 14px; }
 
@@ -562,10 +562,10 @@ defineExpose({ showAbout, showDocs, showReport, showCheckUpdates })
   transition: all 0.15s;
 }
 .doc-item:hover {
-  background: rgba(24,160,88,0.1) !important;
-  border-color: rgba(24,160,88,0.2) !important;
+  background: rgba(255,107,0,0.1) !important;
+  border-color: rgba(255,107,0,0.2) !important;
 }
-.doc-icon { color: #18a058; flex-shrink: 0; transition: color 0.2s; }
+.doc-icon { color: #FF6B00; flex-shrink: 0; transition: color 0.2s; }
 .doc-info { flex: 1; }
 .doc-info h4 {
   margin: 0 0 2px;

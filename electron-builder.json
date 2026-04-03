@@ -5,6 +5,7 @@
   "directories": {
     "output": "dist"
   },
+  "publish": null,
   "files": [
     "dist/**/*",
     "dist-electron/**/*",
@@ -21,7 +22,7 @@
   },
   "win": {
     "target": ["nsis"],
-    "icon": "resources/icon.png",
+    "icon": "resources/icon.ico",
     "artifactName": "${productName}-${version}-${arch}.${ext}"
   },
   "linux": {

@@ -1,80 +1,93 @@
 <template>
   <div class="ch-explorer" :class="{ 'light-mode': !isDarkTheme }">
+    <!-- Search bar -->
     <div class="explorer-toolbar">
-      <n-input v-model:value="searchText" size="tiny" placeholder="搜索..." clearable class="search-input">
+      <n-input v-model:value="searchText" size="tiny" placeholder="搜索表..." clearable class="search-input">
         <template #prefix><n-icon :size="12"><SearchOutline /></n-icon></template>
       </n-input>
-      <n-button text size="tiny" @click="loadData" :loading="loading">
+      <n-button text size="tiny" @click="loadAll" :loading="loading">
         <template #icon><n-icon><RefreshOutline /></n-icon></template>
       </n-button>
     </div>
 
+    <!-- Error -->
+    <div v-if="error" class="error-msg">
+      <n-icon><WarningOutline /></n-icon>
+      {{ error }}
+    </div>
+
+    <div v-if="loading && !databases.length" class="loading-hint">加载中...</div>
+
+    <!-- Database tree -->
     <div class="tree-body">
+      <div v-if="!loading && !databases.length" class="empty">
+        点击刷新加载数据库
+      </div>
+
       <!-- Databases -->
-      <div class="section">
-        <div class="section-hd" @click="toggle('dbs')">
-          <n-icon class="arrow" :class="{ open: exp.dbs }"><ChevronForwardOutline /></n-icon>
-          <n-icon class="sec-icon db-c"><ServerOutline /></n-icon>
-          <span class="sec-label">数据库</span>
-          <span class="badge">{{ databases.length }}</span>
-        </div>
-        <div v-if="exp.dbs" class="sec-body">
-          <div
-            v-for="db in databases" :key="db.name"
-            class="tree-item"
-            :class="{ active: activeDb === db.name }"
-            @click="selectDb(db.name)"
-          >
-            <n-icon class="item-icon db-c"><ServerOutline /></n-icon>
-            <span class="item-name">{{ db.name }}</span>
-            <n-tag v-if="activeDb === db.name" size="tiny" type="success" class="active-tag">active</n-tag>
-          </div>
-        </div>
-      </div>
+      <div v-for="db in databases" :key="db.name" class="db-node">
 
-      <!-- Tables -->
-      <div class="section">
-        <div class="section-hd" @click="toggle('tables')">
-          <n-icon class="arrow" :class="{ open: exp.tables }"><ChevronForwardOutline /></n-icon>
-          <n-icon class="sec-icon tbl-c"><GridOutline /></n-icon>
-          <span class="sec-label">{{ t('explorer.tables') }}</span>
-          <span class="badge">{{ filteredTables.length }}</span>
+        <!-- Database row -->
+        <div class="tree-row db-row" :class="{ open: exp[db.name] }" @click="toggleDb(db.name)">
+          <n-icon class="row-arrow" :class="{ open: exp[db.name] }">
+            <ChevronForwardOutline />
+          </n-icon>
+          <n-icon class="row-icon db-icon"><ServerOutline /></n-icon>
+          <span class="row-name" :title="db.name">{{ db.name }}</span>
         </div>
-        <div v-if="exp.tables" class="sec-body">
-          <div v-if="!filteredTables.length" class="empty">{{ t('explorer.noTables') }}</div>
-          <div
-            v-for="tbl in filteredTables" :key="tbl.name"
-            class="tree-item"
-            :class="{ active: sel?.name === tbl.name }"
-            @click="select(tbl, 'table')"
-            @contextmenu.prevent="openCtx($event, tbl)"
-          >
-            <n-icon class="item-icon tbl-c"><GridOutline /></n-icon>
-            <span class="item-name">{{ tbl.name }}</span>
-            <span class="item-meta">{{ tbl.engine }}</span>
-          </div>
-        </div>
-      </div>
 
-      <!-- SQL Query -->
-      <div class="section">
-        <div class="section-hd" @click="select(null, 'query')">
-          <n-icon class="arrow invisible"><ChevronForwardOutline /></n-icon>
-          <n-icon class="sec-icon query-c"><TerminalOutline /></n-icon>
-          <span class="sec-label">SQL 查询</span>
+        <!-- Expanded children -->
+        <div v-if="exp[db.name]" class="db-children">
+
+          <!-- Tables section -->
+          <div class="section-node">
+            <div class="tree-row sec-row" @click="toggleSec(db.name, 'tables')">
+              <n-icon class="row-arrow" :class="{ open: secExp[db.name]?.tables }">
+                <ChevronForwardOutline />
+              </n-icon>
+              <n-icon class="row-icon tbl-icon"><GridOutline /></n-icon>
+              <span class="row-name sec-label">Tables</span>
+              <span class="badge">{{ filteredTables(db.name).length }}</span>
+            </div>
+            <div v-if="secExp[db.name]?.tables" class="sec-children">
+              <div
+                v-for="tbl in filteredTables(db.name)" :key="tbl.name"
+                class="tree-row item-row"
+                :class="{ active: sel?._db === db.name && sel?.name === tbl.name }"
+                @click="selectItem(db.name, tbl, 'table')"
+                @contextmenu.prevent="openCtx($event, db.name, tbl)"
+              >
+                <n-icon class="row-icon item-icon tbl-icon"><GridOutline /></n-icon>
+                <span class="row-name" :title="tbl.name">{{ tbl.name }}</span>
+              </div>
+              <div v-if="!filteredTables(db.name).length" class="empty-row">无表</div>
+            </div>
+          </div>
+
         </div>
       </div>
     </div>
-    <n-dropdown trigger="manual" :show="ctxShow" :x="ctxX" :y="ctxY"
-      :options="ctxOptions" @select="handleCtx" @clickoutside="ctxShow = false" />
+
+    <n-dropdown
+      trigger="manual"
+      :show="ctxShow"
+      :x="ctxX"
+      :y="ctxY"
+      :options="ctxOptions"
+      @select="handleCtx"
+      @clickoutside="ctxShow = false"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
+import { ref, reactive, computed, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { NIcon, NButton, NInput, NTag, NDropdown, useMessage, useDialog } from 'naive-ui'
-import { RefreshOutline, ChevronForwardOutline, GridOutline, ServerOutline, SearchOutline, TerminalOutline } from '@vicons/ionicons5'
+import { NIcon, NButton, NInput, NDropdown, useMessage, useDialog } from 'naive-ui'
+import {
+  RefreshOutline, ChevronForwardOutline, GridOutline,
+  ServerOutline, SearchOutline, WarningOutline
+} from '@vicons/ionicons5'
 import { useSettingsStore } from '../../../stores/settings'
 import { clickhouseMeta } from '../../../api/meta'
 
@@ -83,26 +96,62 @@ const message = useMessage()
 const dialog = useDialog()
 const settingsStore = useSettingsStore()
 const isDarkTheme = computed(() => settingsStore.settings.theme === 'dark')
+
 const props = defineProps<{ connection: any }>()
-const emit = defineEmits<{ (e: 'select-item', item: any, type: string): void; (e: 'db-change', db: string): void }>()
+const emit = defineEmits<{
+  (e: 'select-item', item: any, type: string): void
+  (e: 'db-change', db: string): void
+}>()
 
 const loading = ref(false)
 const searchText = ref('')
 const sel = ref<any>(null)
-const activeDb = ref('default')
-const databases = ref<any[]>([])
-const tables = ref<any[]>([])
-const exp = ref({ dbs: true, tables: true })
+const databases = ref<{ name: string }[]>([])
+const tables = ref<Record<string, any[]>>({})
+const error = ref('')
+
+// expanded state
+const exp = reactive<Record<string, boolean>>({})
+const secExp = reactive<Record<string, { tables: boolean }>>({})
+
+// context menu
 const ctxShow = ref(false)
 const ctxX = ref(0)
 const ctxY = ref(0)
 const ctxItem = ref<any>(null)
+const ctxDb = ref('')
 
-const filteredTables = computed(() =>
-  searchText.value ? tables.value.filter(t => t.name.toLowerCase().includes(searchText.value.toLowerCase())) : tables.value
-)
+const filteredTables = (db: string) => {
+  if (!searchText.value) return tables.value[db] || []
+  return (tables.value[db] || []).filter(t => t.name.toLowerCase().includes(searchText.value.toLowerCase()))
+}
 
-const toggle = (k: keyof typeof exp.value) => { exp.value[k] = !exp.value[k] }
+const toggleDb = (db: string) => {
+  exp[db] = !exp[db]
+  if (exp[db] && !secExp[db]) {
+    secExp[db] = { tables: true }
+    loadTables(db)
+  }
+  if (exp[db]) emit('db-change', db)
+}
+
+const toggleSec = (db: string, _key: string) => {
+  if (!secExp[db]) secExp[db] = { tables: false }
+  secExp[db].tables = !secExp[db].tables
+}
+
+const selectItem = (db: string, item: any, type: string) => {
+  sel.value = item ? { ...item, _db: db } : { _db: db }
+  emit('select-item', sel.value, type)
+}
+
+const openCtx = (e: MouseEvent, db: string, tbl: any) => {
+  ctxDb.value = db
+  ctxItem.value = tbl
+  ctxX.value = e.clientX
+  ctxY.value = e.clientY
+  ctxShow.value = true
+}
 
 const ctxOptions = [
   { label: '数据浏览', key: 'browse' },
@@ -110,98 +159,98 @@ const ctxOptions = [
   { type: 'divider', key: 'd1' },
   { label: '删除表', key: 'drop' }
 ]
-const openCtx = (e: MouseEvent, item: any) => { ctxItem.value = item; ctxShow.value = true; ctxX.value = e.clientX; ctxY.value = e.clientY }
+
 const handleCtx = (key: string) => {
   ctxShow.value = false
-  if (key === 'browse') select(ctxItem.value, 'table')
-  else if (key === 'schema') select(ctxItem.value, 'schema')
-  else if (key === 'drop') dropTable(ctxItem.value)
+  if (key === 'browse') selectItem(ctxDb.value, ctxItem.value, 'table')
+  else if (key === 'schema') selectItem(ctxDb.value, ctxItem.value, 'schema')
+  else if (key === 'drop') dropTable(ctxDb.value, ctxItem.value)
 }
-const dropTable = (tbl: any) => {
+
+const dropTable = (db: string, tbl: any) => {
   dialog.warning({
-    title: '删除表', content: `确定删除表 "${tbl.name}"？ClickHouse 此操作不可撤销！`,
+    title: '删除表', content: `确定删除表 "${tbl.name}"？`,
     positiveText: '确定删除', negativeText: '取消',
     onPositiveClick: async () => {
       try {
-        const db = activeDb.value || 'default'
         const res = await clickhouseMeta.execute(props.connection.id, `DROP TABLE \`${db}\`.\`${tbl.name}\``)
         if ((res as any).error) throw new Error((res as any).error)
-        tables.value = tables.value.filter(t => t.name !== tbl.name)
+        tables.value[db] = (tables.value[db] || []).filter(t => t.name !== tbl.name)
         message.success(`已删除表 ${tbl.name}`)
       } catch (e: any) { message.error('删除失败: ' + (e?.response?.data?.error || e.message)) }
     }
   })
 }
 
-const selectDb = async (name: string) => {
-  activeDb.value = name
-  emit('db-change', name)
-  tables.value = []
+const loadTables = async (db: string) => {
+  if (!props.connection?.id) return
   try {
-    const tRes = await clickhouseMeta.tables(props.connection.id, name)
-    tables.value = tRes.tables
+    const tRes = await clickhouseMeta.tables(props.connection.id, db)
+    tables.value[db] = tRes.tables || []
   } catch { /* ignore */ }
 }
-const select = async (item: any, type: string) => {
-  sel.value = item
-  if (type === 'table' && item) await loadTableColumns(item)
-  emit('select-item', { ...item, _db: activeDb.value }, type)
-}
 
-const loadData = async () => {
+const loadAll = async () => {
+  if (!props.connection?.id) return
   loading.value = true
+  error.value = ''
   try {
-    const dbRes = await clickhouseMeta.databases(props.connection.id)
-    databases.value = (dbRes.databases || []).filter(d => d !== 'INFORMATION_SCHEMA' && d !== 'information_schema').map((d: string) => ({ name: d }))
-    if (!activeDb.value && databases.value.length) {
-      activeDb.value = props.connection.config?.database || databases.value[0]?.name || 'default'
+    const res = await clickhouseMeta.databases(props.connection.id)
+    databases.value = res.databases || []
+    if (databases.value.length) {
+      const first = databases.value[0].name
+      exp[first] = true
+      secExp[first] = { tables: true }
+      loadTables(first)
+      emit('db-change', first)
     }
-    const tRes = await clickhouseMeta.tables(props.connection.id, activeDb.value)
-    tables.value = tRes.tables
-  } catch {
-    // fall through silently - connection may not be live
-  } finally {
-    loading.value = false
-  }
+  } catch (e: any) { error.value = e.message || '加载失败' }
+  finally { loading.value = false }
 }
 
-const loadTableColumns = async (tbl: any) => {
-  if (tbl.columns) return
-  try {
-    const res = await clickhouseMeta.columns(props.connection.id, tbl.name, activeDb.value)
-    tbl.columns = res.columns
-  } catch { /* ignore */ }
-}
-
-watch(() => props.connection, () => { sel.value = null; loadData() }, { immediate: true })
+watch(() => props.connection?.id, () => {
+  sel.value = null
+  databases.value = []
+  tables.value = {}
+  Object.keys(exp).forEach(k => delete exp[k])
+  Object.keys(secExp).forEach(k => delete secExp[k])
+  loadAll()
+}, { immediate: true })
 </script>
 
 <style scoped>
 .ch-explorer { display: flex; flex-direction: column; height: 100%; overflow: hidden; font-size: 12px; }
+
 .explorer-toolbar { display: flex; align-items: center; gap: 4px; padding: 6px 8px; flex-shrink: 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
 .search-input { flex: 1; }
+.error-msg { display: flex; align-items: center; gap: 5px; padding: 6px 10px; font-size: 11px; color: #ef4444; background: rgba(239,68,68,0.08); }
+.loading-hint { padding: 8px 12px; color: rgba(255,255,255,0.3); font-size: 11px; }
+
 .tree-body { flex: 1; overflow-y: auto; padding: 4px 0; }
 .tree-body::-webkit-scrollbar { width: 4px; }
 .tree-body::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
-.section { margin-bottom: 1px; }
-.section-hd { display: flex; align-items: center; gap: 5px; padding: 6px 8px; cursor: pointer; transition: background 0.1s; }
-.section-hd:hover { background: rgba(255,255,255,0.04); }
-.arrow { font-size: 12px; color: rgba(255,255,255,0.3); transition: transform 0.18s; flex-shrink: 0; }
-.arrow.open { transform: rotate(90deg); }
-.arrow.invisible { opacity: 0; }
-.sec-icon { font-size: 13px; flex-shrink: 0; }
-.db-c { color: #f59e0b; }
-.tbl-c { color: #fb923c; }
-.query-c { color: #FF6B00; }
-.sec-label { flex: 1; font-weight: 500; color: rgba(255,255,255,0.65); }
-.badge { font-size: 10px; color: rgba(255,255,255,0.35); background: rgba(255,255,255,0.07); padding: 1px 5px; border-radius: 7px; }
-.sec-body { padding-left: 18px; }
-.tree-item { display: flex; align-items: center; gap: 6px; padding: 5px 10px; cursor: pointer; border-radius: 4px; margin: 1px 4px; transition: background 0.1s; }
-.tree-item:hover { background: rgba(251,146,60,0.1); }
-.tree-item.active { background: rgba(251,146,60,0.18); }
-.item-icon { font-size: 12px; flex-shrink: 0; }
-.item-name { flex: 1; color: rgba(255,255,255,0.82); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.item-meta { font-size: 10px; color: rgba(255,255,255,0.28); font-family: monospace; flex-shrink: 0; }
-.active-tag { flex-shrink: 0; }
-.empty { padding: 6px 10px; color: rgba(255,255,255,0.25); font-style: italic; font-size: 11px; }
+
+.tree-row { display: flex; align-items: center; gap: 4px; padding: 5px 8px; cursor: pointer; border-radius: 4px; margin: 1px 4px; transition: background 0.1s; user-select: none; }
+.tree-row:hover { background: rgba(255,255,255,0.04); }
+.db-row { padding-left: 6px; }
+.db-row.open { background: rgba(255,255,255,0.03); }
+.sec-row { padding-left: 16px; }
+.item-row { padding-left: 28px; }
+.item-row.active { background: rgba(77,184,255,0.15); }
+
+.row-arrow { font-size: 10px; color: rgba(255,255,255,0.25); transition: transform 0.18s; flex-shrink: 0; width: 12px; }
+.row-arrow.open { transform: rotate(90deg); }
+.row-arrow:empty { width: 12px; }
+.row-icon { font-size: 12px; flex-shrink: 0; }
+.db-icon { color: #f0a020; }
+.tbl-icon { color: #4db8ff; }
+.query-icon { color: #FF6B00; }
+.row-name { flex: 1; color: rgba(255,255,255,0.82); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; }
+.sec-label { font-weight: 500; color: rgba(255,255,255,0.6); font-size: 11.5px; }
+.badge { font-size: 10px; color: rgba(255,255,255,0.3); background: rgba(255,255,255,0.07); padding: 0 5px; border-radius: 7px; flex-shrink: 0; }
+
+.db-children { margin-bottom: 4px; }
+.sec-children { margin-bottom: 2px; }
+.empty-row { padding: 4px 12px 4px 44px; color: rgba(255,255,255,0.22); font-size: 11px; font-style: italic; }
+.empty { padding: 8px 12px; color: rgba(255,255,255,0.25); font-size: 11px; font-style: italic; }
 </style>

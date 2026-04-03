@@ -1,8 +1,8 @@
 <template>
   <div class="mysql-explorer" :class="{ 'light-mode': !isDarkTheme }">
-    <!-- Toolbar -->
+    <!-- Search bar -->
     <div class="explorer-toolbar">
-      <n-input v-model:value="searchText" size="tiny" placeholder="搜索..." clearable class="search-input">
+      <n-input v-model:value="searchText" size="tiny" placeholder="搜索表/视图..." clearable class="search-input">
         <template #prefix><n-icon :size="12"><SearchOutline /></n-icon></template>
       </n-input>
       <n-button text size="tiny" @click="loadAll" :loading="loading">
@@ -10,84 +10,94 @@
       </n-button>
     </div>
 
-    <!-- Database selector -->
-    <div v-if="databases.length" class="db-selector">
-      <n-select
-        v-model:value="activeDb"
-        :options="databases.map(d => ({ label: d, value: d }))"
-        size="tiny"
-        placeholder="选择数据库"
-        @update:value="onDbChange"
-      />
-    </div>
-
+    <!-- Error -->
     <div v-if="error" class="error-msg">
       <n-icon><WarningOutline /></n-icon>
       {{ error }}
     </div>
 
+    <!-- Loading hint -->
+    <div v-if="loading && !databases.length" class="loading-hint">加载中...</div>
+
+    <!-- Database tree -->
     <div class="tree-body">
-      <!-- Tables -->
-      <div class="section">
-        <div class="section-hd" @click="toggle('tables')">
-          <n-icon class="arrow" :class="{ open: exp.tables }"><ChevronForwardOutline /></n-icon>
-          <n-icon class="sec-icon tbl-c"><GridOutline /></n-icon>
-          <span class="sec-label">{{ t('explorer.tables') }}</span>
-          <span class="badge">{{ filteredTables.length }}</span>
-          <n-button text size="tiny" class="sec-action" @click.stop="openCreateTable" title="新建表">
+      <div v-if="!loading && !databases.length" class="empty">
+        点击刷新加载数据库
+      </div>
+
+      <!-- Databases -->
+      <div v-for="db in databases" :key="db" class="db-node">
+
+        <!-- Database row -->
+        <div class="tree-row db-row" :class="{ open: exp[db] }" @click="toggleDb(db)">
+          <n-icon class="row-arrow" :class="{ open: exp[db] }">
+            <ChevronForwardOutline />
+          </n-icon>
+          <n-icon class="row-icon db-icon"><ServerOutline /></n-icon>
+          <span class="row-name" :title="db">{{ db }}</span>
+          <n-button text size="tiny" class="row-action" @click.stop="openCreateTable(db)" :title="t('toolbar.createTable')">
             <template #icon><n-icon><AddOutline /></n-icon></template>
           </n-button>
         </div>
-        <div v-if="exp.tables" class="sec-body">
-          <div v-if="tablesLoading" class="loading-hint">加载中...</div>
-          <div v-else-if="!filteredTables.length" class="empty">{{ t('explorer.noTables') }}</div>
-          <div
-            v-for="tbl in filteredTables" :key="tbl.name"
-            class="tree-item"
-            :class="{ active: sel?.name === tbl.name && selType === 'table' }"
-            @click="select(tbl, 'table')"
-            @contextmenu.prevent="openCtx($event, tbl, 'table')"
-          >
-            <n-icon class="item-icon tbl-c"><GridOutline /></n-icon>
-            <span class="item-name">{{ tbl.name }}</span>
-            <span class="item-meta">{{ tbl.engine }}</span>
-          </div>
-        </div>
-      </div>
 
-      <!-- Views -->
-      <div class="section">
-        <div class="section-hd" @click="toggle('views')">
-          <n-icon class="arrow" :class="{ open: exp.views }"><ChevronForwardOutline /></n-icon>
-          <n-icon class="sec-icon view-c"><EyeOutline /></n-icon>
-          <span class="sec-label">{{ t('explorer.views') }}</span>
-          <span class="badge">{{ filteredViews.length }}</span>
-        </div>
-        <div v-if="exp.views" class="sec-body">
-          <div v-if="!filteredViews.length" class="empty">{{ t('explorer.noViews') }}</div>
-          <div
-            v-for="v in filteredViews" :key="v.name"
-            class="tree-item"
-            :class="{ active: sel?.name === v.name && selType === 'view' }"
-            @click="select(v, 'view')"
-          >
-            <n-icon class="item-icon view-c"><EyeOutline /></n-icon>
-            <span class="item-name">{{ v.name }}</span>
-          </div>
-        </div>
-      </div>
+        <!-- Expanded: Tables / Views / Indexes / SQL -->
+        <div v-if="exp[db]" class="db-children">
 
-      <!-- SQL Query shortcut -->
-      <div class="section">
-        <div class="section-hd" @click="select({ db: activeDb }, 'query')">
-          <n-icon class="arrow invisible"><ChevronForwardOutline /></n-icon>
-          <n-icon class="sec-icon query-c"><TerminalOutline /></n-icon>
-          <span class="sec-label">{{ t('explorer.sqlQuery') }}</span>
+          <!-- Tables -->
+          <div class="section-node">
+            <div class="tree-row sec-row" @click="toggleSec(db, 'tables')">
+              <n-icon class="row-arrow" :class="{ open: secExp[db]?.tables }">
+                <ChevronForwardOutline />
+              </n-icon>
+              <n-icon class="row-icon tbl-icon"><GridOutline /></n-icon>
+              <span class="row-name sec-label">{{ t('explorer.tables') }}</span>
+              <span class="badge">{{ filteredTables(db).length }}</span>
+            </div>
+            <div v-if="secExp[db]?.tables" class="sec-children">
+              <div
+                v-for="tbl in filteredTables(db)" :key="tbl.name"
+                class="tree-row item-row"
+                :class="{ active: sel?._db === db && sel?.name === tbl.name && selType === 'table' }"
+                @click="selectItem(db, tbl, 'table')"
+                @contextmenu.prevent="openCtx($event, db, tbl, 'table')"
+              >
+                <n-icon class="row-icon item-icon tbl-icon"><GridOutline /></n-icon>
+                <span class="row-name" :title="tbl.name">{{ tbl.name }}</span>
+                <span class="item-meta">{{ tbl.engine }}</span>
+              </div>
+              <div v-if="!filteredTables(db).length" class="empty-row">无表</div>
+            </div>
+          </div>
+
+          <!-- Views -->
+          <div class="section-node">
+            <div class="tree-row sec-row" @click="toggleSec(db, 'views')">
+              <n-icon class="row-arrow" :class="{ open: secExp[db]?.views }">
+                <ChevronForwardOutline />
+              </n-icon>
+              <n-icon class="row-icon view-icon"><EyeOutline /></n-icon>
+              <span class="row-name sec-label">{{ t('explorer.views') }}</span>
+              <span class="badge">{{ filteredViews(db).length }}</span>
+            </div>
+            <div v-if="secExp[db]?.views" class="sec-children">
+              <div
+                v-for="v in filteredViews(db)" :key="v.name"
+                class="tree-row item-row"
+                :class="{ active: sel?._db === db && sel?.name === v.name && selType === 'view' }"
+                @click="selectItem(db, v, 'view')"
+              >
+                <n-icon class="row-icon item-icon view-icon"><EyeOutline /></n-icon>
+                <span class="row-name" :title="v.name">{{ v.name }}</span>
+              </div>
+              <div v-if="!filteredViews(db).length" class="empty-row">无视图</div>
+            </div>
+          </div>
+
         </div>
       </div>
     </div>
 
-    <!-- Context Menu -->
+    <!-- Context menu -->
     <n-dropdown
       trigger="manual"
       :show="ctx.show"
@@ -98,19 +108,16 @@
       @clickoutside="ctx.show = false"
     />
 
-    <!-- Create Table Modal -->
+    <!-- Create Table modal -->
     <n-modal v-model:show="showCreateTable">
       <n-card title="新建表" style="width:600px" :bordered="false" size="small">
         <template #header-extra>
-          <n-button text @click="showCreateTable = false"><template #icon><n-icon><CloseOutline /></n-icon></template></n-button>
+          <n-button text @click="showCreateTable = false">
+            <template #icon><n-icon><CloseOutline /></n-icon></template>
+          </n-button>
         </template>
         <p style="font-size:12px;color:rgba(150,150,150,0.8);margin:0 0 8px">编辑 CREATE TABLE 语句：</p>
-        <n-input
-          v-model:value="createTableSQL"
-          type="textarea"
-          :autosize="{ minRows: 8, maxRows: 16 }"
-          style="font-family:monospace;font-size:12px"
-        />
+        <n-input v-model:value="createTableSQL" type="textarea" :autosize="{ minRows: 8, maxRows: 16 }" style="font-family:monospace;font-size:12px" />
         <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:12px">
           <n-button @click="showCreateTable = false">取消</n-button>
           <n-button type="primary" :loading="createTableSaving" @click="executeCreateTable">执行</n-button>
@@ -121,12 +128,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
+import { ref, reactive, computed, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { NIcon, NButton, NInput, NDropdown, NSelect, NModal, NCard, useMessage, useDialog } from 'naive-ui'
+import { NIcon, NButton, NInput, NDropdown, NModal, NCard, useMessage, useDialog } from 'naive-ui'
 import {
   RefreshOutline, ChevronForwardOutline, GridOutline, EyeOutline,
-  AddOutline, SearchOutline, TerminalOutline, WarningOutline, CloseOutline
+  AddOutline, SearchOutline, WarningOutline, CloseOutline, ServerOutline
 } from '@vicons/ionicons5'
 import { useSettingsStore } from '../../../stores/settings'
 import { mysqlMeta } from '../../../api/meta'
@@ -140,45 +147,67 @@ const isDarkTheme = computed(() => settingsStore.settings.theme === 'dark')
 const props = defineProps<{ connection: any }>()
 const emit = defineEmits<{
   (e: 'select-item', item: any, type: string): void
-  (e: 'action', action: string): void
   (e: 'db-change', db: string): void
 }>()
 
 const loading = ref(false)
-const tablesLoading = ref(false)
 const searchText = ref('')
 const sel = ref<any>(null)
 const selType = ref('')
 const databases = ref<string[]>([])
-const activeDb = ref<string>('')
-const tables = ref<any[]>([])
-const views = ref<any[]>([])
+const tables = ref<Record<string, any[]>>({})
+const views = ref<Record<string, any[]>>({})
 const error = ref('')
-const exp = ref({ tables: true, views: false })
-const ctx = ref({ show: false, x: 0, y: 0, item: null as any, type: '' })
+
+// expanded state: exp[db] = boolean, secExp[db] = { tables: bool, views: bool }
+const exp = reactive<Record<string, boolean>>({})
+const secExp = reactive<Record<string, { tables: boolean; views: boolean }>>({})
+
+// context menu
+const ctx = ref({ show: false, x: 0, y: 0, db: '', item: null as any, type: '' })
+
+// create table
 const showCreateTable = ref(false)
 const createTableSQL = ref('')
+const createTableTargetDb = ref('')
 const createTableSaving = ref(false)
 
-const filteredTables = computed(() =>
-  searchText.value ? tables.value.filter(t => t.name.toLowerCase().includes(searchText.value.toLowerCase())) : tables.value
-)
-const filteredViews = computed(() =>
-  searchText.value ? views.value.filter(v => v.name.toLowerCase().includes(searchText.value.toLowerCase())) : views.value
-)
+// ─── Computed ───────────────────────────────────────────────────────────────
+const filteredTables = (db: string) => {
+  if (!searchText.value) return tables.value[db] || []
+  return (tables.value[db] || []).filter(t => t.name.toLowerCase().includes(searchText.value.toLowerCase()))
+}
+const filteredViews = (db: string) => {
+  if (!searchText.value) return views.value[db] || []
+  return (views.value[db] || []).filter(v => v.name.toLowerCase().includes(searchText.value.toLowerCase()))
+}
 
-const toggle = (k: keyof typeof exp.value) => { exp.value[k] = !exp.value[k] }
+// ─── Toggle ─────────────────────────────────────────────────────────────────
+const toggleDb = (db: string) => {
+  exp[db] = !exp[db]
+  if (exp[db] && !secExp[db]) {
+    secExp[db] = { tables: true, views: false }
+  }
+  if (exp[db]) {
+    emit('db-change', db)
+    loadTablesAndViews(db)
+  }
+}
 
-const select = (item: any, type: string) => {
-  sel.value = item
+const toggleSec = (_db: string, key: 'tables' | 'views') => {
+  const db = _db
+  if (!secExp[db]) secExp[db] = { tables: false, views: false }
+  secExp[db][key] = !secExp[db][key]
+}
+
+// ─── Select ─────────────────────────────────────────────────────────────────
+const selectItem = (db: string, item: any, type: string) => {
+  sel.value = item ? { ...item, _db: db } : { _db: db }
   selType.value = type
-  emit('select-item', { ...item, _db: activeDb.value }, type)
+  emit('select-item', sel.value, type)
 }
 
-const openCtx = (e: MouseEvent, item: any, type: string) => {
-  ctx.value = { show: true, x: e.clientX, y: e.clientY, item, type }
-}
-
+// ─── Context menu ────────────────────────────────────────────────────────────
 const ctxOptions = computed(() => [
   { label: '查看数据', key: 'browse' },
   { label: '表结构', key: 'schema' },
@@ -188,39 +217,42 @@ const ctxOptions = computed(() => [
   { label: '删除表', key: 'drop' }
 ])
 
-const handleCtx = (key: string) => {
-  ctx.value.show = false
-  if (key === 'browse') select(ctx.value.item, 'table')
-  else if (key === 'query') select(ctx.value.item, 'query')
-  else if (key === 'schema') select(ctx.value.item, 'schema')
-  else if (key === 'drop') dropTable(ctx.value.item)
-  else if (key === 'truncate') truncateTable(ctx.value.item)
+const openCtx = (e: MouseEvent, db: string, tbl: any, type: string) => {
+  ctx.value = { show: true, x: e.clientX, y: e.clientY, db, item: tbl, type }
 }
 
-const dropTable = (tbl: any) => {
+const handleCtx = (key: string) => {
+  ctx.value.show = false
+  const { db, item, type } = ctx.value
+  if (key === 'browse') selectItem(db, item, 'table')
+  else if (key === 'query') selectItem(db, item, 'query')
+  else if (key === 'schema') selectItem(db, item, 'schema')
+  else if (key === 'drop') dropTable(db, item)
+  else if (key === 'truncate') truncateTable(db, item)
+}
+
+const dropTable = (db: string, tbl: any) => {
   dialog.warning({
     title: '删除表', content: `确定删除表 "${tbl.name}"？所有数据将永久丢失！`,
     positiveText: '确定删除', negativeText: '取消',
     onPositiveClick: async () => {
       try {
-        const db = activeDb.value
         const sql = db ? `DROP TABLE \`${db}\`.\`${tbl.name}\`` : `DROP TABLE \`${tbl.name}\``
         const res = await mysqlMeta.execute(props.connection.id, sql)
         if ((res as any).error) throw new Error((res as any).error)
-        tables.value = tables.value.filter(t => t.name !== tbl.name)
+        tables.value[db] = (tables.value[db] || []).filter(t => t.name !== tbl.name)
         message.success(`已删除表 ${tbl.name}`)
       } catch (e: any) { message.error('删除失败: ' + (e?.response?.data?.error || e.message)) }
     }
   })
 }
 
-const truncateTable = (tbl: any) => {
+const truncateTable = (db: string, tbl: any) => {
   dialog.warning({
     title: '清空表数据', content: `确定清空表 "${tbl.name}" 的所有数据？此操作不可撤销！`,
     positiveText: '确定清空', negativeText: '取消',
     onPositiveClick: async () => {
       try {
-        const db = activeDb.value
         const sql = db ? `TRUNCATE TABLE \`${db}\`.\`${tbl.name}\`` : `TRUNCATE TABLE \`${tbl.name}\``
         const res = await mysqlMeta.execute(props.connection.id, sql)
         if ((res as any).error) throw new Error((res as any).error)
@@ -230,9 +262,10 @@ const truncateTable = (tbl: any) => {
   })
 }
 
-const openCreateTable = () => {
-  const db = activeDb.value ? `\`${activeDb.value}\`.` : ''
-  createTableSQL.value = `CREATE TABLE ${db}\`new_table\` (\n  \`id\` INT NOT NULL AUTO_INCREMENT,\n  \`name\` VARCHAR(255) NOT NULL,\n  \`created_at\` DATETIME DEFAULT CURRENT_TIMESTAMP,\n  PRIMARY KEY (\`id\`)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`
+// ─── Create Table ────────────────────────────────────────────────────────────
+const openCreateTable = (db: string) => {
+  createTableTargetDb.value = db
+  createTableSQL.value = `CREATE TABLE \`${db}\`.\`new_table\` (\n  \`id\` INT NOT NULL AUTO_INCREMENT,\n  \`name\` VARCHAR(255) NOT NULL,\n  \`created_at\` DATETIME DEFAULT CURRENT_TIMESTAMP,\n  PRIMARY KEY (\`id\`)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`
   showCreateTable.value = true
 }
 
@@ -244,62 +277,53 @@ const executeCreateTable = async () => {
     if ((res as any).error) throw new Error((res as any).error)
     showCreateTable.value = false
     message.success('表创建成功')
-    loadTablesAndViews()
+    loadTablesAndViews(createTableTargetDb.value)
   } catch (e: any) { message.error('创建失败: ' + (e?.response?.data?.error || e.message)) }
   finally { createTableSaving.value = false }
 }
 
-const loadDatabases = async () => {
+// ─── Data loading ────────────────────────────────────────────────────────────
+const loadAll = async () => {
+  if (!props.connection?.id) return
   loading.value = true
   error.value = ''
   try {
     const res = await mysqlMeta.databases(props.connection.id)
-    databases.value = res.databases.filter(d => !['information_schema', 'performance_schema', 'sys'].includes(d))
-    if (!activeDb.value && databases.value.length) {
-      activeDb.value = props.connection.config?.database || databases.value[0]
+    databases.value = res.databases.filter((d: string) => !['information_schema', 'performance_schema', 'sys'].includes(d))
+    // auto-expand first db
+    if (databases.value.length) {
+      const firstDb = props.connection.config?.database || databases.value[0]
+      if (!exp[firstDb]) {
+        exp[firstDb] = true
+        secExp[firstDb] = { tables: true, views: false }
+        loadTablesAndViews(firstDb)
+        emit('db-change', firstDb)
+      }
     }
-    await loadTablesAndViews()
-  } catch (e: any) {
-    error.value = e.message || '加载失败'
-  } finally {
-    loading.value = false
-  }
+  } catch (e: any) { error.value = e.message || '加载失败' }
+  finally { loading.value = false }
 }
 
-const loadTablesAndViews = async () => {
+const loadTablesAndViews = async (db: string) => {
   if (!props.connection?.id) return
-  tablesLoading.value = true
   try {
     const [tRes, vRes] = await Promise.all([
-      mysqlMeta.tables(props.connection.id, activeDb.value || undefined),
-      mysqlMeta.views(props.connection.id, activeDb.value || undefined)
+      mysqlMeta.tables(props.connection.id, db),
+      mysqlMeta.views(props.connection.id, db)
     ])
-    tables.value = tRes.tables
-    views.value = vRes.views
-  } catch (e: any) {
-    error.value = e.message || '加载表失败'
-  } finally {
-    tablesLoading.value = false
-  }
-}
-
-const loadAll = () => loadDatabases()
-
-const onDbChange = () => {
-  sel.value = null
-  tables.value = []
-  views.value = []
-  emit('db-change', activeDb.value)
-  loadTablesAndViews()
+    tables.value[db] = tRes.tables || []
+    views.value[db] = vRes.views || []
+  } catch (e: any) { /* silently fail per-db */ }
 }
 
 watch(() => props.connection?.id, () => {
   sel.value = null
   databases.value = []
-  tables.value = []
-  views.value = []
-  activeDb.value = props.connection?.config?.database || ''
-  loadDatabases()
+  tables.value = {}
+  views.value = {}
+  Object.keys(exp).forEach(k => delete exp[k])
+  Object.keys(secExp).forEach(k => delete secExp[k])
+  loadAll()
 }, { immediate: true })
 </script>
 
@@ -309,43 +333,66 @@ watch(() => props.connection?.id, () => {
 .explorer-toolbar { display: flex; align-items: center; gap: 4px; padding: 6px 8px; flex-shrink: 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
 .search-input { flex: 1; }
 
-.db-selector { padding: 5px 8px; flex-shrink: 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
-
 .error-msg { display: flex; align-items: center; gap: 5px; padding: 6px 10px; font-size: 11px; color: #ef4444; background: rgba(239,68,68,0.08); }
+.loading-hint { padding: 8px 12px; color: rgba(255,255,255,0.3); font-size: 11px; }
 
 .tree-body { flex: 1; overflow-y: auto; padding: 4px 0; }
 .tree-body::-webkit-scrollbar { width: 4px; }
 .tree-body::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
 
-.section { margin-bottom: 1px; }
-.section-hd { display: flex; align-items: center; gap: 5px; padding: 6px 8px; cursor: pointer; transition: background 0.1s; }
-.section-hd:hover { background: rgba(255,255,255,0.04); }
+/* ── Generic tree row ── */
+.tree-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 8px;
+  cursor: pointer;
+  border-radius: 4px;
+  margin: 1px 4px;
+  transition: background 0.1s;
+  user-select: none;
+}
+.tree-row:hover { background: rgba(255,255,255,0.04); }
 
-.arrow { font-size: 12px; color: rgba(255,255,255,0.3); transition: transform 0.18s; flex-shrink: 0; }
-.arrow.open { transform: rotate(90deg); }
-.arrow.invisible { opacity: 0; }
+/* Database row */
+.db-row { padding-left: 6px; }
+.db-row.open { background: rgba(255,255,255,0.03); }
 
-.sec-icon { font-size: 13px; flex-shrink: 0; }
-.tbl-c { color: #4db8ff; }
-.view-c { color: #a78bfa; }
-.query-c { color: #FF6B00; }
+/* Section (Tables / Views) row */
+.sec-row { padding-left: 16px; }
 
-.sec-label { flex: 1; font-weight: 500; color: rgba(255,255,255,0.65); }
+/* Item (table / view) row */
+.item-row { padding-left: 28px; }
+.item-row.active { background: rgba(77,184,255,0.15); }
 
-.badge { font-size: 10px; color: rgba(255,255,255,0.35); background: rgba(255,255,255,0.07); padding: 1px 5px; border-radius: 7px; }
+/* ── Arrow ── */
+.row-arrow { font-size: 10px; color: rgba(255,255,255,0.25); transition: transform 0.18s; flex-shrink: 0; width: 12px; }
+.row-arrow.open { transform: rotate(90deg); }
+.row-arrow:empty { width: 12px; }
 
-.sec-action { opacity: 0; transition: opacity 0.1s; }
-.section-hd:hover .sec-action { opacity: 1; }
-.sec-body { padding-left: 18px; }
+/* ── Icons ── */
+.row-icon { font-size: 12px; flex-shrink: 0; }
+.db-icon { color: #f0a020; }
+.tbl-icon { color: #4db8ff; }
+.view-icon { color: #a78bfa; }
+.query-icon { color: #FF6B00; }
 
-.tree-item { display: flex; align-items: center; gap: 6px; padding: 5px 10px; cursor: pointer; border-radius: 4px; margin: 1px 4px; transition: background 0.1s; }
-.tree-item:hover { background: rgba(77,184,255,0.1); }
-.tree-item.active { background: rgba(77,184,255,0.18); }
-
-.item-icon { font-size: 12px; flex-shrink: 0; }
-.item-name { flex: 1; color: rgba(255,255,255,0.82); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* ── Text ── */
+.row-name { flex: 1; color: rgba(255,255,255,0.82); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; }
+.sec-label { font-weight: 500; color: rgba(255,255,255,0.6); font-size: 11.5px; }
 .item-meta { font-size: 10px; color: rgba(255,255,255,0.28); font-family: monospace; flex-shrink: 0; }
 
-.loading-hint { padding: 6px 10px; color: rgba(255,255,255,0.3); font-size: 11px; }
-.empty { padding: 6px 10px; color: rgba(255,255,255,0.25); font-style: italic; font-size: 11px; }
+/* ── Badge ── */
+.badge { font-size: 10px; color: rgba(255,255,255,0.3); background: rgba(255,255,255,0.07); padding: 0 5px; border-radius: 7px; flex-shrink: 0; }
+
+/* ── Section expand ── */
+.db-children { margin-bottom: 4px; }
+.sec-children { margin-bottom: 2px; }
+
+.empty-row { padding: 4px 12px 4px 44px; color: rgba(255,255,255,0.22); font-size: 11px; font-style: italic; }
+.empty { padding: 8px 12px; color: rgba(255,255,255,0.25); font-size: 11px; font-style: italic; }
+
+/* ── Row action (add button) ── */
+.row-action { opacity: 0; transition: opacity 0.1s; }
+.db-row:hover .row-action { opacity: 1; }
 </style>

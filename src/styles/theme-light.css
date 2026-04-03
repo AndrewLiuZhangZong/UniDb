@@ -18,7 +18,7 @@ body.light-theme .conn-sidebar {
   border: none !important;
 }
 body.light-theme .content-layout {
-  background: #f4f4f7;
+  background: #f0f1f5;
 }
 body.light-theme .welcome-title {
   color: rgba(0, 0, 0, 0.9);
@@ -85,7 +85,7 @@ body.light-theme .value-textarea {
 
 /* ── MySQL Workspace ── */
 body.light-theme .mysql-workspace {
-  background: #f5f5f8;
+  background: #f0f1f5;
   color: rgba(0, 0, 0, 0.85);
 }
 body.light-theme .mysql-workspace .tab-bar {
@@ -197,14 +197,14 @@ body.light-theme .mysql-workspace .type-sm {
 body.light-theme .mysql-explorer .explorer-toolbar {
   border-bottom-color: rgba(0, 0, 0, 0.06);
 }
-body.light-theme .mysql-explorer .db-selector {
-  border-bottom-color: rgba(0, 0, 0, 0.06);
-}
-body.light-theme .mysql-explorer .section-hd:hover {
+body.light-theme .mysql-explorer .tree-row:hover {
   background: rgba(0, 0, 0, 0.04);
 }
-body.light-theme .mysql-explorer .arrow {
+body.light-theme .mysql-explorer .row-arrow {
   color: rgba(0, 0, 0, 0.3);
+}
+body.light-theme .mysql-explorer .row-name {
+  color: rgba(0, 0, 0, 0.82);
 }
 body.light-theme .mysql-explorer .sec-label {
   color: rgba(0, 0, 0, 0.65);
@@ -213,14 +213,11 @@ body.light-theme .mysql-explorer .badge {
   color: rgba(0, 0, 0, 0.35);
   background: rgba(0, 0, 0, 0.06);
 }
-body.light-theme .mysql-explorer .tree-item:hover {
+body.light-theme .mysql-explorer .item-row:hover {
   background: rgba(77, 184, 255, 0.08);
 }
-body.light-theme .mysql-explorer .tree-item.active {
+body.light-theme .mysql-explorer .item-row.active {
   background: rgba(77, 184, 255, 0.15);
-}
-body.light-theme .mysql-explorer .item-name {
-  color: rgba(0, 0, 0, 0.82);
 }
 body.light-theme .mysql-explorer .item-meta {
   color: rgba(0, 0, 0, 0.28);
@@ -300,11 +297,14 @@ body.light-theme .ch-workspace .sort-tag {
 body.light-theme .ch-explorer .explorer-toolbar {
   border-bottom-color: rgba(0, 0, 0, 0.06);
 }
-body.light-theme .ch-explorer .section-hd:hover {
+body.light-theme .ch-explorer .tree-row:hover {
   background: rgba(0, 0, 0, 0.04);
 }
-body.light-theme .ch-explorer .arrow {
+body.light-theme .ch-explorer .row-arrow {
   color: rgba(0, 0, 0, 0.3);
+}
+body.light-theme .ch-explorer .row-name {
+  color: rgba(0, 0, 0, 0.82);
 }
 body.light-theme .ch-explorer .sec-label {
   color: rgba(0, 0, 0, 0.65);
@@ -313,14 +313,11 @@ body.light-theme .ch-explorer .badge {
   color: rgba(0, 0, 0, 0.35);
   background: rgba(0, 0, 0, 0.06);
 }
-body.light-theme .ch-explorer .tree-item:hover {
-  background: rgba(251, 146, 60, 0.08);
+body.light-theme .ch-explorer .item-row:hover {
+  background: rgba(77, 184, 255, 0.08);
 }
-body.light-theme .ch-explorer .tree-item.active {
-  background: rgba(251, 146, 60, 0.15);
-}
-body.light-theme .ch-explorer .item-name {
-  color: rgba(0, 0, 0, 0.82);
+body.light-theme .ch-explorer .item-row.active {
+  background: rgba(77, 184, 255, 0.15);
 }
 body.light-theme .ch-explorer .item-meta {
   color: rgba(0, 0, 0, 0.28);
@@ -439,11 +436,14 @@ body.light-theme .mongo-workspace .idx-row code {
 body.light-theme .mongo-explorer .explorer-toolbar {
   border-bottom-color: rgba(0, 0, 0, 0.06);
 }
-body.light-theme .mongo-explorer .section-hd:hover {
+body.light-theme .mongo-explorer .tree-row:hover {
   background: rgba(0, 0, 0, 0.04);
 }
-body.light-theme .mongo-explorer .arrow {
+body.light-theme .mongo-explorer .row-arrow {
   color: rgba(0, 0, 0, 0.3);
+}
+body.light-theme .mongo-explorer .row-name {
+  color: rgba(0, 0, 0, 0.82);
 }
 body.light-theme .mongo-explorer .sec-label {
   color: rgba(0, 0, 0, 0.65);
@@ -452,14 +452,11 @@ body.light-theme .mongo-explorer .badge {
   color: rgba(0, 0, 0, 0.35);
   background: rgba(0, 0, 0, 0.06);
 }
-body.light-theme .mongo-explorer .tree-item:hover {
+body.light-theme .mongo-explorer .item-row:hover {
   background: rgba(96, 165, 250, 0.08);
 }
-body.light-theme .mongo-explorer .tree-item.active {
+body.light-theme .mongo-explorer .item-row.active {
   background: rgba(96, 165, 250, 0.15);
-}
-body.light-theme .mongo-explorer .item-name {
-  color: rgba(0, 0, 0, 0.82);
 }
 body.light-theme .mongo-explorer .item-meta {
   color: rgba(0, 0, 0, 0.28);

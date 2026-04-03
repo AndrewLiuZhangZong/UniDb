@@ -6,39 +6,27 @@
       <SqlEditor :connection="connection" :db-type="'mysql'" :active-db="activeDb" />
     </template>
 
-    <!-- Table selected: tabbed view -->
+    <!-- Table / view selected: DBeaver-style tabbed workspace -->
     <template v-else-if="selectedItemType === 'table' || selectedItemType === 'view'">
+      <!-- Tab bar -->
       <div class="tab-bar">
         <div
           v-for="tab in tabs" :key="tab.key"
           class="tab-btn" :class="{ active: activeTab === tab.key }"
           @click="activeTab = tab.key"
         >
-          <n-icon :size="13">
-            <component :is="tab.icon" />
-          </n-icon>
+          <n-icon :size="13"><component :is="tab.icon" /></n-icon>
           {{ tab.label }}
         </div>
       </div>
-
-      <!-- Tab: Browse Data -->
-      <div v-if="activeTab === 'browse'" class="tab-content">
-        <TableBrowse :table="selectedItem" :connection="connection" />
-      </div>
-
-      <!-- Tab: Schema -->
-      <div v-else-if="activeTab === 'schema'" class="tab-content">
-        <TableSchema :table="selectedItem" :connection="connection" />
-      </div>
-
-      <!-- Tab: SQL Query -->
-      <div v-else-if="activeTab === 'sql'" class="tab-content">
-        <SqlEditor :connection="connection" :db-type="'mysql'" :active-db="activeDb" :initial-sql="`SELECT * FROM \`${selectedItem?.name}\` LIMIT 100;`" />
-      </div>
-
-      <!-- Tab: Indexes -->
-      <div v-else-if="activeTab === 'indexes'" class="tab-content">
-        <TableIndexes :table="selectedItem" :connection="connection" />
+      <!-- Tab content -->
+      <div class="tab-content">
+        <TableBrowse v-if="activeTab === 'browse'" :table="selectedItem" :connection="connection" />
+        <TableSchema v-else-if="activeTab === 'schema'" :table="selectedItem" :connection="connection" />
+        <SqlEditor v-else-if="activeTab === 'sql'"
+          :connection="connection" :db-type="'mysql'" :active-db="activeDb"
+          :initial-sql="`SELECT * FROM \`${selectedItem?.name}\` LIMIT 100;`" />
+        <TableIndexes v-else-if="activeTab === 'indexes'" :table="selectedItem" :connection="connection" />
       </div>
     </template>
 
@@ -721,7 +709,7 @@ const TableIndexes = defineComponent({
 /* ── Workspace shell ── */
 .mysql-workspace {
   flex: 1; display: flex; flex-direction: column; overflow: hidden;
-  background: #0f0f16; color: rgba(255,255,255,0.85);
+  background: transparent; color: rgba(255,255,255,0.85);
 }
 
 .tab-bar {
@@ -738,7 +726,7 @@ const TableIndexes = defineComponent({
 .tab-btn:hover { color: rgba(255,255,255,0.85); background: rgba(255,255,255,0.04); }
 .tab-btn.active { color: #4db8ff; border-bottom-color: #4db8ff; }
 
-.tab-content { flex: 1; overflow: hidden; display: flex; flex-direction: column; }
+.tab-content { flex: 1; overflow: hidden; display: flex; flex-direction: column; min-height: 0; }
 
 /* ── SQL Editor ── */
 .sql-editor-wrap {

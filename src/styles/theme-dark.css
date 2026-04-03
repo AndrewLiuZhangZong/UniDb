@@ -85,7 +85,7 @@ body.dark-theme {
 .home-container,
 .settings-container,
 .log-viewer-container {
-  background: linear-gradient(135deg, #1a1a1f 0%, #12121a 100%);
+  background: #0f0f16;
 }
 
 /* ── Connection Header ── */

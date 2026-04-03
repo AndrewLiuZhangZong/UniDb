@@ -286,5 +286,26 @@ export default {
     clearConfirmMessage: '确定要清空所有日志吗？此操作不可撤销。',
     cleared: '日志已清空',
     clearError: '清空日志失败'
+  },
+  toolbar: {
+    refresh: '刷新',
+    refreshMetadata: '刷新元数据',
+    createTable: '新建表',
+    createDatabase: '新建数据库',
+    createIndex: '新建索引',
+    createCollection: '新建 Collection',
+    newKey: '新建 Key',
+    flushDb: '清空 DB'
+  },
+  status: {
+    connected: '已连接',
+    disconnected: '未连接'
+  },
+  nav: {
+    database: '数据库导航',
+    newConnection: '新建连接',
+    refresh: '刷新',
+    actions: '操作',
+    noConnections: '暂无连接'
   }
 }

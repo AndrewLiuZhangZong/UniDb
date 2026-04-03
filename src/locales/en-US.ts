@@ -286,5 +286,26 @@ export default {
     clearConfirmMessage: 'Are you sure you want to clear all logs? This cannot be undone.',
     cleared: 'Logs cleared',
     clearError: 'Failed to clear logs'
+  },
+  toolbar: {
+    refresh: 'Refresh',
+    refreshMetadata: 'Refresh Metadata',
+    createTable: 'New Table',
+    createDatabase: 'New Database',
+    createIndex: 'New Index',
+    createCollection: 'New Collection',
+    newKey: 'New Key',
+    flushDb: 'Flush DB'
+  },
+  status: {
+    connected: 'Connected',
+    disconnected: 'Disconnected'
+  },
+  nav: {
+    database: 'Database Navigator',
+    newConnection: 'New Connection',
+    refresh: 'Refresh',
+    actions: 'Actions',
+    noConnections: 'No connections'
   }
 }

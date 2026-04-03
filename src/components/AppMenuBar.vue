@@ -50,46 +50,6 @@
         </div>
       </div>
 
-      <!-- Database -->
-      <div class="menu-wrapper">
-        <div class="menu-item">
-          <span class="menu-label">{{ getMenuLabel('database') }}</span>
-        </div>
-        <div class="dropdown-menu">
-          <div class="dropdown-item" @click.stop="handleAction('connect')">
-            <n-icon class="item-icon"><CloudDoneOutline /></n-icon>
-            <span class="item-label">{{ t('menu.connect') }}</span>
-          </div>
-          <div class="dropdown-item" @click.stop="handleAction('disconnect')">
-            <n-icon class="item-icon"><CloudOfflineOutline /></n-icon>
-            <span class="item-label">{{ t('menu.disconnect') }}</span>
-          </div>
-          <div class="dropdown-divider"></div>
-          <div class="dropdown-item" @click.stop="handleAction('refresh')">
-            <n-icon class="item-icon"><RefreshOutline /></n-icon>
-            <span class="item-label">{{ t('menu.refresh') }}</span>
-            <span class="item-shortcut">F5</span>
-          </div>
-          <div class="dropdown-item" @click.stop="handleAction('refreshMetadata')">
-            <n-icon class="item-icon"><SyncOutline /></n-icon>
-            <span class="item-label">{{ t('menu.refreshMetadata') }}</span>
-          </div>
-          <div class="dropdown-divider"></div>
-          <div class="dropdown-item" @click.stop="handleAction('createTable')">
-            <n-icon class="item-icon"><CreateOutline /></n-icon>
-            <span class="item-label">{{ t('menu.createTable') }}</span>
-          </div>
-          <div class="dropdown-item" @click.stop="handleAction('createDatabase')">
-            <n-icon class="item-icon"><ServerOutline /></n-icon>
-            <span class="item-label">{{ t('menu.createDatabase') }}</span>
-          </div>
-          <div class="dropdown-item" @click.stop="handleAction('createIndex')">
-            <n-icon class="item-icon"><BuildOutline /></n-icon>
-            <span class="item-label">{{ t('menu.createIndex') }}</span>
-          </div>
-        </div>
-      </div>
-
       <!-- Settings -->
       <div class="menu-item" @click="handleAction('settings')">
         <span class="menu-label">{{ t('menu.settings') }}</span>
@@ -131,8 +91,7 @@ import { useI18n } from 'vue-i18n'
 import { NIcon } from 'naive-ui'
 import {
   AddOutline, DownloadOutline, CloudUploadOutline,
-  ExitOutline, CloudDoneOutline, CloudOfflineOutline,
-  RefreshOutline, SyncOutline, CreateOutline, ServerOutline, BuildOutline,
+  ExitOutline,
   BookOutline, BugOutline, CloudDownloadOutline, InformationCircleOutline
 } from '@vicons/ionicons5'
 import { useSettingsStore } from '../stores/settings'

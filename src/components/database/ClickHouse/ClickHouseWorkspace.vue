@@ -265,7 +265,7 @@ watch(() => props.selectedItem, () => {
 </script>
 
 <style scoped>
-.ch-workspace { flex: 1; display: flex; flex-direction: column; overflow: hidden; background: #13131a; color: rgba(255,255,255,0.85); }
+.ch-workspace { flex: 1; display: flex; flex-direction: column; overflow: hidden; background: #0f0f16; color: rgba(255,255,255,0.85); }
 
 .tab-bar { display: flex; align-items: center; height: 38px; flex-shrink: 0; background: rgba(0,0,0,0.25); border-bottom: 1px solid rgba(255,255,255,0.06); padding: 0 12px; gap: 2px; }
 .tab-btn { display: flex; align-items: center; gap: 5px; padding: 0 12px; height: 100%; font-size: 12px; cursor: pointer; border-bottom: 2px solid transparent; color: rgba(255,255,255,0.5); transition: all 0.15s; }

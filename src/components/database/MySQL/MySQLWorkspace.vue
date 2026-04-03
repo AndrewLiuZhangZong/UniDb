@@ -721,7 +721,7 @@ const TableIndexes = defineComponent({
 /* ── Workspace shell ── */
 .mysql-workspace {
   flex: 1; display: flex; flex-direction: column; overflow: hidden;
-  background: #13131a; color: rgba(255,255,255,0.85);
+  background: #0f0f16; color: rgba(255,255,255,0.85);
 }
 
 .tab-bar {

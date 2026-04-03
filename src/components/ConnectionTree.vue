@@ -1,104 +1,144 @@
 <template>
-  <div class="connection-tree" :class="{ 'light-theme': !isDarkTheme }">
-    <div class="tree-header">
-      <n-space justify="space-between" align="center">
-        <span class="tree-title">{{ t('sidebar.connections') }}</span>
-      </n-space>
+  <div class="navigator" :class="{ 'light-mode': !isDarkTheme }">
+
+    <!-- ── Navigator Header ── -->
+    <div class="nav-header">
+      <div class="nav-title-row">
+        <n-icon class="nav-icon"><CubeOutline /></n-icon>
+        <span class="nav-title">{{ t('nav.database') }}</span>
+      </div>
+      <div class="nav-actions">
+        <n-tooltip trigger="hover" placement="bottom">
+          <template #trigger>
+            <n-button text size="tiny" @click="handleNewConnection">
+              <template #icon><n-icon><AddOutline /></n-icon></template>
+            </n-button>
+          </template>
+          {{ t('nav.newConnection') }}
+        </n-tooltip>
+        <n-tooltip trigger="hover" placement="bottom">
+          <template #trigger>
+            <n-button text size="tiny" @click="handleRefresh">
+              <template #icon><n-icon><RefreshOutline /></n-icon></template>
+            </n-button>
+          </template>
+          {{ t('nav.refresh') }}
+        </n-tooltip>
+      </div>
     </div>
 
-    <div class="tree-content">
-      <!-- Empty State -->
-      <div v-if="connectionStore.connections.length === 0" class="empty-state">
-        <div class="empty-icon">
-          <n-icon :size="48"><ServerOutline /></n-icon>
-        </div>
-        <p class="empty-text">{{ t('sidebar.noConnections') }}</p>
-        <p class="empty-hint">{{ t('sidebar.useMenuToCreate') }}</p>
-      </div>
+    <!-- ── Navigator Tree ── -->
+    <div class="nav-tree" v-if="connectionStore.connections.length">
 
-      <!-- Connection List -->
-      <div v-else class="connection-list">
+      <!-- Connection nodes -->
+      <div
+        v-for="conn in connectionStore.connections"
+        :key="conn.id"
+        class="conn-node"
+      >
+        <!-- Connection row -->
         <div
-          v-for="conn in connectionStore.connections"
-          :key="conn.id"
-          class="connection-item"
-          :class="{ 'is-selected': activeConnectionId === conn.id }"
-          @click="handleSelectConnection(conn)"
+          class="tree-row conn-row"
+          :class="{ 'is-active': activeConnId === conn.id }"
+          @click="toggleConn(conn)"
         >
-          <DbTypeIcon :type="conn.type" :size="22" />
-          <div class="connection-info">
-            <span class="connection-name">{{ conn.name }}</span>
-            <span class="connection-type">{{ getDbTypeName(conn.type) }}</span>
-          </div>
-          <div class="connection-actions">
-            <n-tooltip trigger="hover" placement="right">
-              <template #trigger>
-                <n-icon class="action-icon" @click.stop="handleConnectionMenu(conn)">
-                  <EllipsisHorizontalOutline />
-                </n-icon>
-              </template>
-              Actions
-            </n-tooltip>
-          </div>
+          <n-icon class="row-arrow" :class="{ open: expandedConns.has(conn.id) }">
+            <ChevronForwardOutline />
+          </n-icon>
+          <DbTypeIcon :type="conn.type" :size="14" />
+          <span class="row-name" :title="conn.name">{{ conn.name }}</span>
+          <n-tooltip trigger="hover" placement="right">
+            <template #trigger>
+              <n-icon class="row-action-icon" @click.stop="handleConnMenu(conn, $event)">
+                <EllipsisHorizontalOutline />
+              </n-icon>
+            </template>
+            {{ t('nav.actions') }}
+          </n-tooltip>
+        </div>
+
+        <!-- Expanded: Database sub-nodes (per-db Explorer) -->
+        <div v-if="expandedConns.has(conn.id)" class="conn-children">
+          <component
+            :is="explorerMap[conn.type]"
+            :connection="conn"
+            :is-selected="activeConnId === conn.id"
+            @select-item="(item, type) => emit('select', conn, item, type)"
+            @db-change="(db) => emit('db-change', conn, db)"
+          />
         </div>
       </div>
     </div>
 
-    <div class="tree-footer">
-      <div class="footer-item" @click="handleRefresh">
-        <n-icon><RefreshOutline /></n-icon>
-        <span>{{ t('sidebar.refresh') }}</span>
-      </div>
+    <!-- ── Empty State ── -->
+    <div v-else class="nav-empty">
+      <n-icon class="empty-icon"><ServerOutline /></n-icon>
+      <p class="empty-text">{{ t('nav.noConnections') }}</p>
+      <n-button size="small" type="primary" @click="handleNewConnection">
+        <template #icon><n-icon><AddOutline /></n-icon></template>
+        {{ t('nav.newConnection') }}
+      </n-button>
     </div>
 
-    <!-- Context Menu -->
+    <!-- Connection context menu -->
     <n-dropdown
-      :show="showContextMenu"
-      :x="contextMenuX"
-      :y="contextMenuY"
-      :options="contextMenuOptions"
-      @select="handleContextMenuSelect"
-      @clickoutside="closeContextMenu"
+      :show="ctxShow"
+      :x="ctxX"
+      :y="ctxY"
+      :options="ctxOptions"
+      @select="handleCtxSelect"
+      @clickoutside="ctxShow = false"
     />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, reactive, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { NIcon, NSpace, NTooltip, NDropdown, useMessage, useDialog } from 'naive-ui'
+import { NIcon, NButton, NTooltip, NDropdown } from 'naive-ui'
 import {
-  EllipsisHorizontalOutline,
-  RefreshOutline,
-  ServerOutline,
-  CreateOutline,
-  TrashOutline,
-  CloudDoneOutline
+  CubeOutline, ChevronForwardOutline, AddOutline, RefreshOutline,
+  EllipsisHorizontalOutline, ServerOutline, CreateOutline,
+  TrashOutline, CloudDoneOutline, CloudOfflineOutline
 } from '@vicons/ionicons5'
 import { h } from 'vue'
 import { useConnectionStore } from '../stores/connection'
 import { useSettingsStore } from '../stores/settings'
 import DbTypeIcon from './DbTypeIcon.vue'
 
+import MySQLExplorer from './database/MySQL/MySQLExplorer.vue'
+import ClickHouseExplorer from './database/ClickHouse/ClickHouseExplorer.vue'
+import MongoDBExplorer from './database/MongoDB/MongoDBExplorer.vue'
+import RedisExplorer from './database/Redis/RedisExplorer.vue'
+
 const { t } = useI18n()
-const message = useMessage()
-const dialog = useDialog()
 const connectionStore = useConnectionStore()
 const settingsStore = useSettingsStore()
-
 const isDarkTheme = computed(() => settingsStore.settings.theme === 'dark')
 
 const emit = defineEmits<{
-  (e: 'select', connection: any): void
+  (e: 'select', connection: any, item: any, type: string): void
+  (e: 'db-change', connection: any, db: string): void
+  (e: 'connection-select', connection: any): void
 }>()
 
-const activeConnectionId = ref<string | null>(null)
-const showContextMenu = ref(false)
-const contextMenuX = ref(0)
-const contextMenuY = ref(0)
-const selectedConnection = ref<any>(null)
+const explorerMap: Record<string, any> = {
+  mysql: MySQLExplorer,
+  clickhouse: ClickHouseExplorer,
+  mongodb: MongoDBExplorer,
+  redis: RedisExplorer
+}
 
-const contextMenuOptions = [
+const activeConnId = ref<string | null>(null)
+const expandedConns = reactive(new Set<string>())
+
+// Context menu
+const ctxShow = ref(false)
+const ctxX = ref(0)
+const ctxY = ref(0)
+const ctxConn = ref<any>(null)
+
+const ctxOptions = computed(() => [
   {
     label: t('common.edit'),
     key: 'edit',
@@ -110,85 +150,57 @@ const contextMenuOptions = [
     icon: () => h(NIcon, null, { default: () => h(CloudDoneOutline) })
   },
   {
-    type: 'divider',
-    key: 'd1'
+    label: t('connection.disconnect'),
+    key: 'disconnect',
+    icon: () => h(NIcon, null, { default: () => h(CloudOfflineOutline) })
   },
+  { type: 'divider', key: 'd1' },
   {
     label: t('common.delete'),
     key: 'delete',
     icon: () => h(NIcon, null, { default: () => h(TrashOutline) })
   }
-]
+])
 
-// Get database type name
-const getDbTypeName = (type: string) => {
-  const names: Record<string, string> = {
-    mysql: 'MySQL',
-    clickhouse: 'ClickHouse',
-    mongodb: 'MongoDB',
-    redis: 'Redis'
-  }
-  return names[type] || type
-}
-
-// Select connection
-const handleSelectConnection = (conn: any) => {
-  activeConnectionId.value = conn.id
-  emit('select', conn)
-}
-
-// Connection menu (right-click context)
-const handleConnectionMenu = (conn: any, event?: MouseEvent) => {
-  selectedConnection.value = conn
-  if (event) {
-    contextMenuX.value = event.clientX
-    contextMenuY.value = event.clientY
+const toggleConn = (conn: any) => {
+  if (activeConnId.value === conn.id && expandedConns.has(conn.id)) {
+    expandedConns.delete(conn.id)
+    activeConnId.value = null
+  } else if (activeConnId.value === conn.id) {
+    expandedConns.add(conn.id)
   } else {
-    contextMenuX.value = 200
-    contextMenuY.value = 200
+    activeConnId.value = conn.id
+    expandedConns.add(conn.id)
   }
-  showContextMenu.value = true
+  emit('connection-select', conn)
 }
 
-// Close context menu
-const closeContextMenu = () => {
-  showContextMenu.value = false
+const handleConnMenu = (conn: any, e: MouseEvent) => {
+  ctxConn.value = conn
+  ctxX.value = e.clientX
+  ctxY.value = e.clientY
+  ctxShow.value = true
 }
 
-// Handle context menu selection
-const handleContextMenuSelect = async (key: string) => {
-  closeContextMenu()
-
-  switch (key) {
-    case 'edit':
-      window.dispatchEvent(new CustomEvent('edit-connection', { detail: selectedConnection.value }))
-      break
-    case 'connect':
-      message.info(`Connecting to ${selectedConnection.value?.name}...`)
-      break
-    case 'delete':
-      await handleDelete(selectedConnection.value.id)
-      break
+const handleCtxSelect = async (key: string) => {
+  ctxShow.value = false
+  if (key === 'edit') {
+    window.dispatchEvent(new CustomEvent('edit-connection', { detail: ctxConn.value }))
+  } else if (key === 'delete') {
+    try {
+      await connectionStore.deleteConnection(ctxConn.value.id)
+      expandedConns.delete(ctxConn.value.id)
+      if (activeConnId.value === ctxConn.value.id) activeConnId.value = null
+    } catch { /* handled by store */ }
   }
 }
 
-// Delete connection
-const handleDelete = async (id: string) => {
-  try {
-    await connectionStore.deleteConnection(id)
-    if (activeConnectionId.value === id) {
-      activeConnectionId.value = null
-    }
-    message.success('Connection deleted')
-  } catch {
-    message.error('Delete failed')
-  }
+const handleNewConnection = () => {
+  window.dispatchEvent(new CustomEvent('open-connection-dialog'))
 }
 
-// Refresh
-const handleRefresh = async () => {
-  await connectionStore.fetchConnections()
-  message.success('Refreshed')
+const handleRefresh = () => {
+  connectionStore.fetchConnections()
 }
 
 onMounted(() => {
@@ -197,183 +209,178 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.connection-tree {
-  height: 100%;
+.navigator {
   display: flex;
   flex-direction: column;
-  background: linear-gradient(180deg, rgba(30, 30, 35, 1) 0%, rgba(25, 25, 30, 1) 100%);
-  transition: background 0.3s ease;
+  height: 100%;
+  background: rgba(28, 28, 32, 0.98);
+  overflow: hidden;
 }
 
-.tree-header {
-  padding: 16px 16px 12px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+/* ── Header ── */
+.nav-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 10px 8px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  flex-shrink: 0;
 }
 
-.tree-title {
+.nav-title-row {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.nav-icon {
+  font-size: 14px;
+  color: #FF6B00;
+}
+
+.nav-title {
   font-size: 11px;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.35);
+  font-weight: 700;
+  color: rgba(255,255,255,0.4);
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 1.2px;
 }
 
-.tree-content {
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+:deep(.nav-actions .n-button) {
+  color: rgba(255,255,255,0.4);
+}
+:deep(.nav-actions .n-button:hover) {
+  color: rgba(255,255,255,0.85);
+}
+
+/* ── Tree ── */
+.nav-tree {
   flex: 1;
   overflow-y: auto;
-  padding: 8px 0;
+  padding: 4px 0;
 }
 
-/* Custom scrollbar */
-.tree-content::-webkit-scrollbar {
-  width: 6px;
+.nav-tree::-webkit-scrollbar { width: 5px; }
+.nav-tree::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 3px; }
+
+/* Connection node */
+.conn-node {
+  margin-bottom: 1px;
 }
 
-.tree-content::-webkit-scrollbar-track {
-  background: transparent;
+.conn-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 8px;
+  cursor: pointer;
+  border-radius: 5px;
+  margin: 1px 4px;
+  transition: background 0.12s;
+  position: relative;
 }
 
-.tree-content::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.1);
+.conn-row:hover {
+  background: rgba(255,255,255,0.05);
+}
+
+.conn-row.is-active {
+  background: rgba(255,107,0,0.12);
+}
+
+.conn-row.is-active::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 50%;
+  transform: translateY(-50%);
+  width: 2px; height: 18px;
+  background: #FF6B00;
+  border-radius: 0 2px 2px 0;
+}
+
+.row-arrow {
+  font-size: 11px;
+  color: rgba(255,255,255,0.25);
+  transition: transform 0.18s;
+  flex-shrink: 0;
+}
+.row-arrow.open { transform: rotate(90deg); }
+
+.row-name {
+  flex: 1;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: rgba(255,255,255,0.82);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.row-action-icon {
+  font-size: 14px;
+  color: rgba(255,255,255,0.25);
+  cursor: pointer;
+  padding: 2px;
   border-radius: 3px;
+  transition: all 0.12s;
+  flex-shrink: 0;
+  opacity: 0;
+}
+.conn-row:hover .row-action-icon { opacity: 1; }
+.row-action-icon:hover {
+  color: rgba(255,255,255,0.85);
+  background: rgba(255,255,255,0.1);
 }
 
-.tree-content::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.2);
+/* Expanded children */
+.conn-children {
+  padding-left: 8px;
+  margin-bottom: 4px;
 }
 
-/* Empty State */
-.empty-state {
+/* ── Empty ── */
+.nav-empty {
+  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 40px 20px;
-  gap: 16px;
+  gap: 12px;
+  padding: 32px 16px;
 }
 
 .empty-icon {
-  color: rgba(255, 255, 255, 0.15);
+  font-size: 40px;
+  color: rgba(255,255,255,0.12);
 }
 
 .empty-text {
-  font-size: 13px;
-  color: rgba(255, 255, 255, 0.35);
-  margin: 0;
-}
-
-.empty-hint {
   font-size: 12px;
-  color: rgba(255, 255, 255, 0.25);
+  color: rgba(255,255,255,0.28);
   margin: 0;
   text-align: center;
 }
 
-/* Connection List */
-.connection-list {
-  padding: 0 8px;
+/* ── Light mode ── */
+.light-mode .nav-header {
+  background: rgba(246, 246, 250, 0.98);
+  border-bottom-color: rgba(0,0,0,0.08);
 }
-
-.connection-item {
-  position: relative;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 10px 12px;
-  border-radius: 10px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  margin-bottom: 4px;
-  border: 1px solid transparent;
-}
-
-.connection-item:hover {
-  background: rgba(255, 255, 255, 0.05);
-  border-color: rgba(255, 255, 255, 0.06);
-}
-
-.connection-item:hover .connection-actions {
-  opacity: 1;
-}
-
-.connection-item.is-selected {
-  background: linear-gradient(135deg, rgba(255, 107, 0, 0.15) 0%, rgba(255, 107, 0, 0.08) 100%);
-  border-color: rgba(255, 107, 0, 0.3);
-}
-
-.connection-item.is-selected::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 3px;
-  height: 24px;
-  background: linear-gradient(180deg, #FF6B00, #FF8C42);
-  border-radius: 0 2px 2px 0;
-}
-
-.connection-info {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.connection-name {
-  font-size: 13px;
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.9);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.connection-type {
-  font-size: 11px;
-  color: rgba(255, 255, 255, 0.4);
-}
-
-.connection-actions {
-  opacity: 0;
-  transition: opacity 0.2s ease;
-}
-
-.action-icon {
-  font-size: 18px;
-  color: rgba(255, 255, 255, 0.4);
-  cursor: pointer;
-  padding: 4px;
-  border-radius: 4px;
-  transition: all 0.15s ease;
-}
-
-.action-icon:hover {
-  color: rgba(255, 255, 255, 0.9);
-  background: rgba(255, 255, 255, 0.1);
-}
-
-/* Footer */
-.tree-footer {
-  padding: 8px 12px;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
-}
-
-.footer-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 8px 12px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 13px;
-  color: rgba(255, 255, 255, 0.5);
-  transition: all 0.2s ease;
-}
-
-.footer-item:hover {
-  background: rgba(255, 255, 255, 0.06);
-  color: rgba(255, 255, 255, 0.9);
-}
+.light-mode .nav-title { color: rgba(0,0,0,0.4); }
+.light-mode .nav-icon { color: #FF6B00; }
+.light-mode .nav-tree { background: rgba(246, 246, 250, 0.98); }
+.light-mode .conn-row:hover { background: rgba(0,0,0,0.04); }
+.light-mode .conn-row.is-active { background: rgba(255,107,0,0.08); }
+.light-mode .row-name { color: rgba(0,0,0,0.82); }
+.light-mode .row-arrow { color: rgba(0,0,0,0.3); }
+.light-mode .row-action-icon { color: rgba(0,0,0,0.3); }
+.light-mode .row-action-icon:hover { background: rgba(0,0,0,0.06); }
+.light-mode .empty-icon { color: rgba(0,0,0,0.1); }
+.light-mode .empty-text { color: rgba(0,0,0,0.35); }
 </style>

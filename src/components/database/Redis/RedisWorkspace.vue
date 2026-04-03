@@ -469,7 +469,7 @@ watch(() => props.connection?.id, () => {
 </script>
 
 <style scoped>
-.redis-workspace { flex: 1; display: flex; flex-direction: column; overflow: hidden; background: #13131a; color: rgba(255,255,255,0.85); }
+.redis-workspace { flex: 1; display: flex; flex-direction: column; overflow: hidden; background: #0f0f16; color: rgba(255,255,255,0.85); }
 .spacer { flex: 1; }
 
 /* Overview */

@@ -142,7 +142,7 @@ const SqlEditor = defineComponent({
               title: k, key: k, width: 140, ellipsis: { tooltip: true },
               render: (row: any) => {
                 const v = row[k]
-                if (v === null || v === undefined) return h('span', { style: 'color:rgba(255,255,255,0.25);font-style:italic' }, 'NULL')
+                if (v === null || v === undefined) return h('span', { style: 'color:var(--type-null);font-style:italic' }, 'NULL')
                 return h('span', null, String(v))
               }
             }))
@@ -224,6 +224,9 @@ const TableBrowse = defineComponent({
     const showEditModal = ref(false)
     const showInsertModal = ref(false)
     const insertData = ref<any>({})
+    // inline new-row state
+    const newRowData = ref<Record<string, string>>({})
+    const isAddingRow = ref(false)
 
     const dbName = () => p.table?._db || p.connection?.config?.database
     const tblFull = () => {
@@ -234,6 +237,7 @@ const TableBrowse = defineComponent({
     const loadRows = async () => {
       if (!p.table || !p.connection?.id) return
       loading.value = true; error.value = ''
+      isAddingRow.value = false; newRowData.value = {}
       try {
         const res = await mysqlMeta.tableData(p.connection.id, p.table.name, dbName(), page.value, pageSize.value)
         total.value = res.total || 0
@@ -247,11 +251,20 @@ const TableBrowse = defineComponent({
     }
 
     const buildCols = (flds: any[]) => {
-      const dataCols = (flds.length ? flds : (rows.value.length ? Object.keys(rows.value[0]).map(k => ({ name: k })) : [])).map((f: any) => ({
+      const colDefs = flds.length ? flds : (rows.value.length ? Object.keys(rows.value[0]).map(k => ({ name: k })) : [])
+      const dataCols = colDefs.map((f: any) => ({
         title: f.name, key: f.name,
         width: f.name === 'id' ? 70 : 140,
         ellipsis: { tooltip: true },
         render: (row: any) => {
+          if (row.__isNew) {
+            return h('input', {
+              class: 'inline-cell-input',
+              value: newRowData.value[f.name] ?? '',
+              placeholder: 'NULL',
+              onInput: (e: any) => { newRowData.value[f.name] = e.target.value }
+            })
+          }
           const v = row[f.name]
           if (v === null || v === undefined) return h('span', { class: 'null-val' }, 'NULL')
           if (f.name === 'id') return h('span', { class: 'id-val' }, String(v))
@@ -260,15 +273,27 @@ const TableBrowse = defineComponent({
       }))
       // action column
       const actCol = {
-        title: '操作', key: '__actions', width: 90, fixed: 'right' as const,
-        render: (row: any) => h('div', { class: 'row-actions' }, [
-          h(NButton, { text: true, size: 'tiny', onClick: () => { editingRow.value = row; editingData.value = { ...row }; showEditModal.value = true } }, {
-            icon: () => h(NIcon, null, { default: () => h(CreateOutline) })
-          }),
-          h(NButton, { text: true, size: 'tiny', type: 'error', onClick: () => confirmDeleteRow(row) }, {
-            icon: () => h(NIcon, null, { default: () => h(TrashOutline) })
-          })
-        ])
+        title: '操作', key: '__actions', width: 100, fixed: 'right' as const,
+        render: (row: any) => {
+          if (row.__isNew) {
+            return h('div', { class: 'row-actions' }, [
+              h(NButton, { text: true, size: 'tiny', type: 'primary', loading: saving.value, onClick: saveInlineInsert }, {
+                default: () => '保存'
+              }),
+              h(NButton, { text: true, size: 'tiny', onClick: cancelAddRow }, {
+                default: () => '取消'
+              })
+            ])
+          }
+          return h('div', { class: 'row-actions' }, [
+            h(NButton, { text: true, size: 'tiny', onClick: () => { editingRow.value = row; editingData.value = { ...row }; showEditModal.value = true } }, {
+              icon: () => h(NIcon, null, { default: () => h(CreateOutline) })
+            }),
+            h(NButton, { text: true, size: 'tiny', type: 'error', onClick: () => confirmDeleteRow(row) }, {
+              icon: () => h(NIcon, null, { default: () => h(TrashOutline) })
+            })
+          ])
+        }
       }
       cols.value = [...dataCols, actCol]
     }
@@ -334,32 +359,43 @@ const TableBrowse = defineComponent({
     }
 
     const openInsert = () => {
-      insertData.value = {}
-      fields.value.forEach((f: any) => { insertData.value[f.name] = '' })
-      showInsertModal.value = true
+      if (isAddingRow.value) return
+      newRowData.value = {}
+      isAddingRow.value = true
+      rows.value = [...rows.value, { __isNew: true }]
     }
 
-    const saveInsert = async () => {
-      const flds = Object.keys(insertData.value).filter(k => insertData.value[k] !== '' && insertData.value[k] !== null)
+    const cancelAddRow = () => {
+      rows.value = rows.value.filter((r: any) => !r.__isNew)
+      newRowData.value = {}
+      isAddingRow.value = false
+    }
+
+    const saveInlineInsert = async () => {
+      const flds = Object.keys(newRowData.value).filter(k => newRowData.value[k] !== '' && newRowData.value[k] !== null)
       if (!flds.length) { message.warning('请至少填写一个字段'); return }
       const colPart = flds.map(k => `\`${k}\``).join(', ')
-      const valPart = flds.map(k => `'${String(insertData.value[k]).replace(/'/g, "''")}'`).join(', ')
+      const valPart = flds.map(k => `'${String(newRowData.value[k]).replace(/'/g, "''")}'`).join(', ')
       saving.value = true
       try {
         const sql = `INSERT INTO ${tblFull()} (${colPart}) VALUES (${valPart})`
         const res = await mysqlMeta.execute(p.connection!.id, sql)
         if (res.error) throw new Error(res.error)
-        showInsertModal.value = false
         message.success('插入成功')
+        isAddingRow.value = false
+        newRowData.value = {}
         loadRows()
       } catch (e: any) { message.error('插入失败: ' + (e?.response?.data?.error || e.message)) }
       finally { saving.value = false }
     }
 
+    const saveInsert = saveInlineInsert
+
     const exportCSV = () => {
-      if (!rows.value.length) { message.warning('无数据可导出'); return }
-      const header = Object.keys(rows.value[0]).join(',')
-      const body = rows.value.map(r => Object.values(r).map(v => `"${String(v ?? '').replace(/"/g, '""')}"`).join(',')).join('\n')
+      const realRows = rows.value.filter((r: any) => !r.__isNew)
+      if (!realRows.length) { message.warning('无数据可导出'); return }
+      const header = Object.keys(realRows[0]).join(',')
+      const body = realRows.map((r: any) => Object.values(r).map(v => `"${String(v ?? '').replace(/"/g, '""')}"`).join(',')).join('\n')
       const a = Object.assign(document.createElement('a'), {
         href: URL.createObjectURL(new Blob([header + '\n' + body], { type: 'text/csv' })),
         download: `${p.table?.name || 'data'}.csv`
@@ -372,24 +408,41 @@ const TableBrowse = defineComponent({
 
     const modalFields = computed(() => fields.value.length ? fields.value : (rows.value.length ? Object.keys(rows.value[0]).map(k => ({ name: k })) : []))
 
-    return () => h('div', { class: ['table-browse', !isDark.value && 'light-mode'] }, [
+    const children: any[] = [
       // Toolbar
       h('div', { class: 'browse-toolbar' }, [
         h('span', { class: 'browse-title' }, `${p.table?.name || ''}  ·  ${total.value.toLocaleString()} 行`),
         h('div', { style: 'flex:1' }),
-        h(NButton, { size: 'small', type: 'primary', onClick: openInsert },
+        h(NButton, { size: 'small', type: 'primary', disabled: isAddingRow.value, onClick: openInsert },
           { default: () => '新增行', icon: () => h(NIcon, null, { default: () => h(AddOutline) }) }),
         h(NButton, { size: 'small', onClick: loadRows, loading: loading.value },
           { default: () => '刷新', icon: () => h(NIcon, null, { default: () => h(RefreshOutline) }) }),
         h(NButton, { size: 'small', onClick: exportCSV },
           { default: () => '导出 CSV', icon: () => h(NIcon, null, { default: () => h(DownloadOutline) }) }),
       ]),
-      error.value ? h(NAlert, { type: 'error', title: '加载失败', style: 'margin:8px 12px;font-size:12px' }, { default: () => error.value }) : null,
+    ]
+
+    if (error.value) {
+      children.push(h(NAlert, { type: 'error', title: '加载失败', style: 'margin:8px 12px;font-size:12px' }, { default: () => error.value }))
+    }
+
+    // Display rows: real rows + optional inline new row
+    const displayRows = isAddingRow.value
+      ? [...rows.value, { __isNew: true, __rowKey: '__new__' }]
+      : rows.value
+
+    children.push(
       h(NDataTable, {
-        columns: cols.value, data: rows.value, loading: loading.value,
+        columns: cols.value,
+        data: displayRows,
+        loading: loading.value,
+        rowKey: (row: any) => row.__rowKey ?? row.id ?? JSON.stringify(row),
         size: 'small', maxHeight: 'calc(100vh - 285px)', striped: true,
-        pagination: false, scrollX: (cols.value.length) * 140
-      }),
+        pagination: false, scrollX: Math.max(600, cols.value.length * 140)
+      })
+    )
+
+    children.push(
       h('div', { class: 'browse-pagination' }, [
         h('span', { class: 'pg-info' }, `共 ${total.value.toLocaleString()} 行 · 每页 ${pageSize.value}`),
         h('div', { style: 'flex:1' }),
@@ -398,9 +451,11 @@ const TableBrowse = defineComponent({
         h('span', { class: 'pg-num' }, `第 ${page.value} 页`),
         h(NButton, { text: true, size: 'tiny', disabled: rows.value.length < pageSize.value, onClick: () => { page.value++; loadRows() } },
           { icon: () => h(NIcon, null, { default: () => h(ChevronForwardOutline) }) }),
-      ]),
+      ])
+    )
 
-      // ── Edit Modal ──
+    // ── Edit Modal ──
+    children.push(
       h(NModal, { show: showEditModal.value, 'onUpdate:show': (v: boolean) => { showEditModal.value = v } }, {
         default: () => h(NCard, {
           title: `编辑行 — ${p.table?.name}`, style: 'width:520px;max-height:80vh;overflow-y:auto',
@@ -424,34 +479,10 @@ const TableBrowse = defineComponent({
             ])
           ])
         })
-      }),
-
-      // ── Insert Modal ──
-      h(NModal, { show: showInsertModal.value, 'onUpdate:show': (v: boolean) => { showInsertModal.value = v } }, {
-        default: () => h(NCard, {
-          title: `新增行 — ${p.table?.name}`, style: 'width:520px;max-height:80vh;overflow-y:auto',
-          bordered: false, size: 'small',
-          headerExtra: () => h(NButton, { text: true, onClick: () => { showInsertModal.value = false } }, { icon: () => h(NIcon, null, { default: () => h(CloseOutline) }) })
-        }, {
-          default: () => h('div', { class: 'form-grid' }, [
-            ...modalFields.value.map((f: any) =>
-              h('div', { class: 'form-row', key: f.name }, [
-                h('label', { class: 'form-label' }, f.name),
-                h(NInput, {
-                  value: insertData.value[f.name] ?? '',
-                  onUpdateValue: (v: string) => { insertData.value[f.name] = v },
-                  size: 'small', placeholder: '留空则为 NULL'
-                })
-              ])
-            ),
-            h('div', { class: 'form-actions' }, [
-              h(NButton, { type: 'primary', loading: saving.value, onClick: saveInsert }, { default: () => '插入' }),
-              h(NButton, { onClick: () => { showInsertModal.value = false } }, { default: () => '取消' })
-            ])
-          ])
-        })
       })
-    ])
+    )
+
+    return h('div', { class: ['table-browse', !isDark.value && 'light-mode'] }, children)
   }
 })
 
@@ -579,7 +610,7 @@ const TableSchema = defineComponent({
               h('span', { class: 'col-h comment' }, '注释'),
               h('span', { class: 'col-h actions' }, '操作'),
             ]),
-            cols.value.length === 0 ? h('div', { style: 'padding:20px;text-align:center;color:rgba(255,255,255,0.3)' }, '无字段') : null,
+            cols.value.length === 0 ? h('div', { style: 'padding:20px;text-align:center;color:var(--text-disabled)' }, '无字段') : null,
             ...cols.value.map((col: any) =>
               h('div', { class: ['schema-col-row', col.isPrimary && 'is-pk'], key: col.name }, [
                 h('span', { class: 'col-h pk' }, col.isPrimary ? '🔑' : ''),
@@ -688,7 +719,7 @@ const TableIndexes = defineComponent({
               h('span', { class: 'idx-h cols' }, '字段'),
             ]),
             indexes.value.length === 0
-              ? h('div', { style: 'padding:24px;text-align:center;color:rgba(255,255,255,0.3);font-size:13px' }, '暂无索引')
+              ? h('div', { style: 'padding:24px;text-align:center;color:var(--text-disabled);font-size:13px' }, '暂无索引')
               : indexes.value.map((idx: any) =>
                   h('div', { class: 'idx-row', key: idx.name }, [
                     h('span', { class: 'idx-h name' }, [
@@ -709,22 +740,22 @@ const TableIndexes = defineComponent({
 /* ── Workspace shell ── */
 .mysql-workspace {
   flex: 1; display: flex; flex-direction: column; overflow: hidden;
-  background: transparent; color: rgba(255,255,255,0.85);
+  background: var(--bg-primary); color: var(--text-secondary);
 }
 
 .tab-bar {
   display: flex; align-items: center; height: 38px; flex-shrink: 0;
-  background: rgba(0,0,0,0.25); border-bottom: 1px solid rgba(255,255,255,0.06);
+  background: var(--bg-tabbar); border-bottom: 1px solid var(--border-secondary);
   padding: 0 12px; gap: 2px;
 }
 
 .tab-btn {
   display: flex; align-items: center; gap: 5px; padding: 0 12px; height: 100%;
   font-size: 12px; cursor: pointer; border-bottom: 2px solid transparent;
-  color: rgba(255,255,255,0.5); transition: all 0.15s; white-space: nowrap;
+  color: var(--text-quaternary); transition: all 0.15s; white-space: nowrap;
 }
-.tab-btn:hover { color: rgba(255,255,255,0.85); background: rgba(255,255,255,0.04); }
-.tab-btn.active { color: #4db8ff; border-bottom-color: #4db8ff; }
+.tab-btn:hover { color: var(--text-secondary); background: var(--bg-row-hover); }
+.tab-btn.active { color: var(--type-string); border-bottom-color: var(--type-string); }
 
 .tab-content { flex: 1; overflow: hidden; display: flex; flex-direction: column; min-height: 0; }
 
@@ -734,33 +765,33 @@ const TableIndexes = defineComponent({
 }
 .sql-toolbar {
   display: flex; align-items: center; gap: 8px; padding: 8px 12px; flex-shrink: 0;
-  border-bottom: 1px solid rgba(255,255,255,0.06);
+  border-bottom: 1px solid var(--border-secondary);
 }
 .sql-spacer { flex: 1; }
-.sql-hint { font-size: 11px; color: rgba(255,255,255,0.3); }
+.sql-hint { font-size: 11px; color: var(--code-comment); }
 
 .sql-area-wrap { flex: 1; overflow: hidden; min-height: 140px; }
 .sql-textarea {
   width: 100%; height: 100%; padding: 12px 14px; resize: none; outline: none;
-  background: #1a1a24; color: #e0e0e0; font-family: 'SF Mono','Monaco','Consolas',monospace;
+  background: var(--code-bg); color: var(--text-secondary); font-family: 'SF Mono','Monaco','Consolas',monospace;
   font-size: 13px; line-height: 1.6; border: none; box-sizing: border-box;
 }
 
-.sql-results { flex-shrink: 0; border-top: 1px solid rgba(255,255,255,0.06); }
+.sql-results { flex-shrink: 0; border-top: 1px solid var(--border-secondary); }
 
 .result-tabs {
   display: flex; align-items: center; gap: 8px;
   padding: 0 12px; height: 34px; background: rgba(0,0,0,0.2);
-  border-bottom: 1px solid rgba(255,255,255,0.05);
+  border-bottom: 1px solid var(--border-secondary);
 }
 
 .rt {
   display: flex; align-items: center; gap: 5px; font-size: 12px;
-  color: rgba(255,255,255,0.5); cursor: pointer; padding: 0 6px; height: 100%;
+  color: var(--text-quaternary); cursor: pointer; padding: 0 6px; height: 100%;
   border-bottom: 2px solid transparent;
 }
-.rt.active { color: #4db8ff; border-bottom-color: #4db8ff; }
-.result-meta { font-size: 11px; color: rgba(255,255,255,0.3); margin-left: 8px; }
+.rt.active { color: var(--type-string); border-bottom-color: var(--type-string); }
+.result-meta { font-size: 11px; color: var(--text-disabled); margin-left: 8px; }
 
 .result-empty { display: flex; align-items: center; justify-content: center; height: 80px; }
 .result-table { font-size: 12px; }
@@ -769,23 +800,23 @@ const TableIndexes = defineComponent({
 .table-browse { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
 .browse-toolbar {
   display: flex; align-items: center; gap: 8px; padding: 8px 12px; flex-shrink: 0;
-  border-bottom: 1px solid rgba(255,255,255,0.06);
+  border-bottom: 1px solid var(--border-secondary);
 }
 .data-table { flex: 1; }
 .browse-pagination {
   display: flex; align-items: center; gap: 8px; padding: 6px 12px;
-  border-top: 1px solid rgba(255,255,255,0.06); height: 36px; flex-shrink: 0;
+  border-top: 1px solid var(--border-secondary); height: 36px; flex-shrink: 0;
 }
-.pg-info { font-size: 12px; color: rgba(255,255,255,0.4); }
-.pg-num { font-size: 12px; color: rgba(255,255,255,0.6); padding: 0 4px; }
+.pg-info { font-size: 12px; color: var(--text-disabled); }
+.pg-num { font-size: 12px; color: var(--text-tertiary); padding: 0 4px; }
 
 /* ── Schema ── */
 .table-schema { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
 .schema-toolbar {
   display: flex; align-items: center; gap: 8px; padding: 10px 14px; flex-shrink: 0;
-  border-bottom: 1px solid rgba(255,255,255,0.06);
+  border-bottom: 1px solid var(--border-secondary);
 }
-.schema-title { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.8); }
+.schema-title { font-size: 13px; font-weight: 600; color: var(--text-secondary); }
 
 .schema-cols { flex: 1; overflow-y: auto; padding: 0 8px 8px; }
 .schema-col-header, .schema-col-row {
@@ -794,29 +825,43 @@ const TableIndexes = defineComponent({
   align-items: center; gap: 4px; padding: 6px 8px;
   border-radius: 4px;
 }
-.schema-col-header { font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.3); text-transform: uppercase; letter-spacing: 0.5px; }
+.schema-col-header { font-size: 10px; font-weight: 700; color: var(--text-disabled); text-transform: uppercase; letter-spacing: 0.5px; }
 .schema-col-row { border-bottom: 1px solid rgba(255,255,255,0.04); transition: background 0.1s; }
-.schema-col-row:hover { background: rgba(255,255,255,0.03); }
+.schema-col-row:hover { background: var(--bg-row-hover); }
 .schema-col-row.is-pk { background: rgba(240,160,32,0.05); }
 
-.col-name-val { font-weight: 500; color: rgba(255,255,255,0.85); font-family: monospace; font-size: 12px; }
-.type-badge { font-size: 11px; color: #4db8ff; background: rgba(77,184,255,0.1); padding: 1px 6px; border-radius: 3px; font-family: monospace; }
-.nn-yes { color: #FF6B00; font-weight: 700; }
-.nn-no { color: rgba(255,255,255,0.2); }
-.comment-text { font-size: 11px; color: rgba(255,255,255,0.4); }
-.def-val { font-size: 11px; color: rgba(255,255,255,0.45); background: rgba(255,255,255,0.06); padding: 1px 5px; border-radius: 3px; font-family: monospace; }
-.browse-title { font-size: 13px; font-weight: 500; color: rgba(255,255,255,0.7); }
+.col-name-val { font-weight: 500; color: var(--text-secondary); font-family: monospace; font-size: 12px; }
+.type-badge { font-size: 11px; color: var(--type-string); background: var(--type-string-bg); padding: 1px 6px; border-radius: 3px; font-family: monospace; }
+.nn-yes { color: var(--accent-primary); font-weight: 700; }
+.nn-no { color: var(--text-disabled); }
+.comment-text { font-size: 11px; color: var(--text-disabled); }
+.def-val { font-size: 11px; color: var(--text-quaternary); background: var(--bg-hover); padding: 1px 5px; border-radius: 3px; font-family: monospace; }
+.browse-title { font-size: 13px; font-weight: 500; color: var(--text-tertiary); }
 
 /* ── Row action buttons ── */
-.row-actions { display: flex; gap: 2px; justify-content: center; }
-.null-val { color: rgba(255,255,255,0.25); font-style: italic; font-size: 11px; }
-.id-val { color: #f0a020; font-family: monospace; font-size: 11px; }
+.row-actions { display: flex; gap: 2px; justify-content: center; align-items: center; }
+.null-val { color: var(--type-null); font-style: italic; font-size: 11px; }
+.id-val { color: var(--status-warning); font-family: monospace; font-size: 11px; }
+
+/* ── Inline new-row input ── */
+.inline-cell-input {
+  width: 100%; height: 22px; padding: 0 6px;
+  font-size: 12px; font-family: inherit;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  border: 1px solid var(--accent-primary);
+  border-radius: 3px;
+  outline: none;
+  box-sizing: border-box;
+}
+.inline-cell-input::placeholder { color: var(--text-disabled); }
+.inline-cell-input:focus { border-color: var(--accent-primary); box-shadow: 0 0 0 2px rgba(255,107,0,0.15); }
 
 /* ── Form modal ── */
 .form-grid { display: flex; flex-direction: column; gap: 12px; padding: 4px 0; }
 .form-row { display: flex; align-items: center; gap: 12px; }
-.form-label { font-size: 13px; color: rgba(255,255,255,0.7); min-width: 80px; flex-shrink: 0; }
-.form-actions { display: flex; gap: 8px; justify-content: flex-end; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.06); margin-top: 4px; }
+.form-label { font-size: 13px; color: var(--text-tertiary); min-width: 80px; flex-shrink: 0; }
+.form-actions { display: flex; gap: 8px; justify-content: flex-end; padding-top: 8px; border-top: 1px solid var(--border-secondary); margin-top: 4px; }
 
 /* schema actions col */
 .schema-col-header, .schema-col-row {
@@ -827,19 +872,19 @@ const TableIndexes = defineComponent({
 .table-indexes { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
 .idx-toolbar {
   display: flex; align-items: center; gap: 8px; padding: 10px 14px; flex-shrink: 0;
-  border-bottom: 1px solid rgba(255,255,255,0.06);
+  border-bottom: 1px solid var(--border-secondary);
 }
-.idx-title { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.8); }
+.idx-title { font-size: 13px; font-weight: 600; color: var(--text-secondary); }
 
 .idx-list { flex: 1; overflow-y: auto; padding: 0 8px 8px; }
 .idx-header, .idx-row {
   display: grid; grid-template-columns: 220px 80px 70px 1fr;
   align-items: center; gap: 4px; padding: 7px 8px; border-radius: 4px;
 }
-.idx-header { font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.3); text-transform: uppercase; }
+.idx-header { font-size: 10px; font-weight: 700; color: var(--text-disabled); text-transform: uppercase; }
 .idx-row { border-bottom: 1px solid rgba(255,255,255,0.04); transition: background 0.1s; font-size: 12px; }
-.idx-row:hover { background: rgba(255,255,255,0.03); }
-.pk-badge { color: #f0a020; font-weight: 700; font-size: 11px; }
-.type-sm { font-size: 11px; color: rgba(255,255,255,0.5); background: rgba(255,255,255,0.07); padding: 1px 5px; border-radius: 3px; }
-.col-badge { font-size: 11px; color: #a78bfa; background: rgba(167,139,250,0.1); padding: 1px 6px; border-radius: 3px; font-family: monospace; }
+.idx-row:hover { background: var(--bg-row-hover); }
+.pk-badge { color: var(--status-warning); font-weight: 700; font-size: 11px; }
+.type-sm { font-size: 11px; color: var(--text-quaternary); background: var(--bg-active); padding: 1px 5px; border-radius: 3px; }
+.col-badge { font-size: 11px; color: var(--type-date); background: var(--type-date-bg); padding: 1px 6px; border-radius: 3px; font-family: monospace; }
 </style>

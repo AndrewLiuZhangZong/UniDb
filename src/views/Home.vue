@@ -272,7 +272,7 @@ onUnmounted(() => {
 .main-layout { flex: 1; overflow: hidden; }
 
 .navigator-sider {
-  background: rgba(28, 28, 32, 0.98) !important;
+  background: var(--bg-sidebar) !important;
   height: 100%;
   position: relative !important;
   display: flex;
@@ -282,9 +282,23 @@ onUnmounted(() => {
 
 /* ── Content layout ── */
 .content-layout {
-  background: #0f0f16;
+  background: var(--bg-primary) !important;
   display: flex;
   flex-direction: column;
+}
+.content-layout :deep(.n-layout-scroll-container),
+.content-layout :deep(.n-layout),
+.content-layout :deep(.n-layout-content) {
+  background: var(--bg-primary) !important;
+}
+
+/* ── Workspace area ── */
+.workspace-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--bg-primary);
 }
 
 /* ── Welcome page ── */
@@ -310,19 +324,19 @@ onUnmounted(() => {
   justify-content: center;
 }
 
-.hero-center-icon { position: absolute; font-size: 44px; color: #FF6B00; }
+.hero-center-icon { position: absolute; font-size: 44px; color: var(--accent-primary); }
 
 .welcome-title {
   font-size: 32px; font-weight: 700; margin: 0;
-  color: rgba(255,255,255,0.95); letter-spacing: -0.5px;
+  color: var(--text-primary); letter-spacing: -0.5px;
 }
 
-.welcome-subtitle { font-size: 15px; margin: 0; color: rgba(255,255,255,0.45); }
+.welcome-subtitle { font-size: 15px; margin: 0; color: var(--text-disabled); }
 
 .supported-databases { text-align: center; }
 
 .supported-title {
-  font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.3);
+  font-size: 11px; font-weight: 600; color: var(--text-disabled);
   text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 16px;
 }
 
@@ -330,17 +344,17 @@ onUnmounted(() => {
 
 .db-card {
   display: flex; flex-direction: column; align-items: center; gap: 10px;
-  padding: 20px 16px; background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(255,255,255,0.06); border-radius: 14px;
+  padding: 20px 16px; background: var(--bg-row-hover);
+  border: 1px solid var(--border-secondary); border-radius: 14px;
   cursor: pointer; transition: all 0.25s ease;
 }
 
 .db-card:hover {
-  background: rgba(255,255,255,0.07); border-color: rgba(255,255,255,0.12);
+  background: var(--bg-hover); border-color: var(--border-hover);
   transform: translateY(-3px);
 }
 
-.db-label { font-size: 13px; font-weight: 500; color: rgba(255,255,255,0.75); }
+.db-label { font-size: 13px; font-weight: 500; color: var(--text-tertiary); }
 
 /* ── Workspace shell ── */
 .workspace-shell {
@@ -359,14 +373,9 @@ onUnmounted(() => {
   height: 30px;
   padding: 0 12px;
   flex-shrink: 0;
-  background: rgba(22, 22, 28, 0.85);
-  border-bottom: 1px solid rgba(255,255,255,0.06);
+  background: var(--bg-sidebar);
+  border-bottom: 1px solid var(--border-secondary);
   gap: 12px;
-}
-
-.workspace-statusbar.light-mode {
-  background: rgba(246, 246, 250, 0.85);
-  border-bottom-color: rgba(0,0,0,0.08);
 }
 
 .statusbar-left {
@@ -379,7 +388,7 @@ onUnmounted(() => {
 .statusbar-conn-name {
   font-size: 12px;
   font-weight: 600;
-  color: rgba(255,255,255,0.75);
+  color: var(--text-tertiary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -387,7 +396,7 @@ onUnmounted(() => {
 
 .statusbar-host {
   font-size: 10px;
-  color: rgba(255,255,255,0.3);
+  color: var(--text-disabled);
   font-family: 'SF Mono', monospace;
   white-space: nowrap;
 }
@@ -402,28 +411,18 @@ onUnmounted(() => {
 .statusbar-sep {
   width: 1px;
   height: 12px;
-  background: rgba(255,255,255,0.1);
+  background: var(--border-strong);
   margin: 0 6px;
   flex-shrink: 0;
 }
 
-.light-mode .statusbar-conn-name { color: rgba(0,0,0,0.7); }
-.light-mode .statusbar-host { color: rgba(0,0,0,0.3); }
-.light-mode .statusbar-sep { background: rgba(0,0,0,0.1); }
-
 :deep(.workspace-statusbar .n-button__content) {
   gap: 4px;
   font-size: 11px;
-  color: rgba(255,255,255,0.5);
+  color: var(--text-quaternary);
 }
 :deep(.workspace-statusbar .n-button:hover .n-button__content) {
-  color: rgba(255,255,255,0.85);
-}
-.light-mode :deep(.workspace-statusbar .n-button__content) {
-  color: rgba(0,0,0,0.45);
-}
-.light-mode :deep(.workspace-statusbar .n-button:hover .n-button__content) {
-  color: rgba(0,0,0,0.8);
+  color: var(--text-primary);
 }
 
 /* ── Main workspace ── */

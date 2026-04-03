@@ -1,34 +1,86 @@
 import type { GlobalThemeOverrides } from 'naive-ui'
 
-// 主题色配置
+// ── Brand / Accent ──────────────────────────────────────────
 export const THEME_COLORS = {
-  // 主色
   primary: '#FF6B00',
   primaryHover: '#FF8C42',
   primaryPressed: '#CC5500',
   primarySuppl: '#FF8C42',
 } as const
 
-// Naive UI 主题覆盖配置
+// ── Status ──────────────────────────────────────────────────
+const STATUS = {
+  success: '#18a058',
+  successHover: '#36b374',
+  successPressed: '#0e7a43',
+  warning: '#f0a020',
+  warningHover: '#f5b942',
+  warningPressed: '#d48a10',
+  error: '#d03050',
+  errorHover: '#e04060',
+  errorPressed: '#b02040',
+  info: '#2080f0',
+  infoHover: '#4090f8',
+  infoPressed: '#1870d8',
+} as const
+
+// ── Dark theme raw values (mirrors :root in theme-dark.css) ─
+const DARK = {
+  bgPrimary: '#111118',
+  bgSecondary: '#1a1a24',
+  bgCard: '#1a1a24',
+  bgModal: '#1e1e28',
+  bgHover: 'rgba(255,255,255,0.06)',
+  bgRowHover: 'rgba(255,255,255,0.03)',
+  borderPrimary: 'rgba(255,255,255,0.08)',
+  borderSecondary: 'rgba(255,255,255,0.06)',
+  textPrimary: 'rgba(255,255,255,0.95)',
+  textSecondary: 'rgba(255,255,255,0.85)',
+  textTertiary: 'rgba(255,255,255,0.7)',
+  textDisabled: 'rgba(255,255,255,0.38)',
+  accentSubtle: 'rgba(255,107,0,0.15)',
+} as const
+
+// ── Light theme raw values (mirrors body.light-theme in theme-light.css) ─
+const LIGHT = {
+  bgPrimary: '#ffffff',
+  bgSecondary: '#ffffff',
+  bgCard: '#ffffff',
+  bgModal: '#ffffff',
+  bgHover: 'rgba(0,0,0,0.04)',
+  bgRowHover: 'rgba(0,0,0,0.02)',
+  borderPrimary: 'rgba(0,0,0,0.08)',
+  borderSecondary: 'rgba(0,0,0,0.07)',
+  textPrimary: 'rgba(0,0,0,0.90)',
+  textSecondary: 'rgba(0,0,0,0.82)',
+  textTertiary: 'rgba(0,0,0,0.65)',
+  textDisabled: 'rgba(0,0,0,0.35)',
+  accentSubtle: 'rgba(255,107,0,0.10)',
+} as const
+
+// ── Naive UI theme overrides ─────────────────────────────────
 export function createThemeOverrides(isDark: boolean): GlobalThemeOverrides {
+  const bg = isDark ? DARK : LIGHT
+
   return {
     common: {
       primaryColor: THEME_COLORS.primary,
       primaryColorHover: THEME_COLORS.primaryHover,
       primaryColorPressed: THEME_COLORS.primaryPressed,
       primaryColorSuppl: THEME_COLORS.primarySuppl,
-      successColor: '#18a058',
-      successColorHover: '#36b374',
-      successColorPressed: '#0e7a43',
-      warningColor: '#f0a020',
-      warningColorHover: '#f5b942',
-      warningColorPressed: '#d48a10',
-      errorColor: '#d03050',
-      errorColorHover: '#e04060',
-      errorColorPressed: '#b02040',
-      infoColor: '#2080f0',
-      infoColorHover: '#4090f8',
-      infoColorPressed: '#1870d8',
+      bodyColor: bg.bgPrimary,
+      successColor: STATUS.success,
+      successColorHover: STATUS.successHover,
+      successColorPressed: STATUS.successPressed,
+      warningColor: STATUS.warning,
+      warningColorHover: STATUS.warningHover,
+      warningColorPressed: STATUS.warningPressed,
+      errorColor: STATUS.error,
+      errorColorHover: STATUS.errorHover,
+      errorColorPressed: STATUS.errorPressed,
+      infoColor: STATUS.info,
+      infoColorHover: STATUS.infoHover,
+      infoColorPressed: STATUS.infoPressed,
       borderRadius: '8px',
       borderRadiusSmall: '6px',
       fontSize: '14px',
@@ -56,9 +108,9 @@ export function createThemeOverrides(isDark: boolean): GlobalThemeOverrides {
       textColorHoverPrimary: '#ffffff',
       textColorPressedPrimary: '#ffffff',
       textColorFocusPrimary: '#ffffff',
-      textColor: isDark ? '#e0e0e0' : '#333333',
-      textColorHover: isDark ? '#ffffff' : '#000000',
-      textColorPressed: isDark ? '#ffffff' : '#000000',
+      textColor: bg.textSecondary,
+      textColorHover: bg.textPrimary,
+      textColorPressed: bg.textPrimary,
       color: isDark ? 'rgba(255,255,255,0.08)' : '#ffffff',
       colorHover: isDark ? 'rgba(255,255,255,0.12)' : '#f0f0f0',
       colorPressed: isDark ? 'rgba(255,255,255,0.16)' : '#e6e6e6',
@@ -77,11 +129,11 @@ export function createThemeOverrides(isDark: boolean): GlobalThemeOverrides {
       paddingSmall: '0 12px'
     },
     Card: {
-      color: isDark ? '#1a1a24' : '#ffffff',
-      colorModal: isDark ? '#1e1e28' : '#ffffff',
+      color: bg.bgCard,
+      colorModal: bg.bgModal,
       borderRadius: '12px',
-      borderColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.07)',
-      borderColorModal: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.09)'
+      borderColor: bg.borderSecondary,
+      borderColorModal: bg.borderPrimary
     },
     Input: {
       color: isDark ? 'rgba(255,255,255,0.03)' : '#ffffff',
@@ -91,42 +143,41 @@ export function createThemeOverrides(isDark: boolean): GlobalThemeOverrides {
       borderRadius: '8px',
       heightMedium: '34px',
       colorDisabled: isDark ? 'rgba(255,255,255,0.02)' : '#f5f5f5',
-      textColor: isDark ? 'rgba(255,255,255,0.9)' : '#333333',
+      textColor: bg.textPrimary,
       caretColor: THEME_COLORS.primary
     },
     Select: {
       peers: {
         InternalSelection: {
           color: isDark ? 'rgba(255,255,255,0.03)' : '#ffffff',
-          borderColor: isDark ? 'rgba(255,255,255,0.1)' : '#d9d9d9',
-          borderColorFocus: THEME_COLORS.primary,
+          borderFocus: `1px solid ${THEME_COLORS.primary}`,
           borderRadius: '8px',
           heightMedium: '34px',
-          textColor: isDark ? 'rgba(255,255,255,0.9)' : '#333333'
+          textColor: bg.textPrimary
         }
       }
     },
     Tree: {
-      color: isDark ? 'transparent' : 'transparent',
-      nodeTextColor: isDark ? 'rgba(255,255,255,0.85)' : 'rgba(0,0,0,0.85)',
-      nodeTextColorHover: isDark ? '#ffffff' : '#000000',
-      nodeColorHover: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)',
-      arrowColor: isDark ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.4)'
+      color: 'transparent',
+      nodeTextColor: bg.textSecondary,
+      nodeTextColorHover: bg.textPrimary,
+      nodeColorHover: bg.bgHover,
+      arrowColor: bg.textDisabled
     },
     Menu: {
-      itemTextColor: isDark ? 'rgba(255,255,255,0.75)' : 'rgba(0,0,0,0.75)',
-      itemTextColorHover: isDark ? '#ffffff' : '#000000',
+      itemTextColor: bg.textTertiary,
+      itemTextColorHover: bg.textPrimary,
       itemTextColorActive: THEME_COLORS.primary,
-      itemColorHover: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)',
-      itemColorActive: isDark ? 'rgba(255,107,0,0.15)' : 'rgba(255,107,0,0.1)',
-      borderColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.08)'
+      itemColorHover: bg.bgHover,
+      itemColorActive: bg.accentSubtle,
+      borderColor: bg.borderSecondary
     },
     Tabs: {
-      tabTextColorLine: isDark ? 'rgba(255,255,255,0.6)' : 'rgba(0,0,0,0.6)',
+      tabTextColorLine: bg.textTertiary,
       tabTextColorActiveLine: THEME_COLORS.primary,
-      tabTextColorHoverLine: isDark ? 'rgba(255,255,255,0.9)' : 'rgba(0,0,0,0.9)',
-      tabColorSegment: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)',
-      tabBorderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
+      tabTextColorHoverLine: bg.textPrimary,
+      tabColorSegment: bg.bgRowHover,
+      tabBorderColor: bg.borderPrimary,
       colorActive: THEME_COLORS.primary,
       barColor: THEME_COLORS.primary
     },
@@ -136,39 +187,50 @@ export function createThemeOverrides(isDark: boolean): GlobalThemeOverrides {
       heightSmall: '22px'
     },
     Dialog: {
-      color: isDark ? '#1e1e28' : '#ffffff',
+      color: bg.bgModal,
       borderRadius: '12px',
-      titleTextColor: isDark ? 'rgba(255,255,255,0.9)' : 'rgba(0,0,0,0.9)'
+      titleTextColor: bg.textPrimary
     },
     Message: {
-      colorSuccess: isDark ? 'rgba(24,160,88,0.2)' : 'rgba(24,160,88,0.1)',
-      textColorSuccess: isDark ? '#36b374' : '#18a058',
-      colorError: isDark ? 'rgba(208,48,80,0.2)' : 'rgba(208,48,80,0.1)',
-      textColorError: isDark ? '#e04060' : '#d03050',
-      colorWarning: isDark ? 'rgba(255,107,0,0.2)' : 'rgba(255,107,0,0.1)',
-      textColorWarning: isDark ? '#FF8C42' : '#FF6B00',
-      colorInfo: isDark ? 'rgba(32,128,240,0.2)' : 'rgba(32,128,240,0.1)',
-      textColorInfo: isDark ? '#4090f8' : '#2080f0'
+      colorSuccess: isDark ? `rgba(24,160,88,0.2)` : `rgba(24,160,88,0.1)`,
+      textColorSuccess: isDark ? STATUS.successHover : STATUS.success,
+      colorError: isDark ? `rgba(208,48,80,0.2)` : `rgba(208,48,80,0.1)`,
+      textColorError: isDark ? STATUS.errorHover : STATUS.error,
+      colorWarning: isDark ? `rgba(255,107,0,0.2)` : `rgba(255,107,0,0.1)`,
+      textColorWarning: isDark ? THEME_COLORS.primaryHover : THEME_COLORS.primary,
+      colorInfo: isDark ? `rgba(32,128,240,0.2)` : `rgba(32,128,240,0.1)`,
+      textColorInfo: isDark ? STATUS.infoHover : STATUS.info
     },
     DataTable: {
-      thColor: isDark ? 'rgba(255,255,255,0.03)' : '#f8f8fb',
-      thColorHover: isDark ? 'rgba(255,255,255,0.05)' : '#f5f5f8',
-      tdColor: 'transparent',
-      tdColorHover: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)',
-      borderColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.07)',
-      thTextColor: isDark ? 'rgba(255,255,255,0.65)' : 'rgba(0,0,0,0.65)',
-      tdTextColor: isDark ? 'rgba(255,255,255,0.85)' : 'rgba(0,0,0,0.82)'
+      thColor: isDark ? bg.bgRowHover : '#f5f6f8',
+      thColorHover: bg.bgHover,
+      tdColor: bg.bgPrimary,
+      tdColorHover: bg.bgRowHover,
+      tdColorStriped: isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)',
+      borderColor: bg.borderSecondary,
+      thTextColor: bg.textTertiary,
+      tdTextColor: bg.textSecondary
     },
     Dropdown: {
-      color: isDark ? '#1e1e28' : '#ffffff',
-      optionColorHover: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)',
-      optionTextColor: isDark ? 'rgba(255,255,255,0.85)' : 'rgba(0,0,0,0.85)',
+      color: bg.bgModal,
+      optionColorHover: bg.bgHover,
+      optionTextColor: bg.textSecondary,
       borderRadius: '8px'
     },
     Tooltip: {
-      color: '#1e1e28',
-      textColor: 'rgba(255,255,255,0.9)',
+      color: DARK.bgModal,
+      textColor: DARK.textPrimary,
       borderRadius: '6px'
+    },
+    Layout: {
+      color: bg.bgPrimary,
+      siderColor: isDark ? DARK.bgSecondary : '#f0f1f5',
+      headerColor: bg.bgPrimary,
+      footerColor: bg.bgPrimary
+    },
+    Scrollbar: {
+      color: isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.15)',
+      colorHover: isDark ? 'rgba(255,255,255,0.25)' : 'rgba(0,0,0,0.25)'
     }
   }
 }

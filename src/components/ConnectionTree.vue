@@ -42,7 +42,7 @@
           :class="{ 'is-active': activeConnId === conn.id }"
           @click="toggleConn(conn)"
         >
-          <n-icon class="row-arrow" :class="{ open: expandedConns.has(conn.id) }">
+          <n-icon class="row-arrow" :class="{ open: expandedConns[conn.id] }">
             <ChevronForwardOutline />
           </n-icon>
           <DbTypeIcon :type="conn.type" :size="14" />
@@ -58,7 +58,7 @@
         </div>
 
         <!-- Expanded: Database sub-nodes (per-db Explorer) -->
-        <div v-if="expandedConns.has(conn.id)" class="conn-children">
+        <div v-if="expandedConns[conn.id]" class="conn-children">
           <component
             :is="explorerMap[conn.type]"
             :connection="conn"
@@ -130,7 +130,7 @@ const explorerMap: Record<string, any> = {
 }
 
 const activeConnId = ref<string | null>(null)
-const expandedConns = reactive(new Set<string>())
+const expandedConns = reactive<Record<string, boolean>>({})
 
 // Context menu
 const ctxShow = ref(false)
@@ -163,14 +163,14 @@ const ctxOptions = computed(() => [
 ])
 
 const toggleConn = (conn: any) => {
-  if (activeConnId.value === conn.id && expandedConns.has(conn.id)) {
-    expandedConns.delete(conn.id)
+  if (activeConnId.value === conn.id && expandedConns[conn.id]) {
+    expandedConns[conn.id] = false
     activeConnId.value = null
   } else if (activeConnId.value === conn.id) {
-    expandedConns.add(conn.id)
+    expandedConns[conn.id] = true
   } else {
     activeConnId.value = conn.id
-    expandedConns.add(conn.id)
+    expandedConns[conn.id] = true
   }
   emit('connection-select', conn)
 }
@@ -189,7 +189,7 @@ const handleCtxSelect = async (key: string) => {
   } else if (key === 'delete') {
     try {
       await connectionStore.deleteConnection(ctxConn.value.id)
-      expandedConns.delete(ctxConn.value.id)
+      delete expandedConns[ctxConn.value.id]
       if (activeConnId.value === ctxConn.value.id) activeConnId.value = null
     } catch { /* handled by store */ }
   }
@@ -213,7 +213,7 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   height: 100%;
-  background: rgba(28, 28, 32, 0.98);
+  background: var(--bg-sidebar);
   overflow: hidden;
 }
 
@@ -223,7 +223,7 @@ onMounted(() => {
   align-items: center;
   justify-content: space-between;
   padding: 10px 10px 8px;
-  border-bottom: 1px solid rgba(255,255,255,0.06);
+  border-bottom: 1px solid var(--border-secondary);
   flex-shrink: 0;
 }
 
@@ -235,13 +235,13 @@ onMounted(() => {
 
 .nav-icon {
   font-size: 14px;
-  color: #FF6B00;
+  color: var(--accent-primary);
 }
 
 .nav-title {
   font-size: 11px;
   font-weight: 700;
-  color: rgba(255,255,255,0.4);
+  color: var(--text-disabled);
   text-transform: uppercase;
   letter-spacing: 1.2px;
 }
@@ -253,10 +253,10 @@ onMounted(() => {
 }
 
 :deep(.nav-actions .n-button) {
-  color: rgba(255,255,255,0.4);
+  color: var(--text-disabled);
 }
 :deep(.nav-actions .n-button:hover) {
-  color: rgba(255,255,255,0.85);
+  color: var(--text-primary);
 }
 
 /* ── Tree ── */
@@ -267,7 +267,7 @@ onMounted(() => {
 }
 
 .nav-tree::-webkit-scrollbar { width: 5px; }
-.nav-tree::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 3px; }
+.nav-tree::-webkit-scrollbar-thumb { background: var(--border-primary); border-radius: 3px; }
 
 /* Connection node */
 .conn-node {
@@ -287,11 +287,11 @@ onMounted(() => {
 }
 
 .conn-row:hover {
-  background: rgba(255,255,255,0.05);
+  background: var(--bg-hover);
 }
 
 .conn-row.is-active {
-  background: rgba(255,107,0,0.12);
+  background: var(--accent-primary-subtle);
 }
 
 .conn-row.is-active::before {
@@ -300,13 +300,13 @@ onMounted(() => {
   left: 0; top: 50%;
   transform: translateY(-50%);
   width: 2px; height: 18px;
-  background: #FF6B00;
+  background: var(--accent-primary);
   border-radius: 0 2px 2px 0;
 }
 
 .row-arrow {
   font-size: 11px;
-  color: rgba(255,255,255,0.25);
+  color: var(--text-hint);
   transition: transform 0.18s;
   flex-shrink: 0;
 }
@@ -316,7 +316,7 @@ onMounted(() => {
   flex: 1;
   font-size: 12.5px;
   font-weight: 500;
-  color: rgba(255,255,255,0.82);
+  color: var(--text-secondary);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -324,7 +324,7 @@ onMounted(() => {
 
 .row-action-icon {
   font-size: 14px;
-  color: rgba(255,255,255,0.25);
+  color: var(--text-hint);
   cursor: pointer;
   padding: 2px;
   border-radius: 3px;
@@ -334,8 +334,8 @@ onMounted(() => {
 }
 .conn-row:hover .row-action-icon { opacity: 1; }
 .row-action-icon:hover {
-  color: rgba(255,255,255,0.85);
-  background: rgba(255,255,255,0.1);
+  color: var(--text-primary);
+  background: var(--border-primary);
 }
 
 /* Expanded children */
@@ -357,33 +357,13 @@ onMounted(() => {
 
 .empty-icon {
   font-size: 40px;
-  color: rgba(255,255,255,0.12);
+  color: var(--text-disabled);
 }
 
 .empty-text {
   font-size: 12px;
-  color: rgba(255,255,255,0.28);
+  color: var(--text-hint);
   margin: 0;
   text-align: center;
 }
-
-/* ── Light mode ── */
-.light-mode .nav-header {
-  background: rgba(246, 246, 250, 0.98);
-  border-bottom-color: rgba(0,0,0,0.08);
-}
-.light-mode .navigator {
-  background: rgba(246, 246, 250, 0.98);
-}
-.light-mode .nav-title { color: rgba(0,0,0,0.4); }
-.light-mode .nav-icon { color: #FF6B00; }
-.light-mode .nav-tree { background: rgba(246, 246, 250, 0.98); }
-.light-mode .conn-row:hover { background: rgba(0,0,0,0.04); }
-.light-mode .conn-row.is-active { background: rgba(255,107,0,0.08); }
-.light-mode .row-name { color: rgba(0,0,0,0.82); }
-.light-mode .row-arrow { color: rgba(0,0,0,0.3); }
-.light-mode .row-action-icon { color: rgba(0,0,0,0.3); }
-.light-mode .row-action-icon:hover { background: rgba(0,0,0,0.06); }
-.light-mode .empty-icon { color: rgba(0,0,0,0.1); }
-.light-mode .empty-text { color: rgba(0,0,0,0.35); }
 </style>

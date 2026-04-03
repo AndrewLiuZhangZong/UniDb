@@ -116,7 +116,7 @@
             <template #icon><n-icon><CloseOutline /></n-icon></template>
           </n-button>
         </template>
-        <p style="font-size:12px;color:rgba(150,150,150,0.8);margin:0 0 8px">编辑 CREATE TABLE 语句：</p>
+        <p style="font-size:12px;color:var(--text-tertiary);margin:0 0 8px">编辑 CREATE TABLE 语句：</p>
         <n-input v-model:value="createTableSQL" type="textarea" :autosize="{ minRows: 8, maxRows: 16 }" style="font-family:monospace;font-size:12px" />
         <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:12px">
           <n-button @click="showCreateTable = false">取消</n-button>
@@ -330,15 +330,15 @@ watch(() => props.connection?.id, () => {
 <style scoped>
 .mysql-explorer { display: flex; flex-direction: column; height: 100%; overflow: hidden; font-size: 12px; }
 
-.explorer-toolbar { display: flex; align-items: center; gap: 4px; padding: 6px 8px; flex-shrink: 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+.explorer-toolbar { display: flex; align-items: center; gap: 4px; padding: 6px 8px; flex-shrink: 0; border-bottom: 1px solid var(--border-secondary); }
 .search-input { flex: 1; }
 
-.error-msg { display: flex; align-items: center; gap: 5px; padding: 6px 10px; font-size: 11px; color: #ef4444; background: rgba(239,68,68,0.08); }
-.loading-hint { padding: 8px 12px; color: rgba(255,255,255,0.3); font-size: 11px; }
+.error-msg { display: flex; align-items: center; gap: 5px; padding: 6px 10px; font-size: 11px; color: var(--status-error); background: rgba(239,68,68,0.08); }
+.loading-hint { padding: 8px 12px; color: var(--text-disabled); font-size: 11px; }
 
 .tree-body { flex: 1; overflow-y: auto; padding: 4px 0; }
 .tree-body::-webkit-scrollbar { width: 4px; }
-.tree-body::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+.tree-body::-webkit-scrollbar-thumb { background: var(--border-primary); border-radius: 2px; }
 
 /* ── Generic tree row ── */
 .tree-row {
@@ -352,45 +352,45 @@ watch(() => props.connection?.id, () => {
   transition: background 0.1s;
   user-select: none;
 }
-.tree-row:hover { background: rgba(255,255,255,0.04); }
+.tree-row:hover { background: var(--bg-row-hover); }
 
 /* Database row */
 .db-row { padding-left: 6px; }
-.db-row.open { background: rgba(255,255,255,0.03); }
+.db-row.open { background: var(--bg-row-hover); }
 
 /* Section (Tables / Views) row */
 .sec-row { padding-left: 16px; }
 
 /* Item (table / view) row */
 .item-row { padding-left: 28px; }
-.item-row.active { background: rgba(77,184,255,0.15); }
+.item-row.active { background: var(--type-string-bg); }
 
 /* ── Arrow ── */
-.row-arrow { font-size: 10px; color: rgba(255,255,255,0.25); transition: transform 0.18s; flex-shrink: 0; width: 12px; }
+.row-arrow { font-size: 10px; color: var(--text-hint); transition: transform 0.18s; flex-shrink: 0; width: 12px; }
 .row-arrow.open { transform: rotate(90deg); }
 .row-arrow:empty { width: 12px; }
 
 /* ── Icons ── */
 .row-icon { font-size: 12px; flex-shrink: 0; }
-.db-icon { color: #f0a020; }
-.tbl-icon { color: #4db8ff; }
-.view-icon { color: #a78bfa; }
-.query-icon { color: #FF6B00; }
+.db-icon { color: var(--status-warning); }
+.tbl-icon { color: var(--type-string); }
+.view-icon { color: var(--type-date); }
+.query-icon { color: var(--accent-primary); }
 
 /* ── Text ── */
-.row-name { flex: 1; color: rgba(255,255,255,0.82); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; }
-.sec-label { font-weight: 500; color: rgba(255,255,255,0.6); font-size: 11.5px; }
-.item-meta { font-size: 10px; color: rgba(255,255,255,0.28); font-family: monospace; flex-shrink: 0; }
+.row-name { flex: 1; color: var(--text-secondary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; }
+.sec-label { font-weight: 500; color: var(--text-tertiary); font-size: 11.5px; }
+.item-meta { font-size: 10px; color: var(--text-disabled); font-family: monospace; flex-shrink: 0; }
 
 /* ── Badge ── */
-.badge { font-size: 10px; color: rgba(255,255,255,0.3); background: rgba(255,255,255,0.07); padding: 0 5px; border-radius: 7px; flex-shrink: 0; }
+.badge { font-size: 10px; color: var(--text-disabled); background: var(--bg-active); padding: 0 5px; border-radius: 7px; flex-shrink: 0; }
 
 /* ── Section expand ── */
 .db-children { margin-bottom: 4px; }
 .sec-children { margin-bottom: 2px; }
 
-.empty-row { padding: 4px 12px 4px 44px; color: rgba(255,255,255,0.22); font-size: 11px; font-style: italic; }
-.empty { padding: 8px 12px; color: rgba(255,255,255,0.25); font-size: 11px; font-style: italic; }
+.empty-row { padding: 4px 12px 4px 44px; color: var(--type-null); font-size: 11px; font-style: italic; }
+.empty { padding: 8px 12px; color: var(--type-null); font-size: 11px; font-style: italic; }
 
 /* ── Row action (add button) ── */
 .row-action { opacity: 0; transition: opacity 0.1s; }

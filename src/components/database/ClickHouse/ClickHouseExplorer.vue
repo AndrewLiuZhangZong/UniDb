@@ -25,42 +25,42 @@
       </div>
 
       <!-- Databases -->
-      <div v-for="db in databases" :key="db.name" class="db-node">
+      <div v-for="db in databases" :key="db" class="db-node">
 
         <!-- Database row -->
-        <div class="tree-row db-row" :class="{ open: exp[db.name] }" @click="toggleDb(db.name)">
-          <n-icon class="row-arrow" :class="{ open: exp[db.name] }">
+        <div class="tree-row db-row" :class="{ open: exp[db] }" @click="toggleDb(db)">
+          <n-icon class="row-arrow" :class="{ open: exp[db] }">
             <ChevronForwardOutline />
           </n-icon>
           <n-icon class="row-icon db-icon"><ServerOutline /></n-icon>
-          <span class="row-name" :title="db.name">{{ db.name }}</span>
+          <span class="row-name" :title="db">{{ db }}</span>
         </div>
 
         <!-- Expanded children -->
-        <div v-if="exp[db.name]" class="db-children">
+        <div v-if="exp[db]" class="db-children">
 
           <!-- Tables section -->
           <div class="section-node">
-            <div class="tree-row sec-row" @click="toggleSec(db.name, 'tables')">
-              <n-icon class="row-arrow" :class="{ open: secExp[db.name]?.tables }">
+            <div class="tree-row sec-row" @click="toggleSec(db, 'tables')">
+              <n-icon class="row-arrow" :class="{ open: secExp[db]?.tables }">
                 <ChevronForwardOutline />
               </n-icon>
               <n-icon class="row-icon tbl-icon"><GridOutline /></n-icon>
               <span class="row-name sec-label">Tables</span>
-              <span class="badge">{{ filteredTables(db.name).length }}</span>
+              <span class="badge">{{ filteredTables(db).length }}</span>
             </div>
-            <div v-if="secExp[db.name]?.tables" class="sec-children">
+            <div v-if="secExp[db]?.tables" class="sec-children">
               <div
-                v-for="tbl in filteredTables(db.name)" :key="tbl.name"
+                v-for="tbl in filteredTables(db)" :key="tbl.name"
                 class="tree-row item-row"
-                :class="{ active: sel?._db === db.name && sel?.name === tbl.name }"
-                @click="selectItem(db.name, tbl, 'table')"
-                @contextmenu.prevent="openCtx($event, db.name, tbl)"
+                :class="{ active: sel?._db === db && sel?.name === tbl.name }"
+                @click="selectItem(db, tbl, 'table')"
+                @contextmenu.prevent="openCtx($event, db, tbl)"
               >
                 <n-icon class="row-icon item-icon tbl-icon"><GridOutline /></n-icon>
                 <span class="row-name" :title="tbl.name">{{ tbl.name }}</span>
               </div>
-              <div v-if="!filteredTables(db.name).length" class="empty-row">无表</div>
+              <div v-if="!filteredTables(db).length" class="empty-row">无表</div>
             </div>
           </div>
 
@@ -106,7 +106,7 @@ const emit = defineEmits<{
 const loading = ref(false)
 const searchText = ref('')
 const sel = ref<any>(null)
-const databases = ref<{ name: string }[]>([])
+const databases = ref<string[]>([])
 const tables = ref<Record<string, any[]>>({})
 const error = ref('')
 
@@ -198,7 +198,7 @@ const loadAll = async () => {
     const res = await clickhouseMeta.databases(props.connection.id)
     databases.value = res.databases || []
     if (databases.value.length) {
-      const first = databases.value[0].name
+      const first = databases.value[0]
       exp[first] = true
       secExp[first] = { tables: true }
       loadTables(first)

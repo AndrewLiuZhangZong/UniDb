@@ -13,8 +13,9 @@ body.light-theme .database-router .unsupported {
 }
 
 /* ── Home.vue ── */
-body.light-theme .conn-sidebar {
-  background: rgba(255, 255, 255, 0.99) !important;
+body.light-theme .conn-sidebar,
+body.light-theme .navigator-sider {
+  background: rgba(246, 246, 250, 0.99) !important;
   border: none !important;
 }
 body.light-theme .content-layout {

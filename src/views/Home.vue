@@ -271,7 +271,14 @@ onUnmounted(() => {
 
 .main-layout { flex: 1; overflow: hidden; }
 
-.navigator-sider { background: rgba(28, 28, 32, 0.98) !important; }
+.navigator-sider {
+  background: rgba(28, 28, 32, 0.98) !important;
+  height: 100%;
+  position: relative !important;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
 
 /* ── Content layout ── */
 .content-layout {

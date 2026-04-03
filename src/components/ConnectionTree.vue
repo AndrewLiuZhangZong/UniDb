@@ -372,6 +372,9 @@ onMounted(() => {
   background: rgba(246, 246, 250, 0.98);
   border-bottom-color: rgba(0,0,0,0.08);
 }
+.light-mode .navigator {
+  background: rgba(246, 246, 250, 0.98);
+}
 .light-mode .nav-title { color: rgba(0,0,0,0.4); }
 .light-mode .nav-icon { color: #FF6B00; }
 .light-mode .nav-tree { background: rgba(246, 246, 250, 0.98); }

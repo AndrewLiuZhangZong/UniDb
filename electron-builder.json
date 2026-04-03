@@ -1,0 +1,32 @@
+{
+  "$schema": "https://raw.githubusercontent.com/electron-userland/electron-builder/master/packages/app-builder-lib/scheme.json",
+  "appId": "com.unidb.app",
+  "productName": "UniDb",
+  "directories": {
+    "output": "dist"
+  },
+  "files": [
+    "dist/**/*",
+    "dist-electron/**/*",
+    "resources/**/*"
+  ],
+  "mac": {
+    "category": "public.app-category.developer-tools",
+    "target": ["zip", "dmg"],
+    "icon": "resources/icon.icns",
+    "artifactName": "${productName}-${version}-${arch}-mac.${ext}"
+  },
+  "dmg": {
+    "artifactName": "${productName}-${version}.${ext}"
+  },
+  "win": {
+    "target": ["nsis"],
+    "icon": "resources/icon.png",
+    "artifactName": "${productName}-${version}-${arch}.${ext}"
+  },
+  "linux": {
+    "target": ["AppImage"],
+    "icon": "resources/icon.png",
+    "artifactName": "${productName}-${version}-${arch}.${ext}"
+  }
+}

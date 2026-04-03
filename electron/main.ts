@@ -9,12 +9,18 @@ let serverPort: number = 3000
 const VITE_DEV_SERVER_URL = process.env.VITE_DEV_SERVER_URL || 'http://localhost:5173'
 
 const createWindow = () => {
+  // macOS 应用图标
+  const iconPath = process.platform === 'darwin'
+    ? join(__dirname, '../resources/icon.icns')
+    : join(__dirname, '../resources/icon.png')
+
   mainWindow = new BrowserWindow({
     width: 1400,
     height: 900,
     minWidth: 1200,
     minHeight: 700,
     frame: false, // 完全自定义标题栏
+    icon: iconPath,
     webPreferences: {
       preload: join(__dirname, 'preload.js'),
       nodeIntegration: false,

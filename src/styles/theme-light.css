@@ -14,8 +14,15 @@ body.light-theme {
   --bg-tabbar: rgba(0, 0, 0, 0.03);
   --bg-hover: rgba(0, 0, 0, 0.04);
   --bg-active: rgba(0, 0, 0, 0.06);
-  --bg-selected: rgba(255, 107, 0, 0.1);
+  --bg-selected: rgba(0, 0, 0, 0.06);
   --bg-row-hover: rgba(0, 0, 0, 0.02);
+
+  --accent-primary: #FF6B00;
+  --accent-primary-hover: #FF8C42;
+  --accent-primary-pressed: #CC5500;
+  --shadow-soft-sm: 0 4px 20px rgba(15, 23, 42, 0.06);
+  --shadow-soft: 0 10px 40px rgba(15, 23, 42, 0.08);
+  --shadow-rail: 4px 0 28px rgba(15, 23, 42, 0.04);
 
   /* Text colors */
   --text-primary: rgba(0, 0, 0, 0.90);
@@ -32,7 +39,7 @@ body.light-theme {
   --border-hover: rgba(0, 0, 0, 0.12);
   --border-strong: rgba(0, 0, 0, 0.15);
 
-  /* Accent subtle backgrounds */
+  /* Accent subtle backgrounds (default orange; overridden by app-accent-styles) */
   --accent-primary-subtle: rgba(255, 107, 0, 0.10);
   --accent-primary-subtle-hover: rgba(255, 107, 0, 0.18);
 
@@ -68,7 +75,7 @@ body.light-theme .navigator-sider {
   border: none !important;
 }
 body.light-theme .content-layout {
-  background: #f0f1f5;
+  background: #eef0f6;
 }
 body.light-theme .welcome-title {
   color: rgba(0, 0, 0, 0.9);
@@ -106,10 +113,10 @@ body.light-theme .panel-conn-host {
 
 /* ── Workspace shell ── */
 body.light-theme .workspace-shell {
-  background: #f0f0f5;
+  background: #eef0f6;
 }
 body.light-theme .workspace-main {
-  background: #f5f5f8;
+  background: #f2f4f9;
 }
 
 /* ── Tab bar (shared across all DB workspaces) ── */
@@ -740,7 +747,7 @@ body.light-theme .connection-tree .empty-icon { color: rgba(0, 0, 0, 0.15); }
 body.light-theme .connection-tree .empty-text { color: rgba(0, 0, 0, 0.45); }
 body.light-theme .connection-tree .empty-hint { color: rgba(0, 0, 0, 0.35); }
 body.light-theme .connection-tree .connection-item:hover { background: rgba(0, 0, 0, 0.03); border-color: rgba(0, 0, 0, 0.06); }
-body.light-theme .connection-tree .connection-item.is-selected { background: linear-gradient(135deg, rgba(255, 107, 0, 0.12) 0%, rgba(255, 107, 0, 0.05) 100%); border-color: rgba(255, 107, 0, 0.25); }
+body.light-theme .connection-tree .connection-item.is-selected { background: linear-gradient(135deg, rgba(124, 58, 237, 0.12) 0%, rgba(124, 58, 237, 0.04) 100%); border-color: rgba(124, 58, 237, 0.22); }
 body.light-theme .connection-tree .connection-name { color: rgba(0, 0, 0, 0.9); }
 body.light-theme .connection-tree .connection-type { color: rgba(0, 0, 0, 0.4); }
 body.light-theme .connection-tree .action-icon { color: rgba(0, 0, 0, 0.4); }
@@ -749,22 +756,11 @@ body.light-theme .connection-tree .tree-footer { border-top-color: rgba(0, 0, 0,
 body.light-theme .connection-tree .footer-item { color: rgba(0, 0, 0, 0.5); }
 body.light-theme .connection-tree .footer-item:hover { background: rgba(0, 0, 0, 0.04); color: rgba(0, 0, 0, 0.9); }
 
-/* ── App Menu Bar ── */
-body.light-theme .app-menu-bar { background: rgba(246, 246, 250, 0.99); border-bottom: 1px solid rgba(0, 0, 0, 0.09); }
-body.light-theme .app-menu-bar .menu-label { color: rgba(0, 0, 0, 0.78); }
-body.light-theme .app-menu-bar .home-name { color: #FF6B00; }
-body.light-theme .app-menu-bar .menu-divider-v { background: rgba(0, 0, 0, 0.1); }
-body.light-theme .app-menu-bar .menu-item:hover { background: rgba(0, 0, 0, 0.05); }
-body.light-theme .app-menu-bar .menu-item.is-active { background: rgba(255, 107, 0, 0.1); }
-body.light-theme .app-menu-bar .dropdown-menu { background: #ffffff; border-color: rgba(0, 0, 0, 0.1); box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12); }
-body.light-theme .app-menu-bar .dropdown-item:hover { background: rgba(255, 107, 0, 0.1); }
-body.light-theme .app-menu-bar .dropdown-item.is-selected { background: rgba(255, 107, 0, 0.08); }
-body.light-theme .app-menu-bar .item-icon { color: rgba(0, 0, 0, 0.5); }
-body.light-theme .app-menu-bar .dropdown-item:hover .item-icon { color: rgba(0, 0, 0, 0.85); }
-body.light-theme .app-menu-bar .item-label { color: rgba(0, 0, 0, 0.82); }
-body.light-theme .app-menu-bar .dropdown-item:hover .item-label { color: rgba(0, 0, 0, 0.92); }
-body.light-theme .app-menu-bar .item-shortcut { color: rgba(0, 0, 0, 0.3); }
-body.light-theme .app-menu-bar .dropdown-divider { background: rgba(0, 0, 0, 0.08); }
+/* ── Side navigation rail ── */
+body.light-theme .app-side-nav.light-mode {
+  background: linear-gradient(180deg, #ffffff 0%, #f7f8fc 100%);
+  border-right-color: rgba(15, 23, 42, 0.06);
+}
 
 /* ── Logs Panel ── */
 body.light-theme .logs-panel .logs-toolbar { border-bottom: 1px solid rgba(0, 0, 0, 0.08); }

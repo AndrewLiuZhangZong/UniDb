@@ -4,10 +4,10 @@
     <!-- ── Main layout: Navigator + Content ── -->
     <n-layout has-sider class="main-layout">
 
-      <!-- Column 1: Database Navigator (DBeaver-style left sidebar) -->
+      <!-- Left: Database Navigator sidebar (collapsible) -->
       <n-layout-sider
         bordered
-        :width="240"
+        :width="220"
         :collapsed-width="0"
         show-trigger="bar"
         collapse-mode="width"
@@ -22,8 +22,15 @@
         />
       </n-layout-sider>
 
-      <!-- Column 2: Main workspace content -->
+      <!-- Right: Main workspace content -->
       <n-layout class="content-layout">
+
+        <!-- Top: Secondary nav bar (connection pills + explorer) -->
+        <ContentTopNav
+          @select="handleNavSelect"
+          @connection-select="handleConnSelect"
+          @db-change="handleNavDbChange"
+        />
 
         <!-- Welcome page: no connection selected -->
         <div v-if="!activeConnection" class="welcome-page">
@@ -35,7 +42,7 @@
                 <circle cx="60" cy="60" r="22" fill="url(#heroGrad)"/>
                 <defs>
                   <linearGradient id="heroGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stop-color="#FF6B00"/><stop offset="100%" stop-color="#36b374"/>
+                    <stop offset="0%" stop-color="#FF6B00"/><stop offset="100%" stop-color="#FF8C42"/>
                   </linearGradient>
                 </defs>
               </svg>
@@ -60,7 +67,7 @@
           </n-button>
         </div>
 
-        <!-- Active workspace: DB Explorer (status bar) + Main content -->
+        <!-- Active workspace -->
         <div v-else class="workspace-shell">
 
           <!-- Status bar: active connection info + db actions -->
@@ -71,7 +78,6 @@
               <span class="statusbar-host">{{ activeConnection.config?.host }}:{{ activeConnection.config?.port }}</span>
             </div>
             <div class="statusbar-right">
-              <!-- Per-type quick actions -->
               <template v-if="activeConnection.type === 'mysql' || activeConnection.type === 'clickhouse'">
                 <n-button text size="tiny" @click="handleAction('createTable')" :title="t('toolbar.createTable')">
                   <template #icon><n-icon><CreateOutline /></n-icon></template>
@@ -138,6 +144,7 @@ import {
 } from '@vicons/ionicons5'
 import ConnectionTree from '../components/ConnectionTree.vue'
 import ConnectionDialog from '../components/ConnectionDialog.vue'
+import ContentTopNav from '../components/ContentTopNav.vue'
 import DbTypeIcon from '../components/DbTypeIcon.vue'
 
 // Lazy-load DB-specific components
@@ -345,13 +352,15 @@ onUnmounted(() => {
 .db-card {
   display: flex; flex-direction: column; align-items: center; gap: 10px;
   padding: 20px 16px; background: var(--bg-row-hover);
-  border: 1px solid var(--border-secondary); border-radius: 14px;
+  border: 1px solid var(--border-secondary); border-radius: 18px;
   cursor: pointer; transition: all 0.25s ease;
+  box-shadow: var(--shadow-soft-sm, none);
 }
 
 .db-card:hover {
   background: var(--bg-hover); border-color: var(--border-hover);
   transform: translateY(-3px);
+  box-shadow: var(--shadow-soft, 0 8px 28px rgba(15, 23, 42, 0.08));
 }
 
 .db-label { font-size: 13px; font-weight: 500; color: var(--text-tertiary); }

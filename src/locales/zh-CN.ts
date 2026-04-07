@@ -58,6 +58,7 @@ export default {
     refresh: '刷新'
   },
   menu: {
+    home: '主页',
     file: '文件',
     language: '语言',
     newConnection: '新建连接',
@@ -131,6 +132,10 @@ export default {
     languageDesc: '选择界面显示语言',
     theme: '主题',
     themeDesc: '选择应用主题',
+    accentColor: '主题色',
+    accentColorDesc: '选择界面强调色',
+    accentOrange: '活力橙',
+    accentPurple: '优雅紫',
     autoUpdate: '自动更新',
     autoUpdateDesc: '有新版本时自动下载安装',
     driversDesc: '管理数据库连接驱动',
@@ -306,6 +311,7 @@ export default {
     newConnection: '新建连接',
     refresh: '刷新',
     actions: '操作',
-    noConnections: '暂无连接'
+    noConnections: '暂无连接',
+    togglePanel: '展开/收起导航面板'
   }
 }

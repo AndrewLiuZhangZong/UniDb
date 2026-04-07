@@ -52,6 +52,19 @@
                 @update:value="(val) => settingsStore.updateSetting('theme', val)"
               />
             </div>
+
+            <div class="setting-item">
+              <div class="setting-info">
+                <label class="setting-label">{{ t('settings.accentColor') }}</label>
+                <p class="setting-desc">{{ t('settings.accentColorDesc') }}</p>
+              </div>
+              <n-select
+                :value="settings.accentColor"
+                :options="accentColorOptions"
+                style="width: 200px;"
+                @update:value="(val) => settingsStore.updateSetting('accentColor', val)"
+              />
+            </div>
           </div>
         </div>
 
@@ -159,6 +172,11 @@ const themeOptions = [
   { label: 'Dark', value: 'dark' },
   { label: 'Light', value: 'light' }
 ]
+
+const accentColorOptions = computed(() => [
+  { label: t('settings.accentOrange'), value: 'orange' },
+  { label: t('settings.accentPurple'), value: 'purple' }
+])
 
 const drivers = ref([
   { id: 'mysql', name: 'MySQL', version: '8.0', installed: true, outdated: false, icon: ServerOutline },

@@ -1,12 +1,25 @@
 import type { GlobalThemeOverrides } from 'naive-ui'
 
-// ── Brand / Accent ──────────────────────────────────────────
-export const THEME_COLORS = {
+// ── Accent Color Palettes ────────────────────────────────
+const ORANGE = {
   primary: '#FF6B00',
   primaryHover: '#FF8C42',
   primaryPressed: '#CC5500',
   primarySuppl: '#FF8C42',
 } as const
+
+const PURPLE = {
+  primary: '#7c3aed',
+  primaryHover: '#8b5cf6',
+  primaryPressed: '#6d28d9',
+  primarySuppl: '#a78bfa',
+} as const
+
+export type AccentColor = 'orange' | 'purple'
+
+export function getAccentColors(accent: AccentColor) {
+  return accent === 'purple' ? PURPLE : ORANGE
+}
 
 // ── Status ──────────────────────────────────────────────────
 const STATUS = {
@@ -38,10 +51,11 @@ const DARK = {
   textSecondary: 'rgba(255,255,255,0.85)',
   textTertiary: 'rgba(255,255,255,0.7)',
   textDisabled: 'rgba(255,255,255,0.38)',
-  accentSubtle: 'rgba(255,107,0,0.15)',
+  accentSubtleOrange: 'rgba(255,107,0,0.15)',
+  accentSubtlePurple: 'rgba(124,58,237,0.22)',
 } as const
 
-// ── Light theme raw values (mirrors body.light-theme in theme-light.css) ─
+// ── Light theme raw values ──────────────────────────────────
 const LIGHT = {
   bgPrimary: '#ffffff',
   bgSecondary: '#ffffff',
@@ -55,19 +69,25 @@ const LIGHT = {
   textSecondary: 'rgba(0,0,0,0.82)',
   textTertiary: 'rgba(0,0,0,0.65)',
   textDisabled: 'rgba(0,0,0,0.35)',
-  accentSubtle: 'rgba(255,107,0,0.10)',
+  accentSubtleOrange: 'rgba(255,107,0,0.10)',
+  accentSubtlePurple: 'rgba(124,58,237,0.12)',
 } as const
 
-// ── Naive UI theme overrides ─────────────────────────────────
-export function createThemeOverrides(isDark: boolean): GlobalThemeOverrides {
+// ── Naive UI theme overrides ──────────────────────��──────────
+export function createThemeOverrides(
+  isDark: boolean,
+  accent: AccentColor = 'orange'
+): GlobalThemeOverrides {
   const bg = isDark ? DARK : LIGHT
+  const ac = getAccentColors(accent)
+  const accentSubtle = accent === 'purple' ? bg.accentSubtlePurple : bg.accentSubtleOrange
 
   return {
     common: {
-      primaryColor: THEME_COLORS.primary,
-      primaryColorHover: THEME_COLORS.primaryHover,
-      primaryColorPressed: THEME_COLORS.primaryPressed,
-      primaryColorSuppl: THEME_COLORS.primarySuppl,
+      primaryColor: ac.primary,
+      primaryColorHover: ac.primaryHover,
+      primaryColorPressed: ac.primaryPressed,
+      primaryColorSuppl: ac.primarySuppl,
       bodyColor: bg.bgPrimary,
       successColor: STATUS.success,
       successColorHover: STATUS.successHover,
@@ -81,8 +101,8 @@ export function createThemeOverrides(isDark: boolean): GlobalThemeOverrides {
       infoColor: STATUS.info,
       infoColorHover: STATUS.infoHover,
       infoColorPressed: STATUS.infoPressed,
-      borderRadius: '8px',
-      borderRadiusSmall: '6px',
+      borderRadius: '12px',
+      borderRadiusSmall: '8px',
       fontSize: '14px',
       fontSizeMini: '12px',
       fontSizeSmall: '13px',
@@ -96,14 +116,14 @@ export function createThemeOverrides(isDark: boolean): GlobalThemeOverrides {
       heightHuge: '46px'
     },
     Button: {
-      colorPrimary: THEME_COLORS.primary,
-      colorHoverPrimary: THEME_COLORS.primaryHover,
-      colorPressedPrimary: THEME_COLORS.primaryPressed,
-      colorFocusPrimary: THEME_COLORS.primary,
-      borderPrimary: `1px solid ${THEME_COLORS.primary}`,
-      borderHoverPrimary: `1px solid ${THEME_COLORS.primaryHover}`,
-      borderPressedPrimary: `1px solid ${THEME_COLORS.primaryPressed}`,
-      borderFocusPrimary: `1px solid ${THEME_COLORS.primary}`,
+      colorPrimary: ac.primary,
+      colorHoverPrimary: ac.primaryHover,
+      colorPressedPrimary: ac.primaryPressed,
+      colorFocusPrimary: ac.primary,
+      borderPrimary: `1px solid ${ac.primary}`,
+      borderHoverPrimary: `1px solid ${ac.primaryHover}`,
+      borderPressedPrimary: `1px solid ${ac.primaryPressed}`,
+      borderFocusPrimary: `1px solid ${ac.primary}`,
       textColorPrimary: '#ffffff',
       textColorHoverPrimary: '#ffffff',
       textColorPressedPrimary: '#ffffff',
@@ -117,7 +137,7 @@ export function createThemeOverrides(isDark: boolean): GlobalThemeOverrides {
       border: isDark ? '1px solid rgba(255,255,255,0.12)' : '1px solid #d9d9d9',
       borderHover: isDark ? '1px solid rgba(255,255,255,0.2)' : '1px solid #bfbfbf',
       borderPressed: isDark ? '1px solid rgba(255,255,255,0.24)' : '1px solid #a8a8a8',
-      borderFocus: isDark ? '1px solid rgba(255,255,255,0.24)' : `1px solid ${THEME_COLORS.primary}`,
+      borderFocus: isDark ? '1px solid rgba(255,255,255,0.24)' : `1px solid ${ac.primary}`,
       borderRadiusMedium: '8px',
       borderRadiusSmall: '6px',
       borderRadiusLarge: '10px',
@@ -131,7 +151,7 @@ export function createThemeOverrides(isDark: boolean): GlobalThemeOverrides {
     Card: {
       color: bg.bgCard,
       colorModal: bg.bgModal,
-      borderRadius: '12px',
+      borderRadius: '18px',
       borderColor: bg.borderSecondary,
       borderColorModal: bg.borderPrimary
     },
@@ -139,18 +159,18 @@ export function createThemeOverrides(isDark: boolean): GlobalThemeOverrides {
       color: isDark ? 'rgba(255,255,255,0.03)' : '#ffffff',
       colorFocus: isDark ? 'rgba(255,255,255,0.05)' : '#ffffff',
       borderColor: isDark ? 'rgba(255,255,255,0.1)' : '#d9d9d9',
-      borderColorFocus: THEME_COLORS.primary,
+      borderColorFocus: ac.primary,
       borderRadius: '8px',
       heightMedium: '34px',
       colorDisabled: isDark ? 'rgba(255,255,255,0.02)' : '#f5f5f5',
       textColor: bg.textPrimary,
-      caretColor: THEME_COLORS.primary
+      caretColor: ac.primary
     },
     Select: {
       peers: {
         InternalSelection: {
           color: isDark ? 'rgba(255,255,255,0.03)' : '#ffffff',
-          borderFocus: `1px solid ${THEME_COLORS.primary}`,
+          borderFocus: `1px solid ${ac.primary}`,
           borderRadius: '8px',
           heightMedium: '34px',
           textColor: bg.textPrimary
@@ -167,19 +187,19 @@ export function createThemeOverrides(isDark: boolean): GlobalThemeOverrides {
     Menu: {
       itemTextColor: bg.textTertiary,
       itemTextColorHover: bg.textPrimary,
-      itemTextColorActive: THEME_COLORS.primary,
+      itemTextColorActive: ac.primary,
       itemColorHover: bg.bgHover,
-      itemColorActive: bg.accentSubtle,
+      itemColorActive: accentSubtle,
       borderColor: bg.borderSecondary
     },
     Tabs: {
       tabTextColorLine: bg.textTertiary,
-      tabTextColorActiveLine: THEME_COLORS.primary,
+      tabTextColorActiveLine: ac.primary,
       tabTextColorHoverLine: bg.textPrimary,
       tabColorSegment: bg.bgRowHover,
       tabBorderColor: bg.borderPrimary,
-      colorActive: THEME_COLORS.primary,
-      barColor: THEME_COLORS.primary
+      colorActive: ac.primary,
+      barColor: ac.primary
     },
     Tag: {
       borderRadius: '6px',
@@ -188,7 +208,7 @@ export function createThemeOverrides(isDark: boolean): GlobalThemeOverrides {
     },
     Dialog: {
       color: bg.bgModal,
-      borderRadius: '12px',
+      borderRadius: '18px',
       titleTextColor: bg.textPrimary
     },
     Message: {
@@ -196,8 +216,8 @@ export function createThemeOverrides(isDark: boolean): GlobalThemeOverrides {
       textColorSuccess: isDark ? STATUS.successHover : STATUS.success,
       colorError: isDark ? `rgba(208,48,80,0.2)` : `rgba(208,48,80,0.1)`,
       textColorError: isDark ? STATUS.errorHover : STATUS.error,
-      colorWarning: isDark ? `rgba(255,107,0,0.2)` : `rgba(255,107,0,0.1)`,
-      textColorWarning: isDark ? THEME_COLORS.primaryHover : THEME_COLORS.primary,
+      colorWarning: isDark ? `rgba(240,160,32,0.22)` : `rgba(240,160,32,0.12)`,
+      textColorWarning: isDark ? STATUS.warningHover : STATUS.warning,
       colorInfo: isDark ? `rgba(32,128,240,0.2)` : `rgba(32,128,240,0.1)`,
       textColorInfo: isDark ? STATUS.infoHover : STATUS.info
     },
@@ -224,7 +244,7 @@ export function createThemeOverrides(isDark: boolean): GlobalThemeOverrides {
     },
     Layout: {
       color: bg.bgPrimary,
-      siderColor: isDark ? DARK.bgSecondary : '#f0f1f5',
+      siderColor: isDark ? DARK.bgSecondary : '#f4f5f9',
       headerColor: bg.bgPrimary,
       footerColor: bg.bgPrimary
     },

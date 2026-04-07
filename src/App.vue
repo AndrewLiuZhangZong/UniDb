@@ -55,8 +55,46 @@ const currentDateLocale = computed(() => {
 
 const themeOverrides = computed(() => {
   const isDark = settingsStore.settings.theme === 'dark'
-  return createThemeOverrides(isDark)
+  const accent = settingsStore.settings.accentColor
+  return createThemeOverrides(isDark, accent)
 })
+
+// Accent color CSS variable sets
+const ORANGE_ACCENT_CSS = `
+  :root {
+    --accent-primary: #FF6B00;
+    --accent-primary-hover: #FF8C42;
+    --accent-primary-pressed: #CC5500;
+    --accent-primary-subtle: rgba(255, 107, 0, 0.15);
+    --accent-primary-subtle-hover: rgba(255, 107, 0, 0.25);
+    --type-number: #FF6B00;
+    --type-number-bg: rgba(255, 107, 0, 0.12);
+  }
+  body.light-theme {
+    --accent-primary-subtle: rgba(255, 107, 0, 0.10);
+    --accent-primary-subtle-hover: rgba(255, 107, 0, 0.18);
+    --type-number-bg: rgba(255, 107, 0, 0.10);
+  }
+`
+
+const PURPLE_ACCENT_CSS = `
+  :root {
+    --accent-primary: #7c3aed;
+    --accent-primary-hover: #8b5cf6;
+    --accent-primary-pressed: #6d28d9;
+    --accent-primary-subtle: rgba(124, 58, 237, 0.22);
+    --accent-primary-subtle-hover: rgba(124, 58, 237, 0.32);
+    --type-number: #7c3aed;
+    --type-number-bg: rgba(124, 58, 237, 0.12);
+  }
+  body.light-theme {
+    --accent-primary-subtle: rgba(124, 58, 237, 0.10);
+    --accent-primary-subtle-hover: rgba(124, 58, 237, 0.16);
+    --type-number-bg: rgba(124, 58, 237, 0.10);
+  }
+`
+
+const accentStyleId = 'app-accent-styles'
 
 // Apply theme CSS to document
 const applyThemeCSS = (isDark: boolean) => {
@@ -68,7 +106,6 @@ const applyThemeCSS = (isDark: boolean) => {
     document.head.appendChild(styleEl)
   }
 
-  // Update body class
   if (isDark) {
     document.body.classList.remove('light-theme')
     document.body.classList.add('dark-theme')
@@ -77,8 +114,17 @@ const applyThemeCSS = (isDark: boolean) => {
     document.body.classList.add('light-theme')
   }
 
-  // Inject theme CSS
   styleEl.textContent = isDark ? darkThemeCSS : lightThemeCSS
+}
+
+const applyAccentCSS = (accent: string) => {
+  let styleEl = document.getElementById(accentStyleId) as HTMLStyleElement
+  if (!styleEl) {
+    styleEl = document.createElement('style')
+    styleEl.id = accentStyleId
+    document.head.appendChild(styleEl)
+  }
+  styleEl.textContent = accent === 'purple' ? PURPLE_ACCENT_CSS : ORANGE_ACCENT_CSS
 }
 
 // Watch for theme changes
@@ -87,6 +133,14 @@ watch(
   (newTheme) => {
     const isDark = newTheme === 'dark'
     applyThemeCSS(isDark)
+  },
+  { immediate: true }
+)
+
+watch(
+  () => settingsStore.settings.accentColor,
+  (accent) => {
+    applyAccentCSS(accent)
   },
   { immediate: true }
 )
@@ -103,8 +157,8 @@ onMounted(() => {
   if (settingsStore.settings.language) {
     locale.value = settingsStore.settings.language
   }
-  // Apply initial theme
   const isDark = settingsStore.settings.theme === 'dark'
   applyThemeCSS(isDark)
+  applyAccentCSS(settingsStore.settings.accentColor)
 })
 </script>

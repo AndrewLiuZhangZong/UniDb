@@ -83,16 +83,16 @@ const handleMaximizeChange = () => {
   display: flex;
   align-items: center;
   height: 36px;
-  background: linear-gradient(180deg, rgba(40, 40, 45, 0.98) 0%, rgba(30, 30, 35, 0.98) 100%);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background: linear-gradient(180deg, rgba(32, 30, 42, 0.98) 0%, rgba(22, 20, 32, 0.99) 100%);
+  border-bottom: 1px solid rgba(167, 139, 250, 0.12);
   user-select: none;
   -webkit-app-region: drag;
 }
 
 /* Light mode */
 .title-bar.light-mode {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(248, 248, 248, 0.98) 100%);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  background: linear-gradient(180deg, #ffffff 0%, #f4f5fb 100%);
+  border-bottom: 1px solid rgba(15, 23, 42, 0.06);
 }
 
 /* Traffic Lights */

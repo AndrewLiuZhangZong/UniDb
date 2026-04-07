@@ -8,6 +8,7 @@ const THEME_KEY = 'unidb-theme'
 export interface AppSettings {
   language: string
   theme: string
+  accentColor: 'orange' | 'purple'
   autoUpdate: boolean
   logRetentionDays: number
   logLevel: string
@@ -20,7 +21,8 @@ export interface AppSettings {
 
 const defaultSettings: AppSettings = {
   language: 'zh-CN',
-  theme: 'light',
+  theme: 'dark',
+  accentColor: 'orange',
   autoUpdate: true,
   logRetentionDays: 30,
   logLevel: 'info',
@@ -42,8 +44,8 @@ export const useSettingsStore = defineStore('settings', () => {
         return {
           ...defaultSettings,
           ...parsed,
-          // theme 始终以 stored 为准，若无则以 default 为准（light）
-          theme: parsed.theme ?? defaultSettings.theme
+          theme: parsed.theme ?? defaultSettings.theme,
+          accentColor: parsed.accentColor ?? defaultSettings.accentColor
         }
       }
     } catch (e) {

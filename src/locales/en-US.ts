@@ -58,6 +58,7 @@ export default {
     refresh: 'Refresh'
   },
   menu: {
+    home: 'Home',
     file: 'File',
     language: 'Language',
     newConnection: 'New Connection',
@@ -131,6 +132,10 @@ export default {
     languageDesc: 'Select interface display language',
     theme: 'Theme',
     themeDesc: 'Select application theme',
+    accentColor: 'Accent Color',
+    accentColorDesc: 'Choose the accent color for the interface',
+    accentOrange: 'Vibrant Orange',
+    accentPurple: 'Elegant Purple',
     autoUpdate: 'Auto Update',
     autoUpdateDesc: 'Automatically download and install new versions',
     driversDesc: 'Manage database connection drivers',
@@ -306,6 +311,7 @@ export default {
     newConnection: 'New Connection',
     refresh: 'Refresh',
     actions: 'Actions',
-    noConnections: 'No connections'
+    noConnections: 'No connections',
+    togglePanel: 'Toggle Navigator Panel'
   }
 }

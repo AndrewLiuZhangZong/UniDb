@@ -3,12 +3,11 @@
     <!-- Title Bar (with Traffic Lights on macOS) -->
     <TitleBar />
 
-    <!-- Menu Bar -->
-    <AppMenuBar @menu-action="handleMenuAction" />
-
-    <!-- Page Content -->
-    <div class="page-content">
-      <router-view />
+    <div class="app-body">
+      <AppSideNav @menu-action="handleMenuAction" />
+      <div class="page-content">
+        <router-view />
+      </div>
     </div>
 
     <!-- Help Dialogs -->
@@ -21,7 +20,7 @@ import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useMessage } from 'naive-ui'
 import TitleBar from './TitleBar.vue'
-import AppMenuBar from './AppMenuBar.vue'
+import AppSideNav from './AppSideNav.vue'
 import HelpDialogs from './HelpDialogs.vue'
 import { useConnectionStore } from '../stores/connection'
 
@@ -164,8 +163,16 @@ const handleMenuAction = (action: string) => {
   overflow: hidden;
 }
 
+.app-body {
+  flex: 1;
+  display: flex;
+  min-height: 0;
+  overflow: hidden;
+}
+
 .page-content {
   flex: 1;
+  min-width: 0;
   overflow: hidden;
 }
 </style>

@@ -13,7 +13,7 @@
   --bg-tabbar: rgba(0, 0, 0, 0.25);       /* workspace tab bar */
   --bg-hover: rgba(255, 255, 255, 0.06);
   --bg-active: rgba(255, 255, 255, 0.08);
-  --bg-selected: rgba(255, 107, 0, 0.15); /* selected tree node */
+  --bg-selected: rgba(255, 255, 255, 0.08); /* selected tree node */
   --bg-row-hover: rgba(255, 255, 255, 0.03); /* data table row hover */
 
   /* ── Text colors ── */
@@ -31,12 +31,17 @@
   --border-hover: rgba(255, 255, 255, 0.1);
   --border-strong: rgba(255, 255, 255, 0.12);
 
-  /* ── Accent / Brand colors ── */
+  /* ── Accent / Brand colors (default orange; overridden by app-accent-styles) ── */
   --accent-primary: #FF6B00;
   --accent-primary-hover: #FF8C42;
   --accent-primary-pressed: #CC5500;
   --accent-primary-subtle: rgba(255, 107, 0, 0.15);
   --accent-primary-subtle-hover: rgba(255, 107, 0, 0.25);
+
+  /* Soft elevation (reference: gentle neumorphic depth) */
+  --shadow-soft-sm: 0 4px 20px rgba(0, 0, 0, 0.28);
+  --shadow-soft: 0 8px 32px rgba(0, 0, 0, 0.35);
+  --shadow-rail: 4px 0 24px rgba(0, 0, 0, 0.18);
 
   /* ── Status colors ── */
   --status-error: #d03050;
@@ -107,16 +112,11 @@ body.dark-theme .n-data-table-th {
   background-color: rgba(255, 255, 255, 0.03) !important;
 }
 
-/* ── Menu Bar ── */
-.app-menu-bar {
-  background: linear-gradient(180deg, rgba(40, 40, 45, 0.98) 0%, rgba(30, 30, 35, 0.98) 100%);
-  border-bottom: 1px solid var(--border-primary);
+/* ── Side navigation rail ── */
+.app-side-nav {
+  background: linear-gradient(180deg, rgba(34, 32, 44, 0.98) 0%, rgba(24, 22, 32, 0.99) 100%);
+  border-right-color: rgba(167, 139, 250, 0.12);
 }
-.app-menu-bar .menu-label { color: var(--text-secondary); }
-.app-menu-bar .menu-item:hover,
-.app-menu-bar .menu-item.is-active { background: var(--bg-active); }
-.app-menu-bar .menu-icon-btn { color: var(--text-tertiary); }
-.app-menu-bar .menu-icon-btn:hover { color: var(--text-primary); background: var(--bg-hover); }
 
 /* ── Dropdown Menu ── */
 .dropdown-menu {
@@ -185,7 +185,7 @@ body.dark-theme .n-data-table-th {
 .settings-sidebar .sidebar-header { border-bottom: 1px solid var(--border-secondary); }
 .settings-nav .nav-item { color: var(--text-secondary); }
 .settings-nav .nav-item:hover { background: var(--bg-hover); }
-.settings-nav .nav-item.is-active { background: rgba(255, 107, 0, 0.15); color: var(--accent-primary); }
+.settings-nav .nav-item.is-active { background: var(--accent-primary-subtle); color: var(--accent-primary); }
 .settings-nav .nav-icon { color: var(--text-tertiary); }
 .settings-nav .nav-item.is-active .nav-icon { color: var(--accent-primary); }
 .settings-content .section-title { color: var(--text-primary); }
@@ -522,7 +522,7 @@ body.dark-theme .n-data-table-th {
 .connection-tree .empty-text { color: var(--text-hint); }
 .connection-tree .empty-hint { color: var(--type-null); }
 .connection-tree .connection-item:hover { background: var(--bg-hover); border-color: var(--border-secondary); }
-.connection-tree .connection-item.is-selected { background: var(--bg-selected); border-color: rgba(255, 107, 0, 0.3); }
+.connection-tree .connection-item.is-selected { background: var(--bg-selected); border-color: rgba(167, 139, 250, 0.35); }
 .connection-tree .connection-name { color: var(--text-primary); }
 .connection-tree .connection-type { color: var(--text-disabled); }
 .connection-tree .action-icon { color: var(--text-disabled); }
@@ -530,26 +530,6 @@ body.dark-theme .n-data-table-th {
 .connection-tree .tree-footer { border-top: 1px solid var(--border-secondary); }
 .connection-tree .footer-item { color: var(--text-quaternary); }
 .connection-tree .footer-item:hover { background: var(--bg-hover); color: var(--text-primary); }
-
-/* ── App Menu Bar ── */
-.app-menu-bar {
-  background: var(--bg-menubar);
-  border-bottom: 1px solid var(--border-secondary);
-}
-.app-menu-bar .menu-label { color: var(--text-secondary); }
-.app-menu-bar .home-name { color: var(--text-primary); }
-.app-menu-bar .menu-divider-v { background: var(--border-strong); }
-.app-menu-bar .menu-item:hover { background: var(--bg-active); }
-.app-menu-bar .menu-item.is-active { background: var(--accent-primary-subtle); }
-.app-menu-bar .dropdown-menu { background: var(--bg-secondary); border-color: var(--border-primary); box-shadow: 0 8px 28px rgba(0,0,0,0.5); }
-.app-menu-bar .dropdown-item:hover { background: var(--accent-primary-subtle-hover); }
-.app-menu-bar .dropdown-item.is-selected { background: var(--accent-primary-subtle); }
-.app-menu-bar .item-icon { color: var(--text-quaternary); }
-.app-menu-bar .dropdown-item:hover .item-icon { color: var(--text-primary); }
-.app-menu-bar .item-label { color: var(--text-secondary); }
-.app-menu-bar .dropdown-item:hover .item-label { color: var(--text-primary); }
-.app-menu-bar .item-shortcut { color: var(--text-disabled); }
-.app-menu-bar .dropdown-divider { background: var(--border-primary); }
 
 /* ── Logs Panel ── */
 .logs-panel .logs-toolbar { border-bottom: 1px solid var(--border-secondary); }

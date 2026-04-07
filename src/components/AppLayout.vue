@@ -134,19 +134,19 @@ const handleMenuAction = (action: string) => {
       window.electronAPI?.toggleFullscreen?.()
       break
     case 'documentation':
-      helpDialogsRef.value?.showDocs()
+      router.push('/docs')
       break
     case 'keyboardShortcuts':
       window.open('https://unidb.com/docs/keyboard', '_blank')
       break
     case 'reportBug':
-      helpDialogsRef.value?.showReport()
+      router.push('/report')
       break
     case 'checkUpdates':
       helpDialogsRef.value?.showCheckUpdates()
       break
     case 'about':
-      helpDialogsRef.value?.showAbout()
+      router.push('/about')
       break
     default:
       console.log('Unhandled action:', action)

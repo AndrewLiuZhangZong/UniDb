@@ -54,6 +54,7 @@ export default {
     edit: '编辑',
     save: '保存',
     close: '关闭',
+    back: '返回',
     or: '或',
     refresh: '刷新'
   },

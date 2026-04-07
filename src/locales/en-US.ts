@@ -54,6 +54,7 @@ export default {
     edit: 'Edit',
     save: 'Save',
     close: 'Close',
+    back: 'Back',
     or: 'or',
     refresh: 'Refresh'
   },

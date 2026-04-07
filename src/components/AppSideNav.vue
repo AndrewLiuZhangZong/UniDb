@@ -1,49 +1,34 @@
 <template>
   <aside class="app-side-nav" :class="{ 'light-mode': !isDarkTheme }">
     <div class="rail-top">
-      <n-tooltip placement="right" :show-arrow="false">
-        <template #trigger>
-          <button type="button" class="rail-logo" @click="goHome" :aria-label="t('menu.home')">
-            <svg width="34" height="34" viewBox="0 0 256 256" fill="none" aria-hidden="true">
-              <circle cx="128" cy="128" r="108" fill="url(#railLogoG)" />
-              <ellipse cx="128" cy="92" rx="44" ry="16" fill="rgba(255,255,255,0.32)" />
-              <ellipse cx="128" cy="128" rx="44" ry="16" fill="rgba(255,255,255,0.18)" />
-              <defs>
-                <linearGradient id="railLogoG" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stop-color="#a78bfa" />
-                  <stop offset="100%" stop-color="#7c3aed" />
-                </linearGradient>
-              </defs>
-            </svg>
-          </button>
-        </template>
-        {{ t('menu.home') }}
-      </n-tooltip>
+      <button type="button" class="rail-logo" @click="goHome" :aria-label="t('menu.home')">
+        <svg width="34" height="34" viewBox="0 0 256 256" fill="none" aria-hidden="true">
+          <circle cx="128" cy="128" r="108" fill="url(#railLogoG)" />
+          <ellipse cx="128" cy="92" rx="44" ry="16" fill="rgba(255,255,255,0.32)" />
+          <ellipse cx="128" cy="128" rx="44" ry="16" fill="rgba(255,255,255,0.18)" />
+          <defs>
+            <linearGradient id="railLogoG" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#a78bfa" />
+              <stop offset="100%" stop-color="#7c3aed" />
+            </linearGradient>
+          </defs>
+        </svg>
+      </button>
     </div>
 
     <nav class="rail-main" aria-label="Main">
-      <n-tooltip placement="right" :show-arrow="false">
-        <template #trigger>
-          <button
-            type="button"
-            class="rail-item"
-            :class="{ active: isHome }"
-            @click="goHome"
-          >
-            <n-icon :size="22"><HomeOutline /></n-icon>
-          </button>
-        </template>
-        {{ t('menu.home') }}
-      </n-tooltip>
+      <button
+        type="button"
+        class="rail-item"
+        :class="{ active: isHome }"
+        @click="goHome"
+      >
+        <n-icon :size="22"><HomeOutline /></n-icon>
+      </button>
 
-      <n-tooltip placement="right" :show-arrow="false">
-        <template #trigger>
-          <button type="button" class="rail-item" @click="emitAction('newConnection')">
-            <n-icon :size="22"><AddOutline /></n-icon>
-          </button>
-        </template>
-        {{ t('menu.newConnection') }}
-      </n-tooltip>
+      <button type="button" class="rail-item" @click="emitAction('newConnection')">
+        <n-icon :size="22"><AddOutline /></n-icon>
+      </button>
 
       <n-dropdown
         v-model:show="fileMenuOpen"
@@ -53,36 +38,26 @@
         @select="onMenuSelect"
       >
         <div class="rail-dropdown-wrap">
-          <n-tooltip placement="right" :show-arrow="false">
-            <template #trigger>
-              <button
-                type="button"
-                class="rail-item"
-                :class="{ active: fileMenuOpen }"
-              >
-                <n-icon :size="22"><FolderOpenOutline /></n-icon>
-              </button>
-            </template>
-            {{ t('menu.file') }}
-          </n-tooltip>
+          <button
+            type="button"
+            class="rail-item"
+            :class="{ active: fileMenuOpen }"
+          >
+            <n-icon :size="22"><FolderOpenOutline /></n-icon>
+          </button>
         </div>
       </n-dropdown>
     </nav>
 
     <div class="rail-bottom">
-      <n-tooltip placement="right" :show-arrow="false">
-        <template #trigger>
-          <button
-            type="button"
-            class="rail-item"
-            :class="{ active: isSettings }"
-            @click="emitAction('settings')"
-          >
-            <n-icon :size="22"><SettingsOutline /></n-icon>
-          </button>
-        </template>
-        {{ t('menu.settings') }}
-      </n-tooltip>
+      <button
+        type="button"
+        class="rail-item"
+        :class="{ active: isSettings }"
+        @click="emitAction('settings')"
+      >
+        <n-icon :size="22"><SettingsOutline /></n-icon>
+      </button>
 
       <n-dropdown
         v-model:show="helpMenuOpen"
@@ -92,18 +67,13 @@
         @select="onMenuSelect"
       >
         <div class="rail-dropdown-wrap">
-          <n-tooltip placement="right" :show-arrow="false">
-            <template #trigger>
-              <button
-                type="button"
-                class="rail-item"
-                :class="{ active: helpMenuOpen }"
-              >
-                <n-icon :size="22"><HelpCircleOutline /></n-icon>
-              </button>
-            </template>
-            {{ t('menu.help') }}
-          </n-tooltip>
+          <button
+            type="button"
+            class="rail-item"
+            :class="{ active: helpMenuOpen }"
+          >
+            <n-icon :size="22"><HelpCircleOutline /></n-icon>
+          </button>
         </div>
       </n-dropdown>
     </div>
@@ -114,7 +84,7 @@
 import { computed, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import { NDropdown, NIcon, NTooltip } from 'naive-ui'
+import { NDropdown, NIcon } from 'naive-ui'
 import type { DropdownOption } from 'naive-ui'
 import {
   HomeOutline,

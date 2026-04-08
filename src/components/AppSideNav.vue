@@ -128,10 +128,9 @@ function goHome() {
   flex-direction: column;
   align-items: stretch;
   background: var(--bg-menubar);
-  border-right: 1px solid var(--border-secondary);
+  border-right: 1px solid var(--accent-primary-subtle);
   user-select: none;
   z-index: 90;
-  box-shadow: var(--shadow-rail, none);
 }
 
 
@@ -176,7 +175,7 @@ function goHome() {
   gap: 6px;
   padding: 8px 0 14px;
   flex-shrink: 0;
-  border-top: 1px solid var(--border-secondary);
+  border-top: 1px solid var(--accent-primary-subtle);
   margin-top: auto;
 }
 

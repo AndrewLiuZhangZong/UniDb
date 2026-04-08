@@ -55,7 +55,7 @@ function createTheme(
       '--bg-tertiary': subtleSelected,
       '--bg-elevated': '#ffffff',
       '--bg-sidebar': '#fafbfc',
-      '--bg-menubar': '#f5f6fa',
+      '--bg-menubar': subtleSelected,
       '--bg-tabbar': subtleSelected,
       '--bg-hover': subtleLight,
       '--bg-active': subtleActive,

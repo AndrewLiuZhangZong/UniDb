@@ -24,11 +24,49 @@ const orangeTheme: ThemeConfig = {
   primaryColorSuppl: '#FF8C42',
 
   cssVars: {
+    // ── 主题色 ──
     '--accent-primary': '#FF6B00',
     '--accent-primary-hover': '#FF8C42',
     '--accent-primary-pressed': '#CC5500',
-    '--accent-primary-subtle': 'rgba(255, 107, 0, 0.12)',
-    '--accent-primary-subtle-hover': 'rgba(255, 107, 0, 0.20)',
+    '--accent-primary-subtle': 'rgba(255, 107, 0, 0.10)',
+    '--accent-primary-subtle-hover': 'rgba(255, 107, 0, 0.18)',
+
+    // ── 背景色 ──
+    '--bg-primary': '#ffffff',
+    '--bg-secondary': '#ffffff',
+    '--bg-tertiary': 'rgba(255, 107, 0, 0.04)',
+    '--bg-elevated': '#ffffff',
+    '--bg-sidebar': '#fafbfc',
+    '--bg-menubar': '#f5f6fa',
+    '--bg-tabbar': 'rgba(255, 107, 0, 0.04)',
+    '--bg-hover': 'rgba(255, 107, 0, 0.06)',
+    '--bg-active': 'rgba(255, 107, 0, 0.08)',
+    '--bg-selected': 'rgba(255, 107, 0, 0.10)',
+    '--bg-row-hover': 'rgba(255, 107, 0, 0.04)',
+
+    // ── 文字色 ──
+    '--text-primary': '#1a1a2e',
+    '--text-secondary': '#4a4a6a',
+    '--text-tertiary': '#7a7a9a',
+    '--text-quaternary': '#9a9ab8',
+    '--text-disabled': '#b0b0c8',
+    '--text-placeholder': '#b0b0c8',
+    '--text-hint': '#b0b0c8',
+
+    // ── 边框色 ──
+    '--border-primary': 'rgba(0, 0, 0, 0.10)',
+    '--border-secondary': 'rgba(0, 0, 0, 0.06)',
+    '--border-hover': 'rgba(0, 0, 0, 0.14)',
+    '--border-strong': 'rgba(0, 0, 0, 0.18)',
+
+    // ── 阴影 ──
+    '--shadow-soft-sm': '0 2px 8px rgba(0, 0, 0, 0.08)',
+    '--shadow-soft': '0 4px 16px rgba(0, 0, 0, 0.10)',
+    '--shadow-rail': '4px 0 16px rgba(0, 0, 0, 0.06)',
+
+    // ── 代码编辑器 ──
+    '--code-bg': '#f8f9fc',
+    '--code-comment': 'rgba(0, 0, 0, 0.35)',
   },
 
   themeOverrides: {
@@ -41,13 +79,17 @@ const orangeTheme: ThemeConfig = {
       borderRadius: '6px',
       borderRadiusSmall: '4px',
 
-      // 亮色主题背景
+      // 亮色主题背景（统一白色）
       popoverColor: '#ffffff',
       tableColor: '#ffffff',
       cardColor: '#ffffff',
       modalColor: '#ffffff',
       bodyColor: '#ffffff',
       tagColor: '#ffffff',
+      actionColor: '#ffffff',
+      tableHeaderColor: '#fafbfc',
+      hoverColor: 'rgba(255, 107, 0, 0.06)',
+      pressedColor: 'rgba(255, 107, 0, 0.10)',
 
       // 文字颜色
       textColorBase: '#1a1a2e',
@@ -187,11 +229,49 @@ const purpleTheme: ThemeConfig = {
   primaryColorSuppl: '#8b5cf6',
 
   cssVars: {
+    // ── 主题色 ──
     '--accent-primary': '#7c3aed',
     '--accent-primary-hover': '#8b5cf6',
     '--accent-primary-pressed': '#6d28d9',
     '--accent-primary-subtle': 'rgba(124, 58, 237, 0.10)',
     '--accent-primary-subtle-hover': 'rgba(124, 58, 237, 0.18)',
+
+    // ── 背景色 ──
+    '--bg-primary': '#ffffff',
+    '--bg-secondary': '#ffffff',
+    '--bg-tertiary': 'rgba(124, 58, 237, 0.04)',
+    '--bg-elevated': '#ffffff',
+    '--bg-sidebar': '#fafbfc',
+    '--bg-menubar': '#f5f6fa',
+    '--bg-tabbar': 'rgba(124, 58, 237, 0.04)',
+    '--bg-hover': 'rgba(124, 58, 237, 0.06)',
+    '--bg-active': 'rgba(124, 58, 237, 0.08)',
+    '--bg-selected': 'rgba(124, 58, 237, 0.10)',
+    '--bg-row-hover': 'rgba(124, 58, 237, 0.04)',
+
+    // ── 文字色 ──
+    '--text-primary': '#1a1a2e',
+    '--text-secondary': '#4a4a6a',
+    '--text-tertiary': '#7a7a9a',
+    '--text-quaternary': '#9a9ab8',
+    '--text-disabled': '#b0b0c8',
+    '--text-placeholder': '#b0b0c8',
+    '--text-hint': '#b0b0c8',
+
+    // ── 边框色 ──
+    '--border-primary': 'rgba(0, 0, 0, 0.10)',
+    '--border-secondary': 'rgba(0, 0, 0, 0.06)',
+    '--border-hover': 'rgba(0, 0, 0, 0.14)',
+    '--border-strong': 'rgba(0, 0, 0, 0.18)',
+
+    // ── 阴影 ──
+    '--shadow-soft-sm': '0 2px 8px rgba(0, 0, 0, 0.08)',
+    '--shadow-soft': '0 4px 16px rgba(0, 0, 0, 0.10)',
+    '--shadow-rail': '4px 0 16px rgba(0, 0, 0, 0.06)',
+
+    // ── 代码编辑器 ──
+    '--code-bg': '#f8f9fc',
+    '--code-comment': 'rgba(0, 0, 0, 0.35)',
   },
 
   themeOverrides: {
@@ -210,6 +290,10 @@ const purpleTheme: ThemeConfig = {
       modalColor: '#ffffff',
       bodyColor: '#ffffff',
       tagColor: '#ffffff',
+      actionColor: '#ffffff',
+      tableHeaderColor: '#fafbfc',
+      hoverColor: 'rgba(124, 58, 237, 0.06)',
+      pressedColor: 'rgba(124, 58, 237, 0.10)',
 
       textColorBase: '#1a1a2e',
       textColor1: '#1a1a2e',

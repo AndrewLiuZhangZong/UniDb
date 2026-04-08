@@ -12,14 +12,14 @@
   --tab-bar-height: 38px;
   --status-bar-height: 28px;
 
-  /* ── 背景色（可被主题覆盖）─ */
+  /* ── 背景色（可被主题覆盖，统一白色更协调）─ */
   --bg-primary: #ffffff;
-  --bg-secondary: #f8f9fc;
-  --bg-tertiary: #f0f2f8;
+  --bg-secondary: #ffffff;
+  --bg-tertiary: rgba(0, 0, 0, 0.02);
   --bg-elevated: #ffffff;
   --bg-sidebar: #fafbfc;
   --bg-menubar: #f5f6fa;
-  --bg-tabbar: rgba(0, 0, 0, 0.04);
+  --bg-tabbar: rgba(0, 0, 0, 0.02);
   --bg-hover: rgba(0, 0, 0, 0.04);
   --bg-active: rgba(0, 0, 0, 0.06);
   --bg-selected: rgba(0, 0, 0, 0.06);

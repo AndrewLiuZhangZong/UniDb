@@ -26,10 +26,6 @@
         <n-icon :size="22"><HomeOutline /></n-icon>
       </button>
 
-      <button type="button" class="rail-item" @click="emitAction('newConnection')">
-        <n-icon :size="22"><AddOutline /></n-icon>
-      </button>
-
       <n-dropdown
         v-model:show="fileMenuOpen"
         trigger="click"
@@ -79,7 +75,6 @@ import { NDropdown, NIcon } from 'naive-ui'
 import type { DropdownOption } from 'naive-ui'
 import {
   HomeOutline,
-  AddOutline,
   FolderOpenOutline,
   SettingsOutline,
   HelpCircleOutline

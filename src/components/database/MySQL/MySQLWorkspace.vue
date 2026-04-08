@@ -776,7 +776,7 @@ const TableIndexes = defineComponent({
 
 .result-tabs {
   display: flex; align-items: center; gap: 8px;
-  padding: 0 12px; height: 34px; background: rgba(0,0,0,0.2);
+  padding: 0 12px; height: 34px; background: var(--bg-secondary);
   border-bottom: 1px solid var(--border-secondary);
 }
 
@@ -823,7 +823,7 @@ const TableIndexes = defineComponent({
 .schema-col-header { font-size: 10px; font-weight: 700; color: var(--text-disabled); text-transform: uppercase; letter-spacing: 0.5px; }
 .schema-col-row { border-bottom: 1px solid var(--border-secondary); transition: background 0.1s; }
 .schema-col-row:hover { background: var(--bg-row-hover); }
-.schema-col-row.is-pk { background: rgba(240,160,32,0.05); }
+.schema-col-row.is-pk { background: var(--type-boolean-bg); }
 
 .col-name-val { font-weight: 500; color: var(--text-secondary); font-family: monospace; font-size: 12px; }
 .type-badge { font-size: 11px; color: var(--type-string); background: var(--type-string-bg); padding: 1px 6px; border-radius: 3px; font-family: monospace; }
@@ -850,7 +850,7 @@ const TableIndexes = defineComponent({
   box-sizing: border-box;
 }
 .inline-cell-input::placeholder { color: var(--text-disabled); }
-.inline-cell-input:focus { border-color: var(--accent-primary); box-shadow: 0 0 0 2px rgba(255,107,0,0.15); }
+.inline-cell-input:focus { border-color: var(--accent-primary); box-shadow: 0 0 0 2px var(--accent-primary-subtle); }
 
 /* ── Form modal ── */
 .form-grid { display: flex; flex-direction: column; gap: 12px; padding: 4px 0; }

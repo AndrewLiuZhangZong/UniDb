@@ -555,7 +555,7 @@ watch(() => props.connection?.id, () => {
 
 /* Set */
 .set-grid { flex: 1; overflow-y: auto; padding: 12px 14px; display: flex; flex-wrap: wrap; gap: 8px; align-content: flex-start; }
-.set-item { display: flex; align-items: center; gap: 4px; padding: 4px 8px; background: var(--type-array-bg); border: 1px solid rgba(96,165,250,0.2); border-radius: 16px; font-size: 12px; color: var(--type-array); }
+.set-item { display: flex; align-items: center; gap: 4px; padding: 4px 8px; background: var(--type-array-bg); border: 1px solid var(--border-secondary); border-radius: 16px; font-size: 12px; color: var(--type-array); }
 
 /* ZSet */
 .zset-table { flex: 1; overflow-y: auto; }

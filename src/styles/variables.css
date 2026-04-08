@@ -1,6 +1,6 @@
 /* ============================================================
    Shared CSS Variables — 所有主题共用的变量
-   具体主题色由 accent-*.css 完整覆盖
+   主题色由 theme-config.ts 统一管理
    ============================================================ */
 
 :root {
@@ -12,6 +12,39 @@
   --tab-bar-height: 38px;
   --status-bar-height: 28px;
 
+  /* ── 背景色（可被主题覆盖）─ */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8f9fc;
+  --bg-tertiary: #f0f2f8;
+  --bg-elevated: #ffffff;
+  --bg-sidebar: #fafbfc;
+  --bg-menubar: #f5f6fa;
+  --bg-tabbar: rgba(0, 0, 0, 0.04);
+  --bg-hover: rgba(0, 0, 0, 0.04);
+  --bg-active: rgba(0, 0, 0, 0.06);
+  --bg-selected: rgba(0, 0, 0, 0.06);
+  --bg-row-hover: rgba(0, 0, 0, 0.02);
+
+  /* ── 文字色（可被主题覆盖）─ */
+  --text-primary: #1a1a2e;
+  --text-secondary: #4a4a6a;
+  --text-tertiary: #7a7a9a;
+  --text-quaternary: #9a9ab8;
+  --text-disabled: #b0b0c8;
+  --text-placeholder: #b0b0c8;
+  --text-hint: #b0b0c8;
+
+  /* ── 边框色（可被主题覆盖）─ */
+  --border-primary: rgba(0, 0, 0, 0.10);
+  --border-secondary: rgba(0, 0, 0, 0.06);
+  --border-hover: rgba(0, 0, 0, 0.14);
+  --border-strong: rgba(0, 0, 0, 0.18);
+
+  /* ── 阴影（可被主题覆盖）─ */
+  --shadow-soft-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --shadow-soft: 0 4px 16px rgba(0, 0, 0, 0.10);
+  --shadow-rail: 4px 0 16px rgba(0, 0, 0, 0.06);
+
   /* ── 数据类型色（固定配色，不受主题色影响）─ */
   --type-string: #4db8ff;
   --type-boolean: #fb923c;
@@ -20,10 +53,25 @@
   --type-array: #60a5fa;
   --type-null: rgba(255, 255, 255, 0.35);
   --type-binary: #f59e0b;
+  --type-number: #4db8ff;
+
+  /* ── 数据类型背景色 ─ */
+  --type-string-bg: rgba(77, 184, 255, 0.10);
+  --type-number-bg: rgba(77, 184, 255, 0.10);
+  --type-boolean-bg: rgba(251, 146, 60, 0.10);
+  --type-date-bg: rgba(167, 139, 250, 0.10);
+  --type-object-bg: rgba(52, 211, 153, 0.10);
+  --type-array-bg: rgba(96, 165, 250, 0.10);
+  --type-null-bg: rgba(255, 255, 255, 0.05);
+  --type-binary-bg: rgba(245, 158, 11, 0.10);
 
   /* ── 状态色（固定）─ */
   --status-error: #d03050;
   --status-warning: #f0a020;
   --status-info: #2080f0;
   --status-success: #18a058;
+
+  /* ── 代码编辑器 ─ */
+  --code-bg: #f8f9fc;
+  --code-comment: rgba(0, 0, 0, 0.35);
 }

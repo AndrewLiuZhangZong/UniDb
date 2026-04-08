@@ -279,7 +279,7 @@ watch(() => props.selectedItem, () => {
 .sql-textarea { width: 100%; height: 100%; padding: 12px 14px; resize: none; outline: none; background: var(--code-bg); color: var(--text-secondary); font-family: 'SF Mono','Monaco','Consolas',monospace; font-size: 13px; line-height: 1.6; border: none; box-sizing: border-box; }
 
 .sql-results { flex-shrink: 0; border-top: 1px solid var(--border-secondary); }
-.result-bar { display: flex; align-items: center; gap: 8px; padding: 0 12px; height: 34px; background: rgba(0,0,0,0.2); border-bottom: 1px solid var(--border-secondary); }
+.result-bar { display: flex; align-items: center; gap: 8px; padding: 0 12px; height: 34px; background: var(--bg-secondary); border-bottom: 1px solid var(--border-secondary); }
 .result-label { display: flex; align-items: center; gap: 5px; font-size: 12px; color: var(--text-quaternary); }
 .result-meta { font-size: 11px; color: var(--text-disabled); }
 .result-empty { display: flex; align-items: center; justify-content: center; height: 80px; }

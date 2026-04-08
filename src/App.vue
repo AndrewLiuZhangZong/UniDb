@@ -2,6 +2,8 @@
   <n-config-provider
     :locale="currentLocale"
     :date-locale="currentDateLocale"
+    :theme="lightTheme"
+    :theme-overrides="currentThemeOverrides"
   >
     <n-message-provider>
       <n-dialog-provider>
@@ -24,9 +26,12 @@ import {
   zhCN,
   enUS,
   dateZhCN,
-  dateEnUS
+  dateEnUS,
+  lightTheme,
+  type GlobalThemeOverrides
 } from 'naive-ui'
 import { useSettingsStore } from './stores/settings'
+import { getTheme } from './styles/theme-config'
 import AppLayout from './components/AppLayout.vue'
 
 const { locale } = useI18n()
@@ -40,11 +45,27 @@ const currentDateLocale = computed(() => {
   return settingsStore.settings.language === 'zh-CN' ? dateZhCN : dateEnUS
 })
 
-// 切换主题色 class（由 accent-*.css 控制所有样式）
+// 当前主题配置
+const currentThemeConfig = computed(() => {
+  return getTheme(settingsStore.settings.accentColor)
+})
+
+// Naive UI 主题覆盖配置
+const currentThemeOverrides = computed<GlobalThemeOverrides>(() => {
+  return currentThemeConfig.value.themeOverrides as GlobalThemeOverrides
+})
+
+// 应用主题 class（仅用于 CSS 变量）
 const applyThemeClass = () => {
-  const { accentColor } = settingsStore.settings
+  const themeName = settingsStore.settings.accentColor
   document.body.classList.remove('accent-orange', 'accent-purple')
-  document.body.classList.add(`accent-${accentColor}`)
+  document.body.classList.add(`accent-${themeName}`)
+
+  // 应用 CSS 变量
+  const cssVars = currentThemeConfig.value.cssVars
+  Object.entries(cssVars).forEach(([key, value]) => {
+    document.documentElement.style.setProperty(key, value)
+  })
 }
 
 watch(

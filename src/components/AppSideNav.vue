@@ -52,24 +52,6 @@
       >
         <n-icon :size="22"><SwapHorizontalOutline /></n-icon>
       </button>
-
-      <n-dropdown
-        v-model:show="fileMenuOpen"
-        trigger="click"
-        placement="right-start"
-        :options="fileOptions"
-        @select="onMenuSelect"
-      >
-        <div class="rail-dropdown-wrap">
-          <button
-            type="button"
-            class="rail-item"
-            :class="{ active: fileMenuOpen }"
-          >
-            <n-icon :size="22"><FolderOpenOutline /></n-icon>
-          </button>
-        </div>
-      </n-dropdown>
     </nav>
 
     <div class="rail-bottom">
@@ -95,17 +77,15 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import { NDropdown, NIcon } from 'naive-ui'
-import type { DropdownOption } from 'naive-ui'
+import { NIcon } from 'naive-ui'
 import {
   HomeOutline,
   StarOutline,
   DocumentTextOutline,
   SwapHorizontalOutline,
-  FolderOpenOutline,
   SettingsOutline,
   HelpCircleOutline
 } from '@vicons/ionicons5'
@@ -131,28 +111,12 @@ const isBookmarks = computed(() => route.path.startsWith('/bookmarks'))
 const isTemplates = computed(() => route.path.startsWith('/templates'))
 const isTransfer = computed(() => route.path.startsWith('/transfer'))
 
-const fileMenuOpen = ref(false)
-
-const fileOptions = computed<DropdownOption[]>(() => [
-  { label: t('menu.newConnection'), key: 'newConnection' },
-  { type: 'divider', key: 'd1' },
-  { label: t('menu.export'), key: 'export' },
-  { label: t('menu.import'), key: 'import' },
-  { type: 'divider', key: 'd2' },
-  { label: t('menu.exit'), key: 'exit' }
-])
-
 function emitAction(action: string) {
   emit('menu-action', action)
 }
 
 function goHome() {
   router.push('/')
-}
-
-function onMenuSelect(key: string | number) {
-  emit('menu-action', String(key))
-  fileMenuOpen.value = false
 }
 </script>
 
@@ -214,12 +178,6 @@ function onMenuSelect(key: string | number) {
   flex-shrink: 0;
   border-top: 1px solid var(--border-secondary);
   margin-top: auto;
-}
-
-.rail-dropdown-wrap {
-  display: flex;
-  justify-content: center;
-  width: 100%;
 }
 
 .rail-item {

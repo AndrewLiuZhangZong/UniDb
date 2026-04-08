@@ -518,7 +518,7 @@ watch(() => activeTab.value, (tab) => {
 .schema-list { flex: 1; overflow-y: auto; padding: 4px 8px; }
 .schema-row { display: grid; grid-template-columns: 180px 200px 60px; align-items: center; gap: 4px; padding: 6px 8px; border-radius: 4px; }
 .schema-row.header { font-size: 10px; font-weight: 700; color: var(--text-disabled); text-transform: uppercase; }
-.schema-row:not(.header) { border-bottom: 1px solid rgba(255,255,255,0.04); transition: background 0.1s; }
+.schema-row:not(.header) { border-bottom: 1px solid var(--border-secondary); transition: background 0.1s; }
 .schema-row:not(.header):hover { background: var(--bg-row-hover); }
 .field-name { font-family: monospace; font-size: 12px; color: var(--text-secondary); }
 .type-badge { font-size: 11px; padding: 1px 6px; border-radius: 3px; font-family: monospace; }
@@ -537,7 +537,7 @@ watch(() => activeTab.value, (tab) => {
 .idx-list { flex: 1; overflow-y: auto; padding: 4px 8px; }
 .idx-row { display: grid; grid-template-columns: 220px 1fr 70px 40px; align-items: center; gap: 4px; padding: 7px 8px; border-radius: 4px; }
 .idx-row.header { font-size: 10px; font-weight: 700; color: var(--text-disabled); text-transform: uppercase; }
-.idx-row:not(.header) { border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 12px; }
+.idx-row:not(.header) { border-bottom: 1px solid var(--border-secondary); font-size: 12px; }
 .idx-row:not(.header):hover { background: var(--bg-row-hover); }
 .idx-row code { font-family: monospace; font-size: 11px; color: var(--text-tertiary); }
 .keys-badge { color: var(--type-array) !important; background: var(--type-array-bg); padding: 1px 6px; border-radius: 3px; }

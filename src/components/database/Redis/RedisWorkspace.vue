@@ -539,7 +539,7 @@ watch(() => props.connection?.id, () => {
 .hash-table { flex: 1; overflow-y: auto; }
 .hash-header, .hash-row { display: grid; grid-template-columns: 180px 1fr 36px; align-items: center; gap: 4px; padding: 6px 14px; }
 .hash-header { font-size: 10px; font-weight: 700; color: var(--text-disabled); text-transform: uppercase; border-bottom: 1px solid var(--border-secondary); }
-.hash-row { border-bottom: 1px solid rgba(255,255,255,0.04); cursor: pointer; font-size: 12px; }
+.hash-row { border-bottom: 1px solid var(--border-secondary); cursor: pointer; font-size: 12px; }
 .hash-row:hover { background: var(--type-binary-bg); }
 .hash-row code { font-family: monospace; font-size: 11px; color: var(--type-binary); }
 .field-val { color: var(--text-tertiary); font-family: monospace; font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block; }
@@ -548,7 +548,7 @@ watch(() => props.connection?.id, () => {
 .list-table { flex: 1; overflow-y: auto; }
 .list-header, .list-row { display: grid; grid-template-columns: 56px 1fr 36px; align-items: center; gap: 4px; padding: 6px 14px; }
 .list-header { font-size: 10px; font-weight: 700; color: var(--text-disabled); text-transform: uppercase; border-bottom: 1px solid var(--border-secondary); }
-.list-row { border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 12px; }
+.list-row { border-bottom: 1px solid var(--border-secondary); font-size: 12px; }
 .list-row:hover { background: var(--accent-primary-subtle); }
 .idx-badge { font-size: 10px; color: var(--accent-primary); background: var(--accent-primary-subtle); padding: 1px 5px; border-radius: 3px; }
 .list-val { color: var(--text-secondary); font-family: monospace; font-size: 12px; }
@@ -561,7 +561,7 @@ watch(() => props.connection?.id, () => {
 .zset-table { flex: 1; overflow-y: auto; }
 .zset-header, .zset-row { display: grid; grid-template-columns: 56px 100px 1fr 36px; align-items: center; gap: 4px; padding: 6px 14px; }
 .zset-header { font-size: 10px; font-weight: 700; color: var(--text-disabled); text-transform: uppercase; border-bottom: 1px solid var(--border-secondary); }
-.zset-row { border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 12px; }
+.zset-row { border-bottom: 1px solid var(--border-secondary); font-size: 12px; }
 .zset-row:hover { background: var(--type-date-bg); }
 .rank-badge { font-size: 10px; color: var(--text-quaternary); background: var(--bg-hover); padding: 1px 5px; border-radius: 3px; }
 .score-val { font-family: monospace; font-size: 12px; color: var(--type-date); font-weight: 600; }

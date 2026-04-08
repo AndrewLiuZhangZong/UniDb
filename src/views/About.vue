@@ -205,7 +205,7 @@ const openLink = (type: string) => {
 
 .about-link-btn:hover {
   background: var(--accent-primary-subtle);
-  border-color: var(--accent-primary-muted);
+  border-color: var(--accent-primary);
   color: var(--accent-primary);
 }
 

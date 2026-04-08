@@ -591,7 +591,7 @@ const handleSave = async () => {
 .section-label {
   font-size: 14px;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.9);
+  color: var(--text-primary);
   margin-bottom: 4px;
 }
 
@@ -609,44 +609,44 @@ const handleSave = async () => {
   align-items: center;
   gap: 8px;
   padding: 20px 12px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 2px solid rgba(255, 255, 255, 0.08);
+  background: var(--bg-row-hover);
+  border: 2px solid var(--border-secondary);
   border-radius: 12px;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .db-type-card:hover {
-  background: rgba(255, 255, 255, 0.06);
-  border-color: rgba(255, 255, 255, 0.15);
+  background: var(--bg-hover);
+  border-color: var(--border-hover);
   transform: translateY(-2px);
 }
 
 .db-type-card.is-selected {
-  background: rgba(255, 107, 0, 0.1);
-  border-color: #FF6B00;
-  box-shadow: 0 0 20px rgba(255, 107, 0, 0.2);
+  background: var(--accent-primary-subtle);
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 20px rgba(255, 107, 0, 0.15);
 }
 
 .db-type-name {
   font-size: 13px;
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.8);
+  color: var(--text-secondary);
 }
 
 .selected-indicator {
   position: absolute;
   top: 8px;
   right: 8px;
-  color: #FF6B00;
+  color: var(--accent-primary);
 }
 
 /* Config Section */
 .config-section {
-  background: rgba(255, 255, 255, 0.02);
+  background: var(--bg-secondary);
   border-radius: 12px;
   padding: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--border-secondary);
 }
 
 .config-grid {
@@ -669,7 +669,7 @@ const handleSave = async () => {
 .config-label {
   font-size: 12px;
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.6);
+  color: var(--text-secondary);
 }
 
 .config-divider {
@@ -677,7 +677,7 @@ const handleSave = async () => {
   align-items: center;
   gap: 16px;
   margin: 16px 0;
-  color: rgba(255, 255, 255, 0.4);
+  color: var(--text-tertiary);
   font-size: 12px;
 }
 
@@ -686,14 +686,14 @@ const handleSave = async () => {
   content: '';
   flex: 1;
   height: 1px;
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--border-secondary);
 }
 
 /* Advanced Section */
 .advanced-section {
   margin-top: 16px;
   padding-top: 16px;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: 1px solid var(--border-primary);
 }
 
 .advanced-toggle {
@@ -702,14 +702,14 @@ const handleSave = async () => {
   gap: 8px;
   padding: 10px 0;
   margin-top: 8px;
-  color: rgba(255, 255, 255, 0.5);
+  color: var(--text-tertiary);
   font-size: 13px;
   cursor: pointer;
   transition: color 0.2s;
 }
 
 .advanced-toggle:hover {
-  color: rgba(255, 255, 255, 0.8);
+  color: var(--text-primary);
 }
 
 /* Dialog Footer */

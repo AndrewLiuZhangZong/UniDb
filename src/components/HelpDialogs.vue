@@ -114,13 +114,13 @@ defineExpose({ showCheckUpdates })
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(255, 107, 0, 0.1);
-  color: #FF6B00;
+  background: var(--accent-primary-subtle);
+  color: var(--accent-primary);
   margin-bottom: 4px;
 }
 .update-icon-wrap.checking {
-  background: rgba(255, 107, 0, 0.08);
-  color: #FF6B00;
+  background: var(--bg-hover);
+  color: var(--accent-primary);
 }
 
 .spinning {
@@ -133,7 +133,7 @@ defineExpose({ showCheckUpdates })
 
 .update-checking .update-title {
   font-size: 16px;
-  color: rgba(255, 255, 255, 0.7);
+  color: var(--text-secondary);
   margin: 0;
 }
 
@@ -142,16 +142,16 @@ defineExpose({ showCheckUpdates })
 .update-title {
   font-size: 18px;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.9);
+  color: var(--text-primary);
   margin: 0 0 8px;
 }
 .update-title.new-version {
-  color: #FF6B00;
+  color: var(--accent-primary);
 }
 
 .update-desc {
   font-size: 13px;
-  color: rgba(255, 255, 255, 0.4);
+  color: var(--text-tertiary);
   margin: 0 0 12px;
 }
 
@@ -166,8 +166,8 @@ defineExpose({ showCheckUpdates })
   padding: 3px 10px;
   border-radius: 6px;
   font-family: 'SF Mono', 'Monaco', monospace;
-  background: rgba(255, 255, 255, 0.06);
-  color: rgba(255, 255, 255, 0.4);
+  background: var(--bg-row-hover);
+  color: var(--text-quaternary);
 }
 
 .update-actions { width: 100%; }

@@ -80,9 +80,9 @@ const handleMaximizeChange = () => {
 .title-bar {
   display: flex;
   align-items: center;
-  height: 36px;
-  background: linear-gradient(180deg, rgba(32, 30, 42, 0.98) 0%, rgba(22, 20, 32, 0.99) 100%);
-  border-bottom: 1px solid rgba(167, 139, 250, 0.12);
+  height: var(--title-bar-height);
+  background: var(--bg-menubar);
+  border-bottom: 1px solid var(--border-secondary);
   user-select: none;
   -webkit-app-region: drag;
 }
@@ -133,11 +133,7 @@ const handleMaximizeChange = () => {
 .app-title {
   font-size: 13px;
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.7);
-}
-
-.app-title {
-  color: rgba(0, 0, 0, 0.6);
+  color: var(--text-secondary);
 }
 
 /* Window Controls (Windows/Linux) */
@@ -158,30 +154,20 @@ const handleMaximizeChange = () => {
   background: transparent;
   cursor: pointer;
   transition: background-color 0.15s ease;
+  color: var(--text-secondary);
 }
 
 .control-btn:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--bg-hover);
+  color: var(--text-primary);
 }
 
 .control-btn.close:hover {
-  background: #e81123;
-}
-
-.control-btn:hover {
-  background: rgba(0, 0, 0, 0.1);
-}
-
-.control-btn.close:hover {
-  background: #e81123;
+  background: var(--status-error);
+  color: #ffffff;
 }
 
 .control-btn n-icon {
   font-size: 14px;
-  color: rgba(255, 255, 255, 0.8);
-}
-
-.control-btn n-icon {
-  color: rgba(0, 0, 0, 0.8);
 }
 </style>

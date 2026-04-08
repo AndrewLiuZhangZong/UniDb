@@ -821,7 +821,7 @@ const TableIndexes = defineComponent({
   border-radius: 4px;
 }
 .schema-col-header { font-size: 10px; font-weight: 700; color: var(--text-disabled); text-transform: uppercase; letter-spacing: 0.5px; }
-.schema-col-row { border-bottom: 1px solid rgba(255,255,255,0.04); transition: background 0.1s; }
+.schema-col-row { border-bottom: 1px solid var(--border-secondary); transition: background 0.1s; }
 .schema-col-row:hover { background: var(--bg-row-hover); }
 .schema-col-row.is-pk { background: rgba(240,160,32,0.05); }
 
@@ -877,7 +877,7 @@ const TableIndexes = defineComponent({
   align-items: center; gap: 4px; padding: 7px 8px; border-radius: 4px;
 }
 .idx-header { font-size: 10px; font-weight: 700; color: var(--text-disabled); text-transform: uppercase; }
-.idx-row { border-bottom: 1px solid rgba(255,255,255,0.04); transition: background 0.1s; font-size: 12px; }
+.idx-row { border-bottom: 1px solid var(--border-secondary); transition: background 0.1s; font-size: 12px; }
 .idx-row:hover { background: var(--bg-row-hover); }
 .pk-badge { color: var(--status-warning); font-weight: 700; font-size: 11px; }
 .type-sm { font-size: 11px; color: var(--text-quaternary); background: var(--bg-active); padding: 1px 5px; border-radius: 3px; }

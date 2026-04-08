@@ -299,7 +299,7 @@ watch(() => props.selectedItem, () => {
 .col-table { flex: 1; overflow-y: auto; padding: 4px 8px; }
 .col-header, .col-row { display: grid; grid-template-columns: 200px 1fr 100px; align-items: center; gap: 4px; padding: 6px 8px; border-radius: 4px; }
 .col-header { font-size: 10px; font-weight: 700; color: var(--text-disabled); text-transform: uppercase; }
-.col-row { border-bottom: 1px solid rgba(255,255,255,0.04); transition: background 0.1s; }
+.col-row { border-bottom: 1px solid var(--border-secondary); transition: background 0.1s; }
 .col-row:hover { background: var(--bg-row-hover); }
 .col-name-code { font-family: monospace; font-size: 12px; color: var(--text-secondary); }
 .type-badge { font-size: 11px; color: var(--type-boolean); background: var(--type-boolean-bg); padding: 1px 6px; border-radius: 3px; font-family: monospace; }

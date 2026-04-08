@@ -458,3 +458,285 @@ body.accent-purple .n-progress {
 body.accent-purple .n-spin {
   color: #7c3aed !important;
 }
+
+/* ══════════════════════════════════════════════════════
+   Empty 空状态
+   ══════════════════════════════════════════════════════ */
+body.accent-purple .n-empty {
+  color: #b0b0c8 !important;
+}
+
+body.accent-purple .n-empty .n-empty__description {
+  color: #b0b0c8 !important;
+}
+
+/* ══════════════════════════════════════════════════════
+   Pagination 分页
+   ══════════════════════════════════════════════════════ */
+body.accent-purple .n-pagination {
+  color: #4a4a6a !important;
+}
+
+body.accent-purple .n-pagination-item {
+  background: #ffffff !important;
+  border-color: rgba(0, 0, 0, 0.10) !important;
+  color: #4a4a6a !important;
+}
+
+body.accent-purple .n-pagination-item:hover {
+  border-color: rgba(0, 0, 0, 0.18) !important;
+  color: #1a1a2e !important;
+}
+
+body.accent-purple .n-pagination-item--active {
+  background: #7c3aed !important;
+  border-color: #7c3aed !important;
+  color: #ffffff !important;
+}
+
+body.accent-purple .n-pagination-item--active:hover {
+  background: #8b5cf6 !important;
+  border-color: #8b5cf6 !important;
+}
+
+body.accent-purple .n-pagination-item--button {
+  color: #4a4a6a !important;
+}
+
+/* ══════════════════════════════════════════════════════
+   DatePicker 日期选择器
+   ══════════════════════════════════════════════════════ */
+body.accent-purple .n-date-picker {
+  background: #ffffff !important;
+}
+
+body.accent-purple .n-date-picker .n-input {
+  background: #ffffff !important;
+  border-color: rgba(0, 0, 0, 0.12) !important;
+}
+
+body.accent-purple .n-date-panel {
+  background: #ffffff !important;
+  color: #1a1a2e !important;
+}
+
+body.accent-purple .n-date-panel-cell {
+  color: #4a4a6a !important;
+}
+
+body.accent-purple .n-date-panel-cell:hover {
+  background: rgba(0, 0, 0, 0.04) !important;
+}
+
+body.accent-purple .n-date-panel-cell--selected {
+  background: rgba(124, 58, 237, 0.10) !important;
+  color: #7c3aed !important;
+}
+
+body.accent-purple .n-date-panel-cell--current {
+  border-color: #7c3aed !important;
+}
+
+/* ══════════════════════════════════════════════════════
+   ButtonGroup 按钮组
+   ══════════════════════════════════════════════════════ */
+body.accent-purple .n-button-group .n-button {
+  border-color: rgba(0, 0, 0, 0.12) !important;
+}
+
+body.accent-purple .n-button-group .n-button:hover {
+  background: rgba(0, 0, 0, 0.04) !important;
+}
+
+/* ══════════════════════════════════════════════════════
+   Text 文本深度颜色
+   ══════════════════════════════════════════════════════ */
+body.accent-purple [depth="1"],
+body.accent-purple .n-text--depth-1 {
+  color: #1a1a2e !important;
+}
+
+body.accent-purple [depth="2"],
+body.accent-purple .n-text--depth-2 {
+  color: #4a4a6a !important;
+}
+
+body.accent-purple [depth="3"],
+body.accent-purple .n-text--depth-3 {
+  color: #7a7a9a !important;
+}
+
+/* ══════════════════════════════════════════════════════
+   日志面板样式
+   ══════════════════════════════════════════════════════ */
+body.accent-purple .log-panel-container {
+  background: var(--bg-primary) !important;
+}
+
+body.accent-purple .log-count {
+  color: var(--text-quaternary) !important;
+}
+
+body.accent-purple .log-entry {
+  background: var(--bg-row-hover) !important;
+  border-color: var(--border-secondary) !important;
+}
+
+body.accent-purple .log-entry:hover {
+  background: var(--bg-hover) !important;
+}
+
+body.accent-purple .log-entry.level-error {
+  border-left-color: var(--status-error) !important;
+  background: rgba(208, 48, 80, 0.05) !important;
+}
+
+body.accent-purple .log-entry.level-warn {
+  border-left-color: var(--status-warning) !important;
+}
+
+body.accent-purple .log-entry.level-info {
+  border-left-color: var(--status-info) !important;
+}
+
+body.accent-purple .log-entry.level-debug {
+  border-left-color: var(--text-quaternary) !important;
+}
+
+body.accent-purple .log-ts {
+  color: var(--text-tertiary) !important;
+}
+
+body.accent-purple .log-src {
+  color: var(--text-quaternary) !important;
+}
+
+body.accent-purple .log-msg {
+  color: var(--text-secondary) !important;
+}
+
+/* ══════════════════════════════════════════════════════
+   数据库工具栏样式
+   ══════════════════════════════════════════════════════ */
+body.accent-purple .db-toolbar {
+  background: var(--bg-secondary) !important;
+  border-color: var(--border-secondary) !important;
+}
+
+body.accent-purple .toolbar-btn {
+  color: var(--text-secondary) !important;
+}
+
+body.accent-purple .toolbar-btn:hover {
+  color: var(--text-primary) !important;
+  background: var(--bg-hover) !important;
+}
+
+body.accent-purple .toolbar-sep {
+  background: var(--border-primary) !important;
+}
+
+/* ══════════════════════════════════════════════════════
+   数据库路由样式
+   ══════════════════════════════════════════════════════ */
+body.accent-purple .db-router-tabs {
+  background: var(--bg-secondary) !important;
+  border-color: var(--border-secondary) !important;
+}
+
+body.accent-purple .db-router-tab {
+  color: var(--text-tertiary) !important;
+}
+
+body.accent-purple .db-router-tab:hover {
+  color: var(--text-primary) !important;
+  background: var(--bg-hover) !important;
+}
+
+body.accent-purple .db-router-tab.active {
+  color: var(--accent-primary) !important;
+  background: var(--accent-primary-subtle) !important;
+}
+
+/* ══════════════════════════════════════════════════════
+   标题栏样式
+   ══════════════════════════════════════════════════════ */
+body.accent-purple .titlebar {
+  background: var(--bg-menubar) !important;
+  border-color: var(--border-secondary) !important;
+}
+
+body.accent-purple .titlebar-title {
+  color: var(--text-secondary) !important;
+}
+
+body.accent-purple .titlebar-wincontrols button {
+  color: var(--text-secondary) !important;
+}
+
+body.accent-purple .titlebar-wincontrols button:hover {
+  background: var(--bg-hover) !important;
+  color: var(--text-primary) !important;
+}
+
+/* ══════════════════════════════════════════════════════
+   连接对话框样式
+   ══════════════════════════════════════════════════════ */
+body.accent-purple .connection-form {
+  background: var(--bg-primary) !important;
+}
+
+body.accent-purple .form-section {
+  background: var(--bg-secondary) !important;
+  border-color: var(--border-secondary) !important;
+}
+
+body.accent-purple .form-section-title {
+  color: var(--text-primary) !important;
+}
+
+body.accent-purple .form-label {
+  color: var(--text-secondary) !important;
+}
+
+body.accent-purple .form-hint {
+  color: var(--text-quaternary) !important;
+}
+
+/* ══════════════════════════════════════════════════════
+   帮助对话框样式
+   ══════════════════════════════════════════════════════ */
+body.accent-purple .help-dialog-title {
+  color: var(--text-primary) !important;
+}
+
+body.accent-purple .help-dialog-item {
+  color: var(--text-secondary) !important;
+}
+
+body.accent-purple .help-dialog-item:hover {
+  color: var(--text-primary) !important;
+  background: var(--bg-hover) !important;
+}
+
+body.accent-purple .help-dialog-shortcut {
+  color: var(--text-quaternary) !important;
+}
+
+/* ══════════════════════════════════════════════════════
+   通用文本覆盖
+   ══════════════════════════════════════════════════════ */
+body.accent-purple h1,
+body.accent-purple h2,
+body.accent-purple h3,
+body.accent-purple h4,
+body.accent-purple h5,
+body.accent-purple h6 {
+  color: var(--text-primary) !important;
+}
+
+body.accent-purple p,
+body.accent-purple span,
+body.accent-purple div {
+  color: var(--text-primary) !important;
+}

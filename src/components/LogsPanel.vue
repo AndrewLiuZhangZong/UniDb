@@ -173,14 +173,14 @@ onMounted(loadLogs)
 
 .logs-toolbar {
   display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;
-  padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.06);
+  padding: 10px 0; border-bottom: 1px solid var(--border-secondary);
 }
 .toolbar-right { display: flex; align-items: center; gap: 8px; }
-.log-count { font-size: 12px; color: rgba(255,255,255,0.35); }
+.log-count { font-size: 12px; color: var(--text-quaternary); }
 
 .log-list { max-height: 500px; overflow-y: auto; border-radius: 8px; }
 .log-list::-webkit-scrollbar { width: 4px; }
-.log-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+.log-list::-webkit-scrollbar-thumb { background: var(--border-primary); border-radius: 2px; }
 
 .state-center { display: flex; align-items: center; justify-content: center; height: 200px; }
 
@@ -189,20 +189,20 @@ onMounted(loadLogs)
 .log-entry {
   display: grid; grid-template-columns: 52px 110px 80px 1fr;
   align-items: baseline; gap: 10px; padding: 8px 10px;
-  background: rgba(255,255,255,0.02); border-radius: 6px;
+  background: var(--bg-row-hover); border-radius: 6px;
   border-left: 3px solid transparent; font-size: 12px;
   transition: background 0.1s;
 }
-.log-entry:hover { background: rgba(255,255,255,0.04); }
-.log-entry.level-error { border-left-color: #d03050; background: rgba(208,48,80,0.05); }
-.log-entry.level-warn { border-left-color: #f0a020; }
-.log-entry.level-info { border-left-color: #2080f0; }
-.log-entry.level-debug { border-left-color: rgba(255,255,255,0.2); }
+.log-entry:hover { background: var(--bg-hover); }
+.log-entry.level-error { border-left-color: var(--status-error); background: rgba(208,48,80,0.05); }
+.log-entry.level-warn { border-left-color: var(--status-warning); }
+.log-entry.level-info { border-left-color: var(--status-info); }
+.log-entry.level-debug { border-left-color: var(--border-primary); }
 
 .log-tag { flex-shrink: 0; }
-.log-ts { font-family: monospace; font-size: 11px; color: rgba(255,255,255,0.4); white-space: nowrap; }
-.log-src { font-size: 11px; color: rgba(255,255,255,0.35); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.log-msg { margin: 0; font-family: inherit; font-size: 12px; color: rgba(255,255,255,0.8); white-space: pre-wrap; word-break: break-word; }
+.log-ts { font-family: monospace; font-size: 11px; color: var(--text-tertiary); white-space: nowrap; }
+.log-src { font-size: 11px; color: var(--text-quaternary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.log-msg { margin: 0; font-family: inherit; font-size: 12px; color: var(--text-secondary); white-space: pre-wrap; word-break: break-word; }
 
 .log-pagination { display: flex; justify-content: center; padding-top: 8px; }
 </style>

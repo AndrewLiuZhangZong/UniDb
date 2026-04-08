@@ -1,0 +1,460 @@
+/* ============================================================
+   Accent — Orange (活力橙·亮色主题)
+   完整覆盖所有颜色，包括 Naive UI 组件样式
+   新增主题色：复制此文件替换颜色值即可
+   ============================================================ */
+
+body.accent-orange {
+  /* ── 页面背景 ── */
+  background: #ffffff;
+  color: #1a1a2e;
+
+  /* ── 主题色 ── */
+  --accent-primary: #FF6B00;
+  --accent-primary-hover: #FF8C42;
+  --accent-primary-pressed: #CC5500;
+  --accent-primary-subtle: rgba(255, 107, 0, 0.12);
+  --accent-primary-subtle-hover: rgba(255, 107, 0, 0.20);
+
+  /* ── 背景色 ── */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8f9fc;
+  --bg-tertiary: #f0f2f8;
+  --bg-elevated: #ffffff;
+  --bg-sidebar: #fafbfc;
+  --bg-menubar: #f5f6fa;
+  --bg-tabbar: rgba(0, 0, 0, 0.04);
+  --bg-hover: rgba(0, 0, 0, 0.04);
+  --bg-active: rgba(0, 0, 0, 0.06);
+  --bg-selected: rgba(0, 0, 0, 0.06);
+  --bg-row-hover: rgba(0, 0, 0, 0.02);
+
+  /* ── 文字色 ── */
+  --text-primary: #1a1a2e;
+  --text-secondary: #4a4a6a;
+  --text-tertiary: #7a7a9a;
+  --text-quaternary: #9a9ab8;
+  --text-disabled: #b0b0c8;
+  --text-placeholder: #b0b0c8;
+  --text-hint: #b0b0c8;
+
+  /* ── 边框色 ── */
+  --border-primary: rgba(0, 0, 0, 0.10);
+  --border-secondary: rgba(0, 0, 0, 0.06);
+  --border-hover: rgba(0, 0, 0, 0.14);
+  --border-strong: rgba(0, 0, 0, 0.18);
+
+  /* ── 阴影 ── */
+  --shadow-soft-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --shadow-soft: 0 4px 16px rgba(0, 0, 0, 0.10);
+  --shadow-rail: 4px 0 16px rgba(0, 0, 0, 0.06);
+
+  /* ── 数据类型色 ── */
+  --type-number: #FF6B00;
+  --type-string-bg: rgba(77, 184, 255, 0.10);
+  --type-number-bg: rgba(255, 107, 0, 0.10);
+  --type-boolean-bg: rgba(251, 146, 60, 0.10);
+  --type-date-bg: rgba(167, 139, 250, 0.10);
+  --type-object-bg: rgba(52, 211, 153, 0.10);
+  --type-array-bg: rgba(96, 165, 250, 0.10);
+  --type-binary-bg: rgba(245, 158, 11, 0.10);
+
+  /* ── 代码编辑器 ── */
+  --code-bg: #f8f9fc;
+  --code-comment: rgba(0, 0, 0, 0.35);
+}
+
+/* ══════════════════════════════════════════════════════
+   Naive UI 全局覆盖（使用浅色主题默认值）
+   覆盖 n-config-provider 默认的深色主题
+   ══════════════════════════════════════════════════════ */
+
+/* 页面根元素 */
+body.accent-orange #app {
+  background: #ffffff !important;
+}
+
+/* 基础组件覆盖 */
+body.accent-orange .n-config-provider {
+  --n-color: #ffffff !important;
+  --n-color-modal: #ffffff !important;
+}
+
+/* Dialog / Modal */
+body.accent-orange .n-dialog,
+body.accent-orange .n-modal {
+  background: #ffffff !important;
+  color: #1a1a2e !important;
+}
+
+body.accent-orange .n-dialog .n-dialog__content,
+body.accent-orange .n-modal .n-modal__content {
+  color: #1a1a2e !important;
+}
+
+/* Dropdown / Popover */
+body.accent-orange .n-dropdown-menu,
+body.accent-orange .n-popover,
+body.accent-orange .n-base-select-menu,
+body.accent-orange .n-date-panel,
+body.accent-orange .n-time-panel {
+  background: #ffffff !important;
+  color: #1a1a2e !important;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12) !important;
+}
+
+/* Tooltip */
+body.accent-orange .n-tooltip {
+  background: #1a1a2e !important;
+  color: #ffffff !important;
+}
+
+/* Scrollbar 样式 */
+body.accent-orange ::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+body.accent-orange ::-webkit-scrollbar-track {
+  background: transparent;
+}
+body.accent-orange ::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 3px;
+}
+body.accent-orange ::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.25);
+}
+
+/* ══════════════════════════════════════════════════════
+   Button 按钮
+   ══════════════════════════════════════════════════════ */
+body.accent-orange .n-button {
+  background: #ffffff !important;
+  border-color: rgba(0, 0, 0, 0.12) !important;
+  color: #1a1a2e !important;
+}
+
+body.accent-orange .n-button:hover {
+  background: rgba(0, 0, 0, 0.04) !important;
+  border-color: rgba(0, 0, 0, 0.16) !important;
+}
+
+body.accent-orange .n-button--primary-type {
+  background: #FF6B00 !important;
+  border-color: #FF6B00 !important;
+  color: #ffffff !important;
+}
+
+body.accent-orange .n-button--primary-type:hover {
+  background: #FF8C42 !important;
+  border-color: #FF8C42 !important;
+}
+
+body.accent-orange .n-button--primary-type:active {
+  background: #CC5500 !important;
+  border-color: #CC5500 !important;
+}
+
+body.accent-orange .n-button--tertiary-type {
+  background: rgba(0, 0, 0, 0.04) !important;
+}
+
+body.accent-orange .n-button--default-type {
+  background: #ffffff !important;
+  border-color: rgba(0, 0, 0, 0.10) !important;
+}
+
+/* ══════════════════════════════════════════════════════
+   Input 输入框
+   ══════════════════════════════════════════════════════ */
+body.accent-orange .n-input {
+  background: #ffffff !important;
+  border-color: rgba(0, 0, 0, 0.12) !important;
+}
+
+body.accent-orange .n-input:hover {
+  border-color: rgba(0, 0, 0, 0.18) !important;
+}
+
+body.accent-orange .n-input--focus {
+  border-color: #FF6B00 !important;
+  box-shadow: 0 0 0 2px rgba(255, 107, 0, 0.15) !important;
+}
+
+body.accent-orange .n-input .n-input__input-el,
+body.accent-orange .n-input .n-input__textarea-el {
+  color: #1a1a2e !important;
+}
+
+body.accent-orange .n-input .n-input__placeholder {
+  color: #b0b0c8 !important;
+}
+
+/* ══════════════════════════════════════════════════════
+   Select 选择器
+   ══════════════════════════════════════════════════��═══ */
+body.accent-orange .n-base-select {
+  background: #ffffff !important;
+}
+
+body.accent-orange .n-base-select .n-base-select__trigger {
+  background: #ffffff !important;
+  border-color: rgba(0, 0, 0, 0.12) !important;
+  color: #1a1a2e !important;
+}
+
+body.accent-orange .n-base-select:hover .n-base-select__trigger {
+  border-color: rgba(0, 0, 0, 0.18) !important;
+}
+
+body.accent-orange .n-base-select--focus .n-base-select__trigger {
+  border-color: #FF6B00 !important;
+  box-shadow: 0 0 0 2px rgba(255, 107, 0, 0.15) !important;
+}
+
+body.accent-orange .n-base-select-option {
+  color: #1a1a2e !important;
+}
+
+body.accent-orange .n-base-select-option:hover {
+  background: rgba(0, 0, 0, 0.04) !important;
+}
+
+body.accent-orange .n-base-select-option--selected {
+  color: #FF6B00 !important;
+  background: rgba(255, 107, 0, 0.12) !important;
+}
+
+/* ══════════════════════════════════════════════════════
+   DataTable 数据表格
+   ══════════════════════════════════════════════════════ */
+body.accent-orange .n-data-table {
+  background: #ffffff !important;
+  color: #1a1a2e !important;
+}
+
+body.accent-orange .n-data-table-th {
+  background: rgba(0, 0, 0, 0.02) !important;
+  color: #4a4a6a !important;
+  border-color: rgba(0, 0, 0, 0.08) !important;
+}
+
+body.accent-orange .n-data-table-td {
+  background: #ffffff !important;
+  color: #1a1a2e !important;
+  border-color: rgba(0, 0, 0, 0.06) !important;
+}
+
+body.accent-orange .n-data-table-tr:hover td {
+  background: rgba(0, 0, 0, 0.02) !important;
+}
+
+body.accent-orange .n-data-table-tr--striped td {
+  background: rgba(0, 0, 0, 0.01) !important;
+}
+
+body.accent-orange .n-data-table-wrapper {
+  border-color: rgba(0, 0, 0, 0.08) !important;
+}
+
+/* ══════════════════════════════════════════════════════
+   Menu 菜单
+   ══════════════════════════════════════════════════════ */
+body.accent-orange .n-menu {
+  background: transparent !important;
+}
+
+body.accent-orange .n-menu-item {
+  color: #4a4a6a !important;
+}
+
+body.accent-orange .n-menu-item:hover {
+  background: rgba(0, 0, 0, 0.04) !important;
+  color: #1a1a2e !important;
+}
+
+body.accent-orange .n-menu-item--selected {
+  color: #FF6B00 !important;
+  background: rgba(255, 107, 0, 0.10) !important;
+}
+
+/* ══════════════════════════════════════════════════════
+   Tabs 标签页
+   ══════════════════════════════════════════════════════ */
+body.accent-orange .n-tabs {
+  background: transparent !important;
+}
+
+body.accent-orange .n-tabs-nav {
+  background: transparent !important;
+}
+
+body.accent-orange .n-tabs-tab {
+  color: #7a7a9a !important;
+  background: transparent !important;
+}
+
+body.accent-orange .n-tabs-tab:hover {
+  color: #1a1a2e !important;
+  background: rgba(0, 0, 0, 0.04) !important;
+}
+
+body.accent-orange .n-tabs-tab--active {
+  color: #FF6B00 !important;
+  background: rgba(255, 107, 0, 0.10) !important;
+}
+
+body.accent-orange .n-tabs-bar {
+  background: #FF6B00 !important;
+}
+
+/* ══════════════════════════════════════════════════════
+   Card 卡片
+   ══════════════════════════════════════════════════════ */
+body.accent-orange .n-card {
+  background: #ffffff !important;
+  border-color: rgba(0, 0, 0, 0.08) !important;
+  color: #1a1a2e !important;
+}
+
+body.accent-orange .n-card-header {
+  border-color: rgba(0, 0, 0, 0.06) !important;
+  color: #1a1a2e !important;
+}
+
+/* ══════════════════════════════════════════════════════
+   Tag 标签
+   ══════════════════════════════════════════════════════ */
+body.accent-orange .n-tag {
+  background: rgba(0, 0, 0, 0.04) !important;
+  border-color: rgba(0, 0, 0, 0.10) !important;
+  color: #4a4a6a !important;
+}
+
+body.accent-orange .n-tag--primary-type {
+  background: rgba(255, 107, 0, 0.12) !important;
+  border-color: rgba(255, 107, 0, 0.20) !important;
+  color: #FF6B00 !important;
+}
+
+/* ══════════════════════════════════════════════════════
+   Checkbox / Radio
+   ══════════════════════════════════════════════════════ */
+body.accent-orange .n-checkbox-box--checked,
+body.accent-orange .n-radio-box--checked {
+  background: #FF6B00 !important;
+  border-color: #FF6B00 !important;
+}
+
+/* ══════════════════════════════════════════════════════
+   Switch 开关
+   ══════════════════════════════════════════════════════ */
+body.accent-orange .n-switch {
+  background: rgba(0, 0, 0, 0.15) !important;
+}
+
+body.accent-orange .n-switch--active {
+  background: #FF6B00 !important;
+}
+
+/* ══════════════════════════════════════════════════════
+   Tree 树形控件
+   ══════════════════════════════════════════════════════ */
+body.accent-orange .n-tree {
+  background: transparent !important;
+}
+
+body.accent-orange .n-tree-node {
+  color: #4a4a6a !important;
+}
+
+body.accent-orange .n-tree-node:hover {
+  background: rgba(0, 0, 0, 0.04) !important;
+}
+
+body.accent-orange .n-tree-node--selected {
+  color: #FF6B00 !important;
+  background: rgba(255, 107, 0, 0.10) !important;
+}
+
+/* ══════════════════════════════════════════════════════
+   Layout 布局
+   ══════════════════════════════════════════════════════ */
+body.accent-orange .n-layout {
+  background: #ffffff !important;
+}
+
+body.accent-orange .n-layout-sider {
+  background: #fafbfc !important;
+  border-color: rgba(0, 0, 0, 0.06) !important;
+}
+
+body.accent-orange .n-layout-header {
+  background: #ffffff !important;
+  border-color: rgba(0, 0, 0, 0.06) !important;
+}
+
+body.accent-orange .n-layout-footer {
+  background: #ffffff !important;
+  border-color: rgba(0, 0, 0, 0.06) !important;
+}
+
+/* ══════════════════════════════════════════════════════
+   Message / Notification 消息通知
+   ══════════════════════════════════════════════════════ */
+body.accent-orange .n-message {
+  background: #ffffff !important;
+  border-color: rgba(0, 0, 0, 0.08) !important;
+}
+
+body.accent-orange .n-notification {
+  background: #ffffff !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* ══════════════════════════════════════════════════════
+   Form 表单
+   ══════════════════════════════════════════════════════ */
+body.accent-orange .n-form-item {
+  color: #1a1a2e !important;
+}
+
+body.accent-orange .n-form-item-label {
+  color: #4a4a6a !important;
+}
+
+/* ══════════════════════════════════════════════════════
+   二级导航栏 / 设置页
+   ══════════════════════════════════════════════════════ */
+body.accent-orange .settings-container,
+body.accent-orange .settings-nav {
+  background: #f8f9fc !important;
+}
+
+/* ══════════════════════════════════════════════════════
+   其他通用覆盖
+   ══════════════════════════════════════════════════════ */
+body.accent-orange .n-split-panel {
+  border-color: rgba(0, 0, 0, 0.06) !important;
+}
+
+body.accent-orange .n-alert {
+  background: rgba(0, 0, 0, 0.02) !important;
+  border-color: rgba(0, 0, 0, 0.08) !important;
+}
+
+body.accent-orange .n-alert--success {
+  border-left-color: #18a058 !important;
+}
+
+body.accent-orange .n-statistic {
+  color: #1a1a2e !important;
+}
+
+body.accent-orange .n-progress {
+  color: #1a1a2e !important;
+}
+
+body.accent-orange .n-spin {
+  color: #FF6B00 !important;
+}

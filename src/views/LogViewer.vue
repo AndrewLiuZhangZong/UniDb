@@ -1,5 +1,5 @@
 <template>
-  <div class="log-viewer-container" :class="{ 'light-theme': !isDarkTheme }">
+  <div class="log-viewer-container">
     <!-- Header -->
     <div class="page-header">
       <div class="header-left">
@@ -164,7 +164,6 @@ const message = useMessage()
 const dialog = useDialog()
 const settingsStore = useSettingsStore()
 
-const isDarkTheme = computed(() => settingsStore.settings.theme === 'dark')
 
 // State
 const loading = ref(false)
@@ -358,12 +357,7 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   height: 100%;
-  background: #12121a;
-  transition: background 0.3s ease;
-}
-
-.log-viewer-container.light-theme {
-  background: #f5f5f5;
+  background: var(--bg-primary);
 }
 
 .page-header {
@@ -371,11 +365,7 @@ onMounted(() => {
   justify-content: space-between;
   align-items: flex-start;
   padding: 24px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-}
-
-.light-theme .page-header {
-  border-bottom-color: rgba(0, 0, 0, 0.08);
+  border-bottom: 1px solid var(--border-secondary);
 }
 
 .header-left {
@@ -393,22 +383,14 @@ onMounted(() => {
 .page-title {
   font-size: 24px;
   font-weight: 700;
-  color: rgba(255, 255, 255, 0.95);
+  color: var(--text-primary);
   margin: 0;
-}
-
-.light-theme .page-title {
-  color: rgba(0, 0, 0, 0.95);
 }
 
 .page-subtitle {
   font-size: 14px;
-  color: rgba(255, 255, 255, 0.5);
+  color: var(--text-disabled);
   margin: 0;
-}
-
-.light-theme .page-subtitle {
-  color: rgba(0, 0, 0, 0.5);
 }
 
 .filters-bar {
@@ -416,13 +398,8 @@ onMounted(() => {
   justify-content: space-between;
   align-items: center;
   padding: 16px 24px;
-  background: rgba(255, 255, 255, 0.02);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-}
-
-.light-theme .filters-bar {
-  background: rgba(0, 0, 0, 0.02);
-  border-bottom-color: rgba(0, 0, 0, 0.04);
+  background: var(--bg-row-hover);
+  border-bottom: 1px solid var(--border-secondary);
 }
 
 .log-list {
@@ -439,12 +416,7 @@ onMounted(() => {
   justify-content: center;
   height: 300px;
   gap: 16px;
-  color: rgba(255, 255, 255, 0.5);
-}
-
-.light-theme .loading-state,
-.light-theme .empty-state {
-  color: rgba(0, 0, 0, 0.5);
+  color: var(--text-disabled);
 }
 
 .log-entries {
@@ -459,47 +431,31 @@ onMounted(() => {
   gap: 16px;
   align-items: start;
   padding: 12px 16px;
-  background: rgba(255, 255, 255, 0.02);
+  background: var(--bg-row-hover);
   border-radius: 8px;
   border-left: 3px solid transparent;
   transition: background-color 0.15s ease;
 }
 
-.light-theme .log-entry {
-  background: rgba(0, 0, 0, 0.02);
-}
-
 .log-entry:hover {
-  background: rgba(255, 255, 255, 0.04);
-}
-
-.light-theme .log-entry:hover {
-  background: rgba(0, 0, 0, 0.04);
+  background: var(--bg-hover);
 }
 
 .log-entry.level-error {
-  border-left-color: #d03050;
+  border-left-color: var(--status-error);
   background: rgba(208, 48, 80, 0.05);
 }
 
-.light-theme .log-entry.level-error {
-  background: rgba(208, 48, 80, 0.03);
-}
-
 .log-entry.level-warn {
-  border-left-color: #f0a020;
+  border-left-color: var(--status-warning);
 }
 
 .log-entry.level-info {
-  border-left-color: #2080f0;
+  border-left-color: var(--status-info);
 }
 
 .log-entry.level-debug {
-  border-left-color: rgba(255, 255, 255, 0.3);
-}
-
-.light-theme .log-entry.level-debug {
-  border-left-color: rgba(0, 0, 0, 0.3);
+  border-left-color: var(--text-disabled);
 }
 
 .log-level {
@@ -509,12 +465,8 @@ onMounted(() => {
 
 .log-timestamp {
   font-size: 12px;
-  color: rgba(255, 255, 255, 0.5);
+  color: var(--text-disabled);
   font-family: 'SF Mono', 'Monaco', monospace;
-}
-
-.light-theme .log-timestamp {
-  color: rgba(0, 0, 0, 0.5);
 }
 
 .log-source {
@@ -523,11 +475,7 @@ onMounted(() => {
 
 .log-message {
   font-size: 13px;
-  color: rgba(255, 255, 255, 0.8);
-}
-
-.light-theme .log-message {
-  color: rgba(0, 0, 0, 0.8);
+  color: var(--text-secondary);
 }
 
 .log-message pre {
@@ -538,17 +486,13 @@ onMounted(() => {
 }
 
 .log-message.has-error {
-  color: #e88080;
+  color: var(--status-error);
 }
 
 .pagination-bar {
   display: flex;
   justify-content: center;
   padding: 16px;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
-}
-
-.light-theme .pagination-bar {
-  border-top-color: rgba(0, 0, 0, 0.08);
+  border-top: 1px solid var(--border-secondary);
 }
 </style>

@@ -1,5 +1,5 @@
 <template>
-  <div class="mysql-workspace" :class="{ 'light-mode': !isDarkTheme }">
+  <div class="mysql-workspace">
 
     <!-- No item selected: default SQL editor -->
     <template v-if="!selectedItem || selectedItemType === 'query'">
@@ -51,7 +51,6 @@ const mysqlParser = new Parser()
 const message = useMessage()
 const dialog = useDialog()
 const settingsStore = useSettingsStore()
-const isDarkTheme = computed(() => settingsStore.settings.theme === 'dark')
 
 const props = defineProps<{
   connection: any
@@ -77,7 +76,6 @@ watch(() => props.selectedItem, () => { activeTab.value = 'browse' })
 const SqlEditor = defineComponent({
   props: { connection: Object, dbType: String, initialSql: { type: String, default: '-- Write SQL here\nSELECT 1;' }, activeDb: { type: String, default: '' as string } },
   setup(p) {
-    const isDark = computed(() => settingsStore.settings.theme === 'dark')
     const sql = ref(p.initialSql)
     const running = ref(false)
     const resultData = ref<any[]>([])
@@ -162,7 +160,7 @@ const SqlEditor = defineComponent({
       sql.value = format(sql.value, { language: 'mysql', tabWidth: 2 })
     }
 
-    return () => h('div', { class: ['sql-editor-wrap', !isDark.value && 'light-mode'] }, [
+    return () => h('div', { class: 'sql-editor-wrap' }, [
       // Toolbar
       h('div', { class: 'sql-toolbar' }, [
         h(NButton, { size: 'small', type: 'primary', loading: running.value, onClick: runQuery }, {
@@ -207,7 +205,6 @@ const SqlEditor = defineComponent({
 const TableBrowse = defineComponent({
   props: { table: Object, connection: Object },
   setup(p) {
-    const isDark = computed(() => settingsStore.settings.theme === 'dark')
     const loading = ref(false)
     const saving = ref(false)
     const error = ref('')
@@ -482,7 +479,7 @@ const TableBrowse = defineComponent({
       })
     )
 
-    return h('div', { class: ['table-browse', !isDark.value && 'light-mode'] }, children)
+    return h('div', { class: 'table-browse' }, children)
   }
 })
 
@@ -490,7 +487,6 @@ const TableBrowse = defineComponent({
 const TableSchema = defineComponent({
   props: { table: Object, connection: Object },
   setup(p) {
-    const isDark = computed(() => settingsStore.settings.theme === 'dark')
     const cols = ref<any[]>([])
     const loading = ref(false)
     const saving = ref(false)
@@ -587,7 +583,7 @@ const TableSchema = defineComponent({
 
     watch(() => [p.table?.name, p.table?._db], loadCols, { immediate: true })
 
-    return () => h('div', { class: ['table-schema', !isDark.value && 'light-mode'] }, [
+    return () => h('div', { class: 'table-schema' }, [
       h('div', { class: 'schema-toolbar' }, [
         h('span', { class: 'schema-title' }, loading.value ? '加载中...' : `${p.table?.name} · ${cols.value.length} 个字段`),
         h('div', { style: 'flex:1' }),
@@ -677,7 +673,6 @@ const TableSchema = defineComponent({
 const TableIndexes = defineComponent({
   props: { table: Object, connection: Object },
   setup(p) {
-    const isDark = computed(() => settingsStore.settings.theme === 'dark')
     const indexes = ref<any[]>([])
     const loading = ref(false)
     const error = ref('')
@@ -700,7 +695,7 @@ const TableIndexes = defineComponent({
 
     watch(() => [p.table?.name, p.table?._db], loadIndexes, { immediate: true })
 
-    return () => h('div', { class: ['table-indexes', !isDark.value && 'light-mode'] }, [
+    return () => h('div', { class: 'table-indexes' }, [
       h('div', { class: 'idx-toolbar' }, [
         h('span', { class: 'idx-title' }, loading.value ? '加载中...' : `${p.table?.name} · ${indexes.value.length} 个索引`),
         h('div', { style: 'flex:1' }),

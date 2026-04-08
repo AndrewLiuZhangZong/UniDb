@@ -1,41 +1,25 @@
 <template>
-  <div class="topnav-bar" :class="{ 'light-mode': !isDarkTheme }">
-    <!-- Secondary nav tabs (left-aligned) -->
-    <div class="topnav-tabs" v-if="secondaryTabs.length > 0">
+  <div class="topnav-bar">
+    <nav class="topnav-nav" v-if="secondaryTabs.length > 0" role="tablist">
       <button
-        v-for="tab in secondaryTabs"
+        v-for="(tab, index) in secondaryTabs"
         :key="tab.path"
+        type="button"
+        role="tab"
         class="topnav-tab"
-        :class="{ active: currentPath === tab.path || currentPath.startsWith(tab.path + '/') }"
+        :class="{ active: isTabActive(tab) }"
         @click="router.push(tab.path)"
       >
-        <n-icon :size="13" v-if="tab.icon"><component :is="tab.icon" /></n-icon>
+        <span class="tab-dot" v-if="isTabActive(tab)" />
         {{ tab.label }}
       </button>
-    </div>
+    </nav>
 
-    <!-- Spacer (push right items to edge) -->
-    <div class="topnav-spacer"></div>
+    <div class="topnav-spacer" />
 
-    <!-- Right: refresh + new connection -->
-    <div class="topnav-right">
-      <n-tooltip trigger="hover" placement="bottom">
-        <template #trigger>
-          <button class="topnav-action-btn" @click="handleRefresh" :title="t('nav.refresh')">
-            <n-icon :size="15"><RefreshOutline /></n-icon>
-          </button>
-        </template>
-        {{ t('nav.refresh') }}
-      </n-tooltip>
-      <n-tooltip trigger="hover" placement="bottom">
-        <template #trigger>
-          <button class="topnav-action-btn" @click="showConnDialog" :title="t('nav.newConnection')">
-            <n-icon :size="15"><AddOutline /></n-icon>
-          </button>
-        </template>
-        {{ t('nav.newConnection') }}
-      </n-tooltip>
-    </div>
+    <button type="button" class="topnav-btn" @click="handleRefresh" :title="t('nav.refresh')">
+      <n-icon :size="16"><RefreshOutline /></n-icon>
+    </button>
   </div>
 </template>
 
@@ -43,137 +27,138 @@
 import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import { NIcon, NTooltip } from 'naive-ui'
-import {
-  RefreshOutline, AddOutline,
-  SettingsOutline, HardwareChipOutline, ListOutline,
-  DocumentTextOutline, BugOutline, InformationCircleOutline
-} from '@vicons/ionicons5'
-import { useSettingsStore } from '../stores/settings'
+import { NIcon } from 'naive-ui'
+import { RefreshOutline } from '@vicons/ionicons5'
 import { useConnectionStore } from '../stores/connection'
 
 const { t } = useI18n()
 const route = useRoute()
 const router = useRouter()
-const settingsStore = useSettingsStore()
 const connectionStore = useConnectionStore()
-const isDarkTheme = computed(() => settingsStore.settings.theme === 'dark')
 
 const currentPath = computed(() => route.path)
 
-// Secondary nav tabs based on current route group
 const secondaryTabs = computed(() => {
   const path = currentPath.value
 
-  // Settings group
   if (path.startsWith('/settings')) {
     return [
-      { path: '/settings?tab=general', label: t('nav.general'), icon: SettingsOutline },
-      { path: '/settings?tab=drivers', label: t('nav.drivers'), icon: HardwareChipOutline },
-      { path: '/settings?tab=logs', label: t('nav.logs'), icon: ListOutline }
+      { path: '/settings?tab=general', label: t('nav.general') },
+      { path: '/settings?tab=drivers', label: t('nav.drivers') },
+      { path: '/settings?tab=logs', label: t('nav.logs') }
     ]
   }
 
-  // Help group
   if (path.startsWith('/docs') || path.startsWith('/report') || path.startsWith('/about') || path.startsWith('/logs')) {
     return [
-      { path: '/docs', label: t('nav.docs'), icon: DocumentTextOutline },
-      { path: '/report', label: t('nav.report'), icon: BugOutline },
-      { path: '/logs', label: t('nav.logs'), icon: ListOutline },
-      { path: '/about', label: t('nav.about'), icon: InformationCircleOutline }
+      { path: '/docs', label: t('nav.docs') },
+      { path: '/report', label: t('nav.report') },
+      { path: '/logs', label: t('nav.logs') },
+      { path: '/about', label: t('nav.about') }
     ]
   }
 
   return []
 })
 
-const handleRefresh = () => {
-  connectionStore.fetchConnections()
+const isTabActive = (tab: { path: string }) => {
+  if (currentPath.value.startsWith('/settings')) {
+    const tabTab = tab.path.match(/tab=(\w+)/)?.[1]
+    const currentTab = (route.query.tab as string) || 'general'
+    return tabTab === currentTab
+  }
+  return currentPath.value.startsWith(tab.path)
 }
 
-const showConnDialog = () => {
-  window.dispatchEvent(new CustomEvent('open-connection-dialog'))
+const handleRefresh = () => {
+  connectionStore.fetchConnections()
 }
 </script>
 
 <style scoped>
+/* 顶栏：白色背景 + 底部细线 */
 .topnav-bar {
   display: flex;
   align-items: center;
-  height: 38px;
-  padding: 0 14px;
-  background: var(--bg-secondary);
+  height: 48px;
+  padding: 0 24px;
+  background: var(--bg-primary);
   border-bottom: 1px solid var(--border-secondary);
   flex-shrink: 0;
-  gap: 6px;
-  overflow: hidden;
   user-select: none;
 }
 
-.topnav-bar.light-mode {
-  background: var(--bg-primary);
-  border-bottom-color: rgba(0, 0, 0, 0.07);
-}
-
-/* ── Tabs: left-aligned ── */
-.topnav-tabs {
+/* Tab 行：左对齐，横向排列 */
+.topnav-nav {
   display: flex;
   align-items: center;
-  gap: 2px;
-  overflow: hidden;
+  gap: 4px;
+  flex: 0 1 auto;
 }
 
+/* 单个 Tab：文字 + 左侧指示点 */
 .topnav-tab {
+  position: relative;
   display: flex;
   align-items: center;
-  gap: 5px;
-  padding: 4px 11px;
+  gap: 6px;
+  padding: 8px 16px;
   border: none;
   border-radius: 6px;
   background: transparent;
-  color: var(--text-tertiary);
-  font-size: 12.5px;
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 500;
   cursor: pointer;
-  transition: all 0.12s;
   white-space: nowrap;
+  transition: all 0.15s ease;
 }
+
 .topnav-tab:hover {
   color: var(--text-primary);
   background: var(--bg-hover);
 }
+
+/* 激活态：主题色文字 */
 .topnav-tab.active {
   color: var(--accent-primary);
+  font-weight: 600;
   background: var(--accent-primary-subtle);
 }
 
-/* ── Spacer ── */
+.topnav-tab.active:hover {
+  background: var(--accent-primary-subtle-hover);
+}
+
+/* 激活指示点 */
+.tab-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent-primary);
+  flex-shrink: 0;
+}
+
 .topnav-spacer {
   flex: 1;
 }
 
-/* ── Right actions ── */
-.topnav-right {
-  display: flex;
-  align-items: center;
-  gap: 2px;
-  flex-shrink: 0;
-}
-
-.topnav-action-btn {
+.topnav-btn {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 28px;
-  height: 28px;
+  width: 32px;
+  height: 32px;
   border: none;
   border-radius: 6px;
   background: transparent;
-  color: var(--text-disabled);
+  color: var(--text-tertiary);
   cursor: pointer;
-  transition: all 0.12s;
+  transition: all 0.15s ease;
 }
-.topnav-action-btn:hover {
+
+.topnav-btn:hover {
   background: var(--bg-hover);
-  color: var(--text-primary);
+  color: var(--accent-primary);
 }
 </style>

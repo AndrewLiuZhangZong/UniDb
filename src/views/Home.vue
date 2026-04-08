@@ -1,5 +1,5 @@
 <template>
-  <div class="home-container" :class="{ 'light-theme': !isDarkTheme }">
+  <div class="home-container">
 
     <!-- ── Main layout: Navigator + Content ── -->
     <n-layout has-sider class="main-layout">
@@ -13,7 +13,6 @@
         collapse-mode="width"
         :native-scrollbar="false"
         class="navigator-sider"
-        :class="{ 'light-mode': !isDarkTheme }"
       >
         <ConnectionTree
           @select="handleNavSelect"
@@ -64,7 +63,7 @@
         <div v-else class="workspace-shell">
 
           <!-- Status bar: active connection info + db actions -->
-          <div class="workspace-statusbar" :class="{ 'light-mode': !isDarkTheme }">
+          <div class="workspace-statusbar">
             <div class="statusbar-left">
               <DbTypeIcon :type="activeConnection.type" :size="14" />
               <span class="statusbar-conn-name">{{ activeConnection.name }}</span>
@@ -154,7 +153,6 @@ const dialog = useDialog()
 const connectionStore = useConnectionStore()
 const settingsStore = useSettingsStore()
 
-const isDarkTheme = computed(() => settingsStore.settings.theme === 'dark')
 const showConnectionDialog = ref(false)
 const editingConnection = ref<any>(null)
 const activeConnection = ref<any>(null)

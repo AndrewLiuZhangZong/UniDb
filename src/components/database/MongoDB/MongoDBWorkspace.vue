@@ -1,5 +1,5 @@
 <template>
-  <div class="mongo-workspace" :class="{ 'light-mode': !isDarkTheme }">
+  <div class="mongo-workspace">
     <template v-if="!selectedItem || selectedItemType === 'query'">
       <!-- JS / MQL query editor -->
       <div class="query-editor-wrap">
@@ -206,7 +206,6 @@ import { mongodbMeta } from '../../../api/meta'
 const message = useMessage()
 const dialog = useDialog()
 const settingsStore = useSettingsStore()
-const isDarkTheme = computed(() => settingsStore.settings.theme === 'dark')
 
 const props = defineProps<{
   connection: any

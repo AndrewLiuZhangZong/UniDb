@@ -1,5 +1,5 @@
 <template>
-  <div class="ch-workspace" :class="{ 'light-mode': !isDarkTheme }">
+  <div class="ch-workspace">
     <template v-if="!selectedItem || selectedItemType === 'query'">
       <!-- SQL Query Editor -->
       <div class="sql-editor-wrap">
@@ -142,7 +142,6 @@ import { format } from 'sql-formatter'
 
 const message = useMessage()
 const settingsStore = useSettingsStore()
-const isDarkTheme = computed(() => settingsStore.settings.theme === 'dark')
 
 const props = defineProps<{
   connection: any

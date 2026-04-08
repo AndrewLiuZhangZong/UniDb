@@ -1,5 +1,5 @@
 <template>
-  <div class="mysql-explorer" :class="{ 'light-mode': !isDarkTheme }">
+  <div class="mysql-explorer">
     <!-- Search bar -->
     <div class="explorer-toolbar">
       <n-input v-model:value="searchText" size="tiny" placeholder="搜索表/视图..." clearable class="search-input">
@@ -142,7 +142,6 @@ const { t } = useI18n()
 const message = useMessage()
 const dialog = useDialog()
 const settingsStore = useSettingsStore()
-const isDarkTheme = computed(() => settingsStore.settings.theme === 'dark')
 
 const props = defineProps<{ connection: any }>()
 const emit = defineEmits<{

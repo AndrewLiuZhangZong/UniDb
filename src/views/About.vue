@@ -1,5 +1,5 @@
 <template>
-  <div class="about-page" :class="{ 'light-mode': !isDarkTheme }">
+  <div class="about-page">
     <div class="about-container">
       <div class="about-logo">
         <svg width="64" height="64" viewBox="0 0 256 256" fill="none">
@@ -72,7 +72,6 @@ import { useSettingsStore } from '../stores/settings'
 
 const { t } = useI18n()
 const settingsStore = useSettingsStore()
-const isDarkTheme = computed(() => settingsStore.settings.theme === 'dark')
 
 const appVersion = '0.1.0'
 const currentYear = new Date().getFullYear()

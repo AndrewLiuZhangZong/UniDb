@@ -1,5 +1,5 @@
 <template>
-  <div class="docs-page" :class="{ 'light-mode': !isDarkTheme }">
+  <div class="docs-page">
     <div class="docs-container">
       <h2 class="docs-title">{{ t('help.docs.title') }}</h2>
 
@@ -53,7 +53,6 @@ import { useSettingsStore } from '../stores/settings'
 
 const { t } = useI18n()
 const settingsStore = useSettingsStore()
-const isDarkTheme = computed(() => settingsStore.settings.theme === 'dark')
 
 const openLink = (type: string) => {
   const urls: Record<string, string> = {
@@ -106,7 +105,7 @@ const openLink = (type: string) => {
 }
 .doc-item:hover {
   background: var(--accent-primary-subtle);
-  border-color: var(--accent-primary-muted);
+  border-color: var(--accent-primary);
 }
 
 .doc-icon {

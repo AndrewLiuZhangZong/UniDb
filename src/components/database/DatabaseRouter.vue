@@ -1,5 +1,5 @@
 <template>
-  <div class="database-router" :class="{ 'light-mode': !isDarkTheme }">
+  <div class="database-router">
     <!-- No connection -->
     <div v-if="!connection" class="no-connection">
       <n-icon :size="36"><ServerOutline /></n-icon>
@@ -49,7 +49,6 @@ import RedisExplorer from './Redis/RedisExplorer.vue'
 
 const { t } = useI18n()
 const settingsStore = useSettingsStore()
-const isDarkTheme = computed(() => settingsStore.settings.theme === 'dark')
 
 defineProps<{ connection: any }>()
 const emit = defineEmits<{ (e: 'select-item', item: any, type: string): void }>()

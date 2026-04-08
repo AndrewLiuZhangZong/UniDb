@@ -1,5 +1,5 @@
 <template>
-  <div class="title-bar" :class="{ 'light-mode': !isDarkTheme }">
+  <div class="title-bar">
     <!-- macOS Traffic Lights -->
     <div class="traffic-lights" v-if="isMacOS">
       <div class="traffic-light close" @click="handleClose"></div>
@@ -38,8 +38,6 @@ import {
 import { useSettingsStore } from '../stores/settings'
 
 const settingsStore = useSettingsStore()
-
-const isDarkTheme = computed(() => settingsStore.settings.theme === 'dark')
 
 const isMacOS = computed(() => {
   return window.electronAPI?.platform === 'darwin'
@@ -87,12 +85,6 @@ const handleMaximizeChange = () => {
   border-bottom: 1px solid rgba(167, 139, 250, 0.12);
   user-select: none;
   -webkit-app-region: drag;
-}
-
-/* Light mode */
-.title-bar.light-mode {
-  background: linear-gradient(180deg, #ffffff 0%, #f4f5fb 100%);
-  border-bottom: 1px solid rgba(15, 23, 42, 0.06);
 }
 
 /* Traffic Lights */
@@ -144,7 +136,7 @@ const handleMaximizeChange = () => {
   color: rgba(255, 255, 255, 0.7);
 }
 
-.light-mode .app-title {
+.app-title {
   color: rgba(0, 0, 0, 0.6);
 }
 
@@ -176,11 +168,11 @@ const handleMaximizeChange = () => {
   background: #e81123;
 }
 
-.light-mode .control-btn:hover {
+.control-btn:hover {
   background: rgba(0, 0, 0, 0.1);
 }
 
-.light-mode .control-btn.close:hover {
+.control-btn.close:hover {
   background: #e81123;
 }
 
@@ -189,7 +181,7 @@ const handleMaximizeChange = () => {
   color: rgba(255, 255, 255, 0.8);
 }
 
-.light-mode .control-btn n-icon {
+.control-btn n-icon {
   color: rgba(0, 0, 0, 0.8);
 }
 </style>

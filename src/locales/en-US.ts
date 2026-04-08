@@ -326,6 +326,8 @@ export default {
     docs: 'Docs',
     report: 'Report Issue',
     help: 'Help',
+    sectionSettings: 'SETTINGS',
+    sectionHelp: 'HELP',
     type: {
       table: 'Table',
       view: 'View',

@@ -69,8 +69,6 @@ const latestVersion = ref('')
 
 const appVersion = '0.1.0'
 
-const isDarkTheme = computed(() => settingsStore.settings.theme === 'dark')
-
 const doCheckUpdate = () => {
   isChecking.value = true
   hasUpdate.value = false

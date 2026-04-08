@@ -326,6 +326,8 @@ export default {
     docs: '文档',
     report: '反馈问题',
     help: '帮助',
+    sectionSettings: '设置',
+    sectionHelp: '帮助',
     type: {
       table: '表',
       view: '视图',

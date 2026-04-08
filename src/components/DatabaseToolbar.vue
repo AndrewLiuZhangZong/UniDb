@@ -1,5 +1,5 @@
 <template>
-  <div class="db-toolbar" :class="{ 'light-mode': !isDarkTheme }">
+  <div class="db-toolbar">
     <!-- Left: DB type badge + name -->
     <div class="toolbar-left">
       <DbTypeIcon :type="connection.type" :size="16" />
@@ -86,7 +86,6 @@ import { useSettingsStore } from '../stores/settings'
 
 const { t } = useI18n()
 const settingsStore = useSettingsStore()
-const isDarkTheme = computed(() => settingsStore.settings.theme === 'dark')
 
 const props = defineProps<{
   connection: any
@@ -111,11 +110,6 @@ const emit = defineEmits<{
   gap: 12px;
 }
 
-.light-mode.db-toolbar {
-  background: rgba(246, 246, 250, 0.8);
-  border-bottom-color: rgba(0,0,0,0.08);
-}
-
 .toolbar-left {
   display: flex;
   align-items: center;
@@ -128,10 +122,11 @@ const emit = defineEmits<{
   color: rgba(255,255,255,0.75);
 }
 
-.light-mode .db-name {
-  color: rgba(0,0,0,0.75);
+.db-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.75);
 }
-
 .toolbar-right {
   display: flex;
   align-items: center;
@@ -146,10 +141,13 @@ const emit = defineEmits<{
   flex-shrink: 0;
 }
 
-.light-mode .toolbar-sep {
-  background: rgba(0,0,0,0.1);
+.toolbar-sep {
+  width: 1px;
+  height: 14px;
+  background: rgba(255,255,255,0.12);
+  margin: 0 6px;
+  flex-shrink: 0;
 }
-
 :deep(.n-button__content) {
   gap: 5px;
   font-size: 12px;
@@ -160,11 +158,13 @@ const emit = defineEmits<{
   color: rgba(255,255,255,0.9);
 }
 
-.light-mode :deep(.n-button__content) {
-  color: rgba(0,0,0,0.55);
+:deep(.n-button__content) {
+  gap: 5px;
+  font-size: 12px;
+  color: rgba(255,255,255,0.6);
 }
 
-.light-mode :deep(.n-button:hover .n-button__content) {
-  color: rgba(0,0,0,0.85);
+:deep(.n-button:hover .n-button__content) {
+  color: rgba(255,255,255,0.9);
 }
 </style>

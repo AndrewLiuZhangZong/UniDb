@@ -163,6 +163,7 @@ const handleMenuAction = (action: string) => {
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  background: var(--bg-primary);
 }
 
 .app-body {

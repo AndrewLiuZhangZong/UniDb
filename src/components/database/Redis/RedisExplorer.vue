@@ -1,5 +1,5 @@
 <template>
-  <div class="redis-explorer" :class="{ 'light-mode': !isDarkTheme }">
+  <div class="redis-explorer">
     <div class="explorer-toolbar">
       <n-input v-model:value="keyPattern" size="tiny" placeholder="key:* 搜索" @keyup.enter="searchKeys" style="flex:1">
         <template #prefix><n-icon :size="12"><SearchOutline /></n-icon></template>
@@ -90,7 +90,6 @@ import { redisMeta } from '../../../api/meta'
 
 const message = useMessage()
 const settingsStore = useSettingsStore()
-const isDarkTheme = computed(() => settingsStore.settings.theme === 'dark')
 const props = defineProps<{ connection: any }>()
 const emit = defineEmits<{ (e: 'select-item', item: any, type: string): void }>()
 

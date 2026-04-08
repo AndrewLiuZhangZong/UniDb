@@ -1,5 +1,5 @@
 <template>
-  <div class="report-page" :class="{ 'light-mode': !isDarkTheme }">
+  <div class="report-page">
     <div class="report-container">
       <h2 class="report-title">{{ t('help.report.title') }}</h2>
 
@@ -83,7 +83,6 @@ import { useSettingsStore } from '../stores/settings'
 const { t } = useI18n()
 const router = useRouter()
 const settingsStore = useSettingsStore()
-const isDarkTheme = computed(() => settingsStore.settings.theme === 'dark')
 
 const appVersion = '0.1.0'
 const platform = window.electronAPI?.platform === 'darwin' ? 'macOS' : 'Windows'

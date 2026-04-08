@@ -1,5 +1,5 @@
 <template>
-  <div class="navigator" :class="{ 'light-mode': !isDarkTheme }">
+  <div class="navigator">
 
     <!-- ── Navigator Header ── -->
     <div class="nav-header">
@@ -114,7 +114,6 @@ import RedisExplorer from './database/Redis/RedisExplorer.vue'
 const { t } = useI18n()
 const connectionStore = useConnectionStore()
 const settingsStore = useSettingsStore()
-const isDarkTheme = computed(() => settingsStore.settings.theme === 'dark')
 
 const emit = defineEmits<{
   (e: 'select', connection: any, item: any, type: string): void

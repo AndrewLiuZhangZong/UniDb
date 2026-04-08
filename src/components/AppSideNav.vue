@@ -1,5 +1,5 @@
 <template>
-  <aside class="app-side-nav" :class="{ 'light-mode': !isDarkTheme }">
+  <aside class="app-side-nav">
     <div class="rail-top">
       <button type="button" class="rail-logo" @click="goHome" :aria-label="t('menu.home')">
         <svg width="34" height="34" viewBox="0 0 256 256" fill="none" aria-hidden="true">
@@ -93,7 +93,6 @@ const settingsStore = useSettingsStore()
 
 const emit = defineEmits<{ (e: 'menu-action', action: string): void }>()
 
-const isDarkTheme = computed(() => settingsStore.settings.theme === 'dark')
 const isHome = computed(() => route.name === 'home' || route.path === '/' || route.path === '')
 const isSettings = computed(() => route.path.startsWith('/settings'))
 
@@ -143,10 +142,6 @@ function onMenuSelect(key: string | number) {
   box-shadow: var(--shadow-rail, none);
 }
 
-.app-side-nav.light-mode {
-  background: #fafbfc;
-  border-right-color: rgba(15, 23, 42, 0.06);
-}
 
 .rail-top {
   display: flex;

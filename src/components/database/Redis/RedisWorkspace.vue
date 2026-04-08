@@ -1,5 +1,5 @@
 <template>
-  <div class="redis-workspace" :class="{ 'light-mode': !isDarkTheme }">
+  <div class="redis-workspace">
 
     <!-- Overview when no key selected -->
     <template v-if="!selectedItem || selectedItemType === 'node'">
@@ -216,7 +216,6 @@ import { redisMeta } from '../../../api/meta'
 const message = useMessage()
 const dialog = useDialog()
 const settingsStore = useSettingsStore()
-const isDarkTheme = computed(() => settingsStore.settings.theme === 'dark')
 
 const props = defineProps<{
   connection: any

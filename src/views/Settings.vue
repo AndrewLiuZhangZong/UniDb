@@ -1,5 +1,5 @@
 <template>
-  <div class="settings-container" :class="{ 'light-theme': !isDarkTheme }">
+  <div class="settings-container">
     <div class="settings-content">
       <!-- General Settings -->
       <div v-if="activeSection === 'general'" class="settings-section">
@@ -114,7 +114,6 @@ const { t } = useI18n()
 const route = useRoute()
 
 const settingsStore = useSettingsStore()
-const isDarkTheme = computed(() => settingsStore.settings.theme === 'dark')
 const settings = computed(() => settingsStore.settings)
 
 const activeSection = ref('general')

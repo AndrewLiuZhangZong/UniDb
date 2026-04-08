@@ -26,6 +26,33 @@
         <n-icon :size="22"><HomeOutline /></n-icon>
       </button>
 
+      <button
+        type="button"
+        class="rail-item"
+        :class="{ active: isBookmarks }"
+        @click="router.push('/bookmarks')"
+      >
+        <n-icon :size="22"><StarOutline /></n-icon>
+      </button>
+
+      <button
+        type="button"
+        class="rail-item"
+        :class="{ active: isTemplates }"
+        @click="router.push('/templates')"
+      >
+        <n-icon :size="22"><DocumentTextOutline /></n-icon>
+      </button>
+
+      <button
+        type="button"
+        class="rail-item"
+        :class="{ active: isTransfer }"
+        @click="router.push('/transfer')"
+      >
+        <n-icon :size="22"><SwapHorizontalOutline /></n-icon>
+      </button>
+
       <n-dropdown
         v-model:show="fileMenuOpen"
         trigger="click"
@@ -75,6 +102,9 @@ import { NDropdown, NIcon } from 'naive-ui'
 import type { DropdownOption } from 'naive-ui'
 import {
   HomeOutline,
+  StarOutline,
+  DocumentTextOutline,
+  SwapHorizontalOutline,
   FolderOpenOutline,
   SettingsOutline,
   HelpCircleOutline
@@ -90,6 +120,16 @@ const emit = defineEmits<{ (e: 'menu-action', action: string): void }>()
 
 const isHome = computed(() => route.name === 'home' || route.path === '/' || route.path === '')
 const isSettings = computed(() => route.path.startsWith('/settings'))
+const isHelpPage = computed(() =>
+  route.path.startsWith('/docs') ||
+  route.path.startsWith('/report') ||
+  route.path.startsWith('/about') ||
+  route.path.startsWith('/logs')
+)
+
+const isBookmarks = computed(() => route.path.startsWith('/bookmarks'))
+const isTemplates = computed(() => route.path.startsWith('/templates'))
+const isTransfer = computed(() => route.path.startsWith('/transfer'))
 
 const fileMenuOpen = ref(false)
 
@@ -109,13 +149,6 @@ function emitAction(action: string) {
 function goHome() {
   router.push('/')
 }
-
-const isHelpPage = computed(() =>
-  route.path.startsWith('/docs') ||
-  route.path.startsWith('/report') ||
-  route.path.startsWith('/about') ||
-  route.path.startsWith('/logs')
-)
 
 function onMenuSelect(key: string | number) {
   emit('menu-action', String(key))

@@ -336,5 +336,90 @@ export default {
       function: '函数',
       index: '索引'
     }
+  },
+  bookmarks: {
+    title: '书签',
+    add: '添加书签',
+    edit: '编辑书签',
+    empty: '暂无书签',
+    name: '名称',
+    namePlaceholder: '输入书签名称',
+    sql: 'SQL 语句',
+    sqlPlaceholder: '输入 SQL 语句',
+    connection: '关联连接',
+    connectionPlaceholder: '选择关联的数据库连接',
+    save: '保存',
+    saved: '书签已保存',
+    deleted: '书签已删除',
+    used: '已复制到剪贴板',
+    fillRequired: '请填写必填项'
+  },
+  templates: {
+    title: '模板',
+    add: '添加模板',
+    edit: '编辑模板',
+    empty: '暂无模板',
+    name: '模板名称',
+    namePlaceholder: '输入模板名称',
+    category: '分类',
+    categoryPlaceholder: '选择模板分类',
+    description: '描述',
+    descPlaceholder: '输入模板描述',
+    sql: 'SQL 语句',
+    sqlPlaceholder: '输入 SQL 语句模板，支持 {{变量名}} 占位符',
+    copy: '复制',
+    save: '保存',
+    saved: '模板已保存',
+    deleted: '模板已删除',
+    copied: '已复制到剪贴板',
+    fillRequired: '请填写必填项',
+    categories: {
+      common: '通用',
+      query: '查询',
+      structure: '结构',
+      custom: '自定义'
+    },
+    builtIn: {
+      pagination: {
+        name: '分页查询',
+        desc: '通用的分页查询语句'
+      },
+      count: {
+        name: '统计记录数',
+        desc: '带条件的记录统计'
+      },
+      describe: {
+        name: '查看表结构',
+        desc: '查看表的字段信息'
+      },
+      duplicate: {
+        name: '查找重复数据',
+        desc: '查找指定列的重复记录'
+      },
+      random: {
+        name: '随机取样',
+        desc: '随机获取若干条记录'
+      }
+    }
+  },
+  transfer: {
+    title: '数据传输',
+    source: '源',
+    target: '目标',
+    connection: '数据库连接',
+    selectConnection: '请选择连接',
+    sourceTable: '源表',
+    targetTable: '目标表',
+    selectTable: '请选择表',
+    columns: '要传输的字段',
+    selectColumns: '请选择字段（留空则传输全部）',
+    mode: '传输模式',
+    modeInsert: '仅插入',
+    modeUpsert: '插入或更新',
+    modeReplace: '替换',
+    start: '开始传输',
+    success: '传输成功',
+    failed: '传输失败',
+    affectedRows: '受影响行数'
   }
 }

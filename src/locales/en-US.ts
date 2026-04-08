@@ -336,5 +336,90 @@ export default {
       function: 'Function',
       index: 'Index'
     }
+  },
+  bookmarks: {
+    title: 'Bookmarks',
+    add: 'Add Bookmark',
+    edit: 'Edit Bookmark',
+    empty: 'No bookmarks yet',
+    name: 'Name',
+    namePlaceholder: 'Enter bookmark name',
+    sql: 'SQL Statement',
+    sqlPlaceholder: 'Enter SQL statement',
+    connection: 'Associated Connection',
+    connectionPlaceholder: 'Select associated database connection',
+    save: 'Save',
+    saved: 'Bookmark saved',
+    deleted: 'Bookmark deleted',
+    used: 'Copied to clipboard',
+    fillRequired: 'Please fill in required fields'
+  },
+  templates: {
+    title: 'Templates',
+    add: 'Add Template',
+    edit: 'Edit Template',
+    empty: 'No templates yet',
+    name: 'Template Name',
+    namePlaceholder: 'Enter template name',
+    category: 'Category',
+    categoryPlaceholder: 'Select template category',
+    description: 'Description',
+    descPlaceholder: 'Enter template description',
+    sql: 'SQL Statement',
+    sqlPlaceholder: 'Enter SQL template, supports {{variable}} placeholders',
+    copy: 'Copy',
+    save: 'Save',
+    saved: 'Template saved',
+    deleted: 'Template deleted',
+    copied: 'Copied to clipboard',
+    fillRequired: 'Please fill in required fields',
+    categories: {
+      common: 'Common',
+      query: 'Query',
+      structure: 'Structure',
+      custom: 'Custom'
+    },
+    builtIn: {
+      pagination: {
+        name: 'Pagination',
+        desc: 'Generic pagination query'
+      },
+      count: {
+        name: 'Count Records',
+        desc: 'Count records with conditions'
+      },
+      describe: {
+        name: 'Describe Table',
+        desc: 'View table field information'
+      },
+      duplicate: {
+        name: 'Find Duplicates',
+        desc: 'Find duplicate records in a column'
+      },
+      random: {
+        name: 'Random Sample',
+        desc: 'Get random records'
+      }
+    }
+  },
+  transfer: {
+    title: 'Data Transfer',
+    source: 'Source',
+    target: 'Target',
+    connection: 'Database Connection',
+    selectConnection: 'Select connection',
+    sourceTable: 'Source Table',
+    targetTable: 'Target Table',
+    selectTable: 'Select table',
+    columns: 'Columns to Transfer',
+    selectColumns: 'Select columns (leave empty for all)',
+    mode: 'Transfer Mode',
+    modeInsert: 'Insert Only',
+    modeUpsert: 'Insert or Update',
+    modeReplace: 'Replace',
+    start: 'Start Transfer',
+    success: 'Transfer successful',
+    failed: 'Transfer failed',
+    affectedRows: 'Affected rows'
   }
 }

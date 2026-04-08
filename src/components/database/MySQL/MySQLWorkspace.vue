@@ -8,6 +8,44 @@
 
     <!-- Table / view selected: DBeaver-style tabbed workspace -->
     <template v-else-if="selectedItemType === 'table' || selectedItemType === 'view'">
+      <!-- Physical table metadata from information_schema -->
+      <div v-if="selectedItemType === 'table'" class="table-meta-bar">
+        <n-spin v-if="metaLoading" size="small" class="meta-spin" />
+        <template v-else-if="tableMeta">
+          <div class="meta-chips">
+            <div class="meta-chip" :title="t('mysqlTable.rowsHint')">
+              <span class="meta-k">{{ t('mysqlTable.rows') }}</span>
+              <span class="meta-v">{{ formatRows(tableMeta.tableRows) }}</span>
+            </div>
+            <div class="meta-sep" />
+            <div class="meta-chip">
+              <span class="meta-k">{{ t('mysqlTable.dataLength') }}</span>
+              <span class="meta-v">{{ formatBytes(tableMeta.dataLength) }}</span>
+            </div>
+            <div class="meta-sep" />
+            <div class="meta-chip">
+              <span class="meta-k">{{ t('mysqlTable.indexLength') }}</span>
+              <span class="meta-v">{{ formatBytes(tableMeta.indexLength) }}</span>
+            </div>
+            <div class="meta-sep" />
+            <div class="meta-chip">
+              <span class="meta-k">{{ t('mysqlTable.engine') }}</span>
+              <span class="meta-v">{{ tableMeta.engine || '—' }}</span>
+            </div>
+            <div class="meta-sep" />
+            <div class="meta-chip">
+              <span class="meta-k">{{ t('mysqlTable.createTime') }}</span>
+              <span class="meta-v">{{ formatMetaTime(tableMeta.createTime) }}</span>
+            </div>
+            <div class="meta-sep" />
+            <div class="meta-chip">
+              <span class="meta-k">{{ t('mysqlTable.collation') }}</span>
+              <span class="meta-v">{{ tableMeta.collation || '—' }}</span>
+            </div>
+          </div>
+        </template>
+        <div v-else class="meta-unavailable">{{ t('mysqlTable.metaUnavailable') }}</div>
+      </div>
       <!-- Tab bar -->
       <div class="tab-bar">
         <div
@@ -34,7 +72,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, defineComponent, h } from 'vue'
+import { ref, computed, watch, defineComponent, h, onMounted, onUnmounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { NIcon, NButton, NInput, NSelect, NDataTable, NEmpty, NSpin, NAlert, NModal, NCard, useMessage, useDialog } from 'naive-ui'
 import {
   GridOutline, ListOutline, CodeSlashOutline, CreateOutline, TrashOutline,
@@ -51,6 +90,7 @@ const mysqlParser = new Parser()
 const message = useMessage()
 const dialog = useDialog()
 const settingsStore = useSettingsStore()
+const { t } = useI18n()
 
 const props = defineProps<{
   connection: any
@@ -68,7 +108,94 @@ const tabs = [
   { key: 'indexes', label: '索引', icon: FilterOutline }
 ]
 
-watch(() => props.selectedItem, () => { activeTab.value = 'browse' })
+const tableMeta = ref<{
+  name: string
+  engine: string | null
+  tableRows: number | null
+  dataLength: number | null
+  indexLength: number | null
+  collation: string | null
+  createTime: string | null
+} | null>(null)
+const metaLoading = ref(false)
+
+const lastTableSelKey = ref('')
+
+watch(
+  () =>
+    [
+      props.selectedItem?.name,
+      props.selectedItem?._db,
+      props.selectedItemType
+    ] as const,
+  ([name, db, typ]) => {
+    if (!name || (typ !== 'table' && typ !== 'view')) {
+      lastTableSelKey.value = ''
+      return
+    }
+    const key = `${db}:${name}:${typ}`
+    if (key !== lastTableSelKey.value) {
+      lastTableSelKey.value = key
+      activeTab.value = 'browse'
+    }
+  }
+)
+
+function formatBytes(n: number | null | undefined) {
+  if (n == null || Number.isNaN(n)) return '—'
+  if (n === 0) return '0 B'
+  const u = ['B', 'KB', 'MB', 'GB', 'TB']
+  let i = 0
+  let v = n
+  while (v >= 1024 && i < u.length - 1) {
+    v /= 1024
+    i++
+  }
+  return `${v < 10 && i > 0 ? v.toFixed(1) : Math.round(v)} ${u[i]}`
+}
+
+function formatRows(n: number | null | undefined) {
+  if (n == null || Number.isNaN(n)) return '—'
+  return n.toLocaleString()
+}
+
+function formatMetaTime(v: string | Date | null | undefined) {
+  if (v == null) return '—'
+  const s = typeof v === 'string' ? v : v.toISOString?.() || String(v)
+  return s.replace('T', ' ').slice(0, 19)
+}
+
+async function loadTableMeta() {
+  tableMeta.value = null
+  if (props.selectedItemType !== 'table' || !props.selectedItem?.name || !props.connection?.id) return
+  const db = props.selectedItem._db || props.activeDb
+  if (!db) return
+  metaLoading.value = true
+  try {
+    const res = await mysqlMeta.tableInfo(props.connection.id, props.selectedItem.name, db)
+    tableMeta.value = res.table
+  } catch {
+    tableMeta.value = null
+  } finally {
+    metaLoading.value = false
+  }
+}
+
+watch(
+  () => [props.connection?.id, props.selectedItem?.name, props.selectedItem?._db, props.selectedItemType, props.activeDb] as const,
+  () => {
+    loadTableMeta()
+  },
+  { immediate: true }
+)
+
+function onMysqlWorkspaceTab(e: Event) {
+  const tab = (e as CustomEvent<{ tab?: string }>).detail?.tab
+  if (tab && ['browse', 'schema', 'sql', 'indexes'].includes(tab)) activeTab.value = tab
+}
+
+onMounted(() => window.addEventListener('mysql-workspace-tab', onMysqlWorkspaceTab as EventListener))
+onUnmounted(() => window.removeEventListener('mysql-workspace-tab', onMysqlWorkspaceTab as EventListener))
 
 // ─── Sub-components defined inline ──────────────────────────────────────────
 
@@ -737,6 +864,27 @@ const TableIndexes = defineComponent({
   flex: 1; display: flex; flex-direction: column; overflow: hidden;
   background: var(--bg-primary); color: var(--text-secondary);
 }
+
+.table-meta-bar {
+  flex-shrink: 0;
+  min-height: 36px;
+  display: flex;
+  align-items: center;
+  padding: 6px 12px;
+  gap: 10px;
+  background: var(--bg-tertiary);
+  border-bottom: 1px solid var(--border-secondary);
+  font-size: 11px;
+}
+.meta-spin { margin: 4px 0; }
+.meta-chips { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 0; width: 100%; }
+.meta-chip { display: inline-flex; align-items: baseline; gap: 6px; padding: 2px 8px 2px 0; }
+.meta-k { color: var(--text-quaternary); white-space: nowrap; }
+.meta-v { color: var(--text-secondary); font-family: ui-monospace, monospace; font-size: 11px; }
+.meta-sep {
+  width: 1px; height: 14px; background: var(--border-secondary); margin: 0 4px; flex-shrink: 0;
+}
+.meta-unavailable { color: var(--text-disabled); font-size: 11px; }
 
 .tab-bar {
   display: flex; align-items: center; height: 38px; flex-shrink: 0;

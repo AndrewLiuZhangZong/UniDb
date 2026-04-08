@@ -100,10 +100,12 @@
     <!-- Context menu -->
     <n-dropdown
       trigger="manual"
+      placement="bottom-start"
       :show="ctx.show"
       :x="ctx.x"
       :y="ctx.y"
       :options="ctxOptions"
+      :dropdown-props="{ scrollable: true }"
       @select="handleCtx"
       @clickoutside="ctx.show = false"
     />
@@ -124,13 +126,68 @@
         </div>
       </n-card>
     </n-modal>
+
+    <!-- Rename table -->
+    <n-modal v-model:show="renameModal.show">
+      <n-card :title="t('mysqlTable.renameTitle')" style="width:420px" :bordered="false" size="small">
+        <template #header-extra>
+          <n-button text @click="renameModal.show = false">
+            <template #icon><n-icon><CloseOutline /></n-icon></template>
+          </n-button>
+        </template>
+        <p style="font-size:12px;color:var(--text-tertiary);margin:0 0 8px">{{ renameModal.oldName }} →</p>
+        <n-input v-model:value="renameModal.newName" :placeholder="t('mysqlTable.renamePlaceholder')" />
+        <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:12px">
+          <n-button @click="renameModal.show = false">{{ t('common.cancel') }}</n-button>
+          <n-button type="primary" :loading="renameModal.saving" @click="confirmRename">{{ t('common.confirm') }}</n-button>
+        </div>
+      </n-card>
+    </n-modal>
+
+    <!-- Copy table -->
+    <n-modal v-model:show="copyModal.show">
+      <n-card :title="t('mysqlTable.copyTableTitle')" style="width:420px" :bordered="false" size="small">
+        <template #header-extra>
+          <n-button text @click="copyModal.show = false">
+            <template #icon><n-icon><CloseOutline /></n-icon></template>
+          </n-button>
+        </template>
+        <p style="font-size:12px;color:var(--text-tertiary);margin:0 0 8px">
+          {{ copyModal.sourceName }} · {{ copyModal.mode === 'full' ? t('mysqlTable.ctx.copyStructureData') : t('mysqlTable.ctx.copyStructureOnly') }}
+        </p>
+        <n-input v-model:value="copyModal.newName" :placeholder="t('mysqlTable.copyTablePlaceholder')" />
+        <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:12px">
+          <n-button @click="copyModal.show = false">{{ t('common.cancel') }}</n-button>
+          <n-button type="primary" :loading="copyModal.saving" @click="confirmCopyTable">{{ t('common.confirm') }}</n-button>
+        </div>
+      </n-card>
+    </n-modal>
+
+    <!-- Dump SQL -->
+    <n-modal v-model:show="dumpModal.show">
+      <n-card :title="dumpModal.table ? `${t('mysqlTable.dumpSqlTitle')}: \`${dumpModal.db}\`.\`${dumpModal.table}\`` : t('mysqlTable.dumpSqlTitle')" style="width:720px;max-width:92vw" :bordered="false" size="small">
+        <template #header-extra>
+          <n-button text @click="dumpModal.show = false">
+            <template #icon><n-icon><CloseOutline /></n-icon></template>
+          </n-button>
+        </template>
+        <n-spin v-if="dumpModal.loading" style="min-height:120px;display:flex;align-items:center;justify-content:center" />
+        <template v-else>
+          <n-input v-model:value="dumpModal.sql" type="textarea" :autosize="{ minRows: 14, maxRows: 28 }" style="font-family:monospace;font-size:11px" readonly />
+          <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:12px">
+            <n-button @click="copyDumpToClipboard">{{ t('menu.copy') }}</n-button>
+            <n-button type="primary" @click="dumpModal.show = false">{{ t('common.close') }}</n-button>
+          </div>
+        </template>
+      </n-card>
+    </n-modal>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, watch } from 'vue'
+import { ref, reactive, computed, watch, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { NIcon, NButton, NInput, NDropdown, NModal, NCard, useMessage, useDialog } from 'naive-ui'
+import { NIcon, NButton, NInput, NDropdown, NModal, NCard, NSpin, useMessage, useDialog } from 'naive-ui'
 import {
   RefreshOutline, ChevronForwardOutline, GridOutline, EyeOutline,
   AddOutline, SearchOutline, WarningOutline, CloseOutline, ServerOutline
@@ -171,6 +228,31 @@ const createTableSQL = ref('')
 const createTableTargetDb = ref('')
 const createTableSaving = ref(false)
 
+const renameModal = reactive({
+  show: false,
+  db: '',
+  oldName: '',
+  newName: '',
+  saving: false
+})
+
+const copyModal = reactive({
+  show: false,
+  db: '',
+  sourceName: '',
+  newName: '',
+  mode: 'structure' as 'structure' | 'full',
+  saving: false
+})
+
+const dumpModal = reactive({
+  show: false,
+  sql: '',
+  loading: false,
+  db: '',
+  table: ''
+})
+
 // ─── Computed ───────────────────────────────────────────────────────────────
 const filteredTables = (db: string) => {
   if (!searchText.value) return tables.value[db] || []
@@ -208,26 +290,232 @@ const selectItem = (db: string, item: any, type: string) => {
 
 // ─── Context menu ────────────────────────────────────────────────────────────
 const ctxOptions = computed(() => [
-  { label: '查看数据', key: 'browse' },
-  { label: '表结构', key: 'schema' },
-  { label: 'SQL 查询', key: 'query' },
+  { label: t('mysqlTable.ctx.openTable'), key: 'open-table' },
+  { label: t('mysqlTable.ctx.designTable'), key: 'design-table' },
+  { label: t('explorer.sqlQuery'), key: 'sql-tab' },
+  { label: t('mysqlTable.ctx.newTable'), key: 'new-table' },
   { type: 'divider', key: 'd1' },
-  { label: '清空表数据', key: 'truncate' },
-  { label: '删除表', key: 'drop' }
+  { label: t('mysqlTable.ctx.emptyTable'), key: 'empty-table' },
+  { label: t('mysqlTable.ctx.truncateTable'), key: 'truncate-table' },
+  { label: t('mysqlTable.ctx.deleteTable'), key: 'delete-table' },
+  { type: 'divider', key: 'd2' },
+  {
+    label: t('mysqlTable.ctx.copyTable'),
+    key: 'copy-table',
+    children: [
+      { label: t('mysqlTable.ctx.copyStructureOnly'), key: 'copy-structure' },
+      { label: t('mysqlTable.ctx.copyStructureData'), key: 'copy-full' }
+    ]
+  },
+  {
+    label: t('mysqlTable.ctx.dumpSql'),
+    key: 'dump-sql',
+    children: [
+      { label: t('mysqlTable.ctx.dumpStructure'), key: 'dump-structure' },
+      { label: t('mysqlTable.ctx.dumpStructureData'), key: 'dump-structure-data' }
+    ]
+  },
+  { type: 'divider', key: 'd3' },
+  { label: t('mysqlTable.ctx.copy'), key: 'copy-name' },
+  { label: t('mysqlTable.ctx.rename'), key: 'rename-table' },
+  { type: 'divider', key: 'd4' },
+  { label: t('mysqlTable.ctx.refresh'), key: 'refresh-tree' }
 ])
 
 const openCtx = (e: MouseEvent, db: string, tbl: any, type: string) => {
   ctx.value = { show: true, x: e.clientX, y: e.clientY, db, item: tbl, type }
 }
 
-const handleCtx = (key: string) => {
+function assertSafeIdent(name: string) {
+  if (!/^[a-zA-Z0-9_]+$/.test(name)) {
+    message.error(t('mysqlTable.invalidName'))
+    return false
+  }
+  return true
+}
+
+function rowsFromExec(res: any): any[] {
+  const d = res?.data
+  return Array.isArray(d) ? d : (d?.rows || [])
+}
+
+async function runSql(sql: string, database: string) {
+  const res = await mysqlMeta.execute(props.connection.id, sql, database)
+  if ((res as any).error) throw new Error((res as any).error)
+  return res
+}
+
+function sqlLiteral(v: any): string {
+  if (v === null || v === undefined) return 'NULL'
+  if (typeof v === 'number' && Number.isFinite(v)) return String(v)
+  if (typeof v === 'boolean') return v ? '1' : '0'
+  if (v instanceof Date) return `'${v.toISOString().slice(0, 19).replace('T', ' ')}'`
+  return `'${String(v).replace(/\\/g, '\\\\').replace(/'/g, "\\'")}'`
+}
+
+function openWorkspaceTab(tab: string) {
+  window.dispatchEvent(new CustomEvent('mysql-workspace-tab', { detail: { tab } }))
+}
+
+const handleCtx = async (key: string) => {
   ctx.value.show = false
-  const { db, item, type } = ctx.value
-  if (key === 'browse') selectItem(db, item, 'table')
-  else if (key === 'query') selectItem(db, item, 'query')
-  else if (key === 'schema') selectItem(db, item, 'schema')
-  else if (key === 'drop') dropTable(db, item)
-  else if (key === 'truncate') truncateTable(db, item)
+  const { db, item } = ctx.value
+  const tbl = item
+  if (!db || !tbl?.name) return
+
+  try {
+    if (key === 'open-table') {
+      selectItem(db, tbl, 'table')
+    } else if (key === 'design-table') {
+      selectItem(db, tbl, 'table')
+      await nextTick()
+      openWorkspaceTab('schema')
+    } else if (key === 'sql-tab') {
+      selectItem(db, tbl, 'table')
+      await nextTick()
+      openWorkspaceTab('sql')
+    } else if (key === 'new-table') {
+      openCreateTable(db)
+    } else if (key === 'empty-table') {
+      emptyTable(db, tbl)
+    } else if (key === 'truncate-table') {
+      truncateTable(db, tbl)
+    } else if (key === 'delete-table') {
+      dropTable(db, tbl)
+    } else if (key === 'copy-structure') {
+      copyModal.db = db
+      copyModal.sourceName = tbl.name
+      copyModal.newName = `${tbl.name}_copy`
+      copyModal.mode = 'structure'
+      copyModal.show = true
+    } else if (key === 'copy-full') {
+      copyModal.db = db
+      copyModal.sourceName = tbl.name
+      copyModal.newName = `${tbl.name}_copy`
+      copyModal.mode = 'full'
+      copyModal.show = true
+    } else if (key === 'dump-structure') {
+      doDump(db, tbl.name, false)
+    } else if (key === 'dump-structure-data') {
+      doDump(db, tbl.name, true)
+    } else if (key === 'copy-name') {
+      try {
+        await navigator.clipboard.writeText(tbl.name)
+        message.success(t('mysqlTable.copiedName'))
+      } catch {
+        message.error(t('mysqlTable.copyNameFailed'))
+      }
+    } else if (key === 'rename-table') {
+      renameModal.db = db
+      renameModal.oldName = tbl.name
+      renameModal.newName = tbl.name
+      renameModal.show = true
+    } else if (key === 'refresh-tree') {
+      await loadTablesAndViews(db)
+      message.success(t('explorer.refreshing'))
+    }
+  } catch (e: any) {
+    message.error((e?.response?.data?.error || e.message) as string)
+  }
+}
+
+async function doDump(database: string, table: string, withData: boolean) {
+  dumpModal.show = true
+  dumpModal.db = database
+  dumpModal.table = table
+  dumpModal.loading = true
+  dumpModal.sql = ''
+  try {
+    const fq = `\`${database}\`.\`${table}\``
+    const cr = await runSql(`SHOW CREATE TABLE ${fq}`, database)
+    const rows = rowsFromExec(cr)
+    const row0 = rows[0] || {}
+    const create =
+      row0['Create Table'] ?? row0.CREATE_TABLE ?? (row0 && Object.values(row0)[0])
+    let out = `-- Dump: ${fq}  [${withData ? 'FULL' : 'STRUCTURE'}]\n${create};\n\n`
+    if (withData) {
+      const dr = await runSql(`SELECT * FROM ${fq} LIMIT 3000`, database)
+      const dataRows = rowsFromExec(dr)
+      if (dataRows.length) {
+        const cols = Object.keys(dataRows[0])
+        const colList = cols.map(c => `\`${c}\``).join(', ')
+        const values = dataRows.map(
+          r => `(${cols.map(c => sqlLiteral((r as any)[c])).join(', ')})`
+        )
+        out += `-- Data (max 3000 rows)\nINSERT INTO ${fq} (${colList}) VALUES\n${values.join(',\n')};\n`
+      }
+    }
+    dumpModal.sql = out
+  } catch (e: any) {
+    dumpModal.sql = `-- Error: ${e?.message || e}`
+  } finally {
+    dumpModal.loading = false
+  }
+}
+
+function copyDumpToClipboard() {
+  if (!dumpModal.sql) return
+  navigator.clipboard.writeText(dumpModal.sql).then(
+    () => message.success(t('mysqlTable.copiedName')),
+    () => message.error(t('mysqlTable.copyNameFailed'))
+  )
+}
+
+function emptyTable(db: string, tbl: any) {
+  dialog.warning({
+    title: t('mysqlTable.confirmEmpty'),
+    content: t('mysqlTable.confirmEmptyMsg', { name: tbl.name }),
+    positiveText: t('common.confirm'),
+    negativeText: t('common.cancel'),
+    onPositiveClick: async () => {
+      try {
+        await runSql(`DELETE FROM \`${db}\`.\`${tbl.name}\``, db)
+        message.success(t('mysqlTable.emptyOk'))
+      } catch (e: any) {
+        message.error(e?.message || String(e))
+      }
+    }
+  })
+}
+
+async function confirmRename() {
+  const { db, oldName, newName } = renameModal
+  if (!assertSafeIdent(newName) || newName === oldName) return
+  renameModal.saving = true
+  try {
+    await runSql(`RENAME TABLE \`${db}\`.\`${oldName}\` TO \`${db}\`.\`${newName}\``, db)
+    renameModal.show = false
+    message.success(t('mysqlTable.renameOk'))
+    await loadTablesAndViews(db)
+    selectItem(db, { name: newName, engine: '', rows: null, comment: '' }, 'table')
+  } catch (e: any) {
+    message.error(e?.message || String(e))
+  } finally {
+    renameModal.saving = false
+  }
+}
+
+async function confirmCopyTable() {
+  const { db, sourceName, newName, mode } = copyModal
+  if (!assertSafeIdent(newName) || newName === sourceName) return
+  copyModal.saving = true
+  try {
+    await runSql(`CREATE TABLE \`${db}\`.\`${newName}\` LIKE \`${db}\`.\`${sourceName}\``, db)
+    if (mode === 'full') {
+      await runSql(
+        `INSERT INTO \`${db}\`.\`${newName}\` SELECT * FROM \`${db}\`.\`${sourceName}\``,
+        db
+      )
+    }
+    copyModal.show = false
+    message.success(t('mysqlTable.copyOk'))
+    await loadTablesAndViews(db)
+    selectItem(db, { name: newName, engine: '', rows: null, comment: '' }, 'table')
+  } catch (e: any) {
+    message.error(e?.message || String(e))
+  } finally {
+    copyModal.saving = false
+  }
 }
 
 const dropTable = (db: string, tbl: any) => {

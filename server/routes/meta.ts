@@ -75,6 +75,48 @@ router.get('/mysql/:connectionId/views', async (req, res) => {
   }
 })
 
+// GET /api/meta/mysql/:connectionId/tableinfo?database=xxx&table=yyy
+router.get('/mysql/:connectionId/tableinfo', async (req, res) => {
+  const { database, table } = req.query as { database?: string; table: string }
+  if (!database || !table) {
+    res.status(400).json({ error: 'database and table are required' })
+    return
+  }
+  try {
+    const adapter = await DatabaseAdapterFactory.createAdapter(req.params.connectionId) as any
+    await adapter.connect()
+    const result = await adapter.query(
+      `SELECT TABLE_NAME, ENGINE, TABLE_ROWS, DATA_LENGTH, INDEX_LENGTH,
+              TABLE_COLLATION, CREATE_TIME, UPDATE_TIME, TABLE_COMMENT, AUTO_INCREMENT
+       FROM information_schema.TABLES
+       WHERE TABLE_SCHEMA = ? AND TABLE_NAME = ?`,
+      [database, table]
+    )
+    await adapter.disconnect()
+    const row = (result.rows || [])[0] as any
+    if (!row) {
+      res.status(404).json({ error: 'Table not found' })
+      return
+    }
+    res.json({
+      table: {
+        name: row.TABLE_NAME,
+        engine: row.ENGINE,
+        tableRows: row.TABLE_ROWS,
+        dataLength: row.DATA_LENGTH,
+        indexLength: row.INDEX_LENGTH,
+        collation: row.TABLE_COLLATION,
+        createTime: row.CREATE_TIME,
+        updateTime: row.UPDATE_TIME,
+        comment: row.TABLE_COMMENT,
+        autoIncrement: row.AUTO_INCREMENT
+      }
+    })
+  } catch (e) {
+    res.status(500).json({ error: (e as Error).message })
+  }
+})
+
 // GET /api/meta/mysql/:connectionId/columns?database=xxx&table=yyy
 router.get('/mysql/:connectionId/columns', async (req, res) => {
   const { database, table } = req.query as { database?: string; table: string }

@@ -39,6 +39,21 @@ export const mysqlMeta = {
   views: (id: string, database?: string) => get<{ views: any[] }>(`/meta/mysql/${id}/views`, { database }),
   columns: (id: string, table: string, database?: string) => get<{ columns: any[] }>(`/meta/mysql/${id}/columns`, { table, database }),
   indexes: (id: string, table: string, database?: string) => get<{ indexes: any[] }>(`/meta/mysql/${id}/indexes`, { table, database }),
+  tableInfo: (id: string, table: string, database: string) =>
+    get<{
+      table: {
+        name: string
+        engine: string | null
+        tableRows: number | null
+        dataLength: number | null
+        indexLength: number | null
+        collation: string | null
+        createTime: string | null
+        updateTime: string | null
+        comment: string | null
+        autoIncrement: number | null
+      }
+    }>(`/meta/mysql/${id}/tableinfo`, { table, database }),
   tableData: (id: string, table: string, database?: string, page = 1, pageSize = 50) =>
     get<{ rows: any[]; fields: any[]; total: number }>(`/meta/mysql/${id}/tabledata`, { table, database, page, pageSize }),
   execute: (connectionId: string, query: string, database?: string) =>

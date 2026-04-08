@@ -309,12 +309,23 @@ export default {
   },
   nav: {
     home: '主页',
+    back: '返回',
     database: '数据库导航',
     newConnection: '新建连接',
     refresh: '刷新',
     actions: '操作',
     noConnections: '暂无连接',
     togglePanel: '展开/收起导航面板',
+    // 帮助页面面包屑
+    settings: '设置',
+    settingsMenu: '设置',
+    general: '通用',
+    drivers: '驱动管理',
+    logs: '日志',
+    about: '关于',
+    docs: '文档',
+    report: '反馈问题',
+    help: '帮助',
     type: {
       table: '表',
       view: '视图',

@@ -1,142 +1,117 @@
 <template>
   <div class="settings-container" :class="{ 'light-theme': !isDarkTheme }">
-    <div class="settings-layout">
-      <!-- Sidebar -->
-      <div class="settings-sidebar">
-        <div class="sidebar-header">
-          <h2 class="sidebar-title">{{ t('settings.title') }}</h2>
-        </div>
-        <div class="settings-nav">
-          <div
-            v-for="section in sections"
-            :key="section.key"
-            class="nav-item"
-            :class="{ 'is-active': activeSection === section.key }"
-            @click="activeSection = section.key"
-          >
-            <n-icon class="nav-icon"><component :is="section.icon" /></n-icon>
-            <span class="nav-label">{{ t(`settings.sections.${section.key}`) }}</span>
+    <div class="settings-content">
+      <!-- General Settings -->
+      <div v-if="activeSection === 'general'" class="settings-section">
+        <h3 class="section-title">{{ t('settings.sections.general') }}</h3>
+
+        <div class="setting-group">
+          <div class="setting-item">
+            <div class="setting-info">
+              <label class="setting-label">{{ t('settings.language') }}</label>
+              <p class="setting-desc">{{ t('settings.languageDesc') }}</p>
+            </div>
+            <n-select
+              :value="settings.language"
+              :options="languageOptions"
+              style="width: 200px;"
+              @update:value="(val) => settingsStore.updateSetting('language', val)"
+            />
+          </div>
+
+          <div class="setting-item">
+            <div class="setting-info">
+              <label class="setting-label">{{ t('settings.accentColor') }}</label>
+              <p class="setting-desc">{{ t('settings.accentColorDesc') }}</p>
+            </div>
+            <n-select
+              :value="settings.accentColor"
+              :options="accentColorOptions"
+              style="width: 200px;"
+              @update:value="(val) => settingsStore.updateSetting('accentColor', val)"
+            />
           </div>
         </div>
       </div>
 
-      <!-- Content -->
-      <div class="settings-content">
-        <!-- General Settings -->
-        <div v-if="activeSection === 'general'" class="settings-section">
-          <h3 class="section-title">{{ t('settings.sections.general') }}</h3>
+      <!-- Driver Management -->
+      <div v-if="activeSection === 'drivers'" class="settings-section">
+        <h3 class="section-title">{{ t('settings.sections.drivers') }}</h3>
+        <p class="section-desc">{{ t('settings.driversDesc') }}</p>
 
-          <div class="setting-group">
-            <div class="setting-item">
-              <div class="setting-info">
-                <label class="setting-label">{{ t('settings.language') }}</label>
-                <p class="setting-desc">{{ t('settings.languageDesc') }}</p>
+        <div class="drivers-grid">
+          <div
+            v-for="driver in drivers"
+            :key="driver.id"
+            class="driver-card"
+          >
+            <div class="driver-header">
+              <n-icon class="driver-icon" :size="28">
+                <ServerOutline v-if="driver.id === 'mysql' || driver.id === 'mongodb' || driver.id === 'redis'" />
+                <CloudDownloadOutline v-else-if="driver.id === 'clickhouse'" />
+              </n-icon>
+              <div class="driver-info">
+                <h4 class="driver-name">{{ driver.name }}</h4>
+                <span class="driver-version">v{{ driver.version }}</span>
               </div>
-              <n-select
-                :value="settings.language"
-                :options="languageOptions"
-                style="width: 200px;"
-                @update:value="(val) => settingsStore.updateSetting('language', val)"
-              />
+              <n-tag v-if="driver.outdated" type="warning" size="small">
+                {{ t('settings.outdated') }}
+              </n-tag>
+              <n-tag v-else-if="driver.installed" type="success" size="small">
+                {{ t('settings.installed') }}
+              </n-tag>
             </div>
-
-            <div class="setting-item">
-              <div class="setting-info">
-                <label class="setting-label">{{ t('settings.accentColor') }}</label>
-                <p class="setting-desc">{{ t('settings.accentColorDesc') }}</p>
-              </div>
-              <n-select
-                :value="settings.accentColor"
-                :options="accentColorOptions"
-                style="width: 200px;"
-                @update:value="(val) => settingsStore.updateSetting('accentColor', val)"
-              />
-            </div>
-          </div>
-        </div>
-
-        <!-- Driver Management -->
-        <div v-if="activeSection === 'drivers'" class="settings-section">
-          <h3 class="section-title">{{ t('settings.sections.drivers') }}</h3>
-          <p class="section-desc">{{ t('settings.driversDesc') }}</p>
-
-          <div class="drivers-grid">
-            <div
-              v-for="driver in drivers"
-              :key="driver.id"
-              class="driver-card"
-              :class="{ 'is-installed': driver.installed, 'is-outdated': driver.outdated }"
-            >
-              <div class="driver-header">
-                <n-icon class="driver-icon" :size="32">
-                  <Component :is="driver.icon" />
-                </n-icon>
-                <div class="driver-info">
-                  <h4 class="driver-name">{{ driver.name }}</h4>
-                  <span class="driver-version">v{{ driver.version }}</span>
-                </div>
-                <n-tag v-if="driver.outdated" type="warning" size="small">
-                  {{ t('settings.outdated') }}
-                </n-tag>
-                <n-tag v-else-if="driver.installed" type="success" size="small">
-                  {{ t('settings.installed') }}
-                </n-tag>
-              </div>
-              <div class="driver-actions">
-                <n-button
-                  v-if="!driver.installed"
-                  type="primary"
-                  size="small"
-                  @click="handleInstallDriver(driver)"
-                >
-                  {{ t('settings.install') }}
-                </n-button>
-                <n-button
-                  v-else-if="driver.outdated"
-                  type="info"
-                  size="small"
-                  @click="handleUpdateDriver(driver)"
-                >
-                  {{ t('settings.update') }}
-                </n-button>
-                <n-button
-                  v-else
-                  size="small"
-                  @click="handleRemoveDriver(driver)"
-                >
-                  {{ t('settings.remove') }}
-                </n-button>
-              </div>
+            <div class="driver-actions">
+              <n-button
+                v-if="!driver.installed"
+                type="primary"
+                size="small"
+                @click="handleInstallDriver(driver)"
+              >
+                {{ t('settings.install') }}
+              </n-button>
+              <n-button
+                v-else-if="driver.outdated"
+                type="info"
+                size="small"
+                @click="handleUpdateDriver(driver)"
+              >
+                {{ t('settings.update') }}
+              </n-button>
+              <n-button
+                v-else
+                size="small"
+                @click="handleRemoveDriver(driver)"
+              >
+                {{ t('settings.remove') }}
+              </n-button>
             </div>
           </div>
         </div>
+      </div>
 
-        <!-- logs -->
-        <div v-if="activeSection === 'logs'" class="settings-section">
-          <h3 class="section-title">{{ t('settings.sections.logs') }}</h3>
-          <p class="section-desc">{{ t('settings.logsDesc') }}</p>
-          <LogsPanel />
-        </div>
-
+      <!-- logs -->
+      <div v-if="activeSection === 'logs'" class="settings-section">
+        <h3 class="section-title">{{ t('settings.sections.logs') }}</h3>
+        <p class="section-desc">{{ t('settings.logsDesc') }}</p>
+        <LogsPanel />
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, defineAsyncComponent } from 'vue'
+import { ref, computed, defineAsyncComponent, watch } from 'vue'
+import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import { NIcon, NSelect, NButton, NTag, useMessage } from 'naive-ui'
-import {
-  SettingsOutline, HardwareChipOutline,
-  ServerOutline, CloudDownloadOutline, ListOutline
-} from '@vicons/ionicons5'
+import { NSelect, NButton, NTag, NIcon } from 'naive-ui'
+import { ServerOutline, CloudDownloadOutline } from '@vicons/ionicons5'
 import { useSettingsStore } from '../stores/settings'
 
 const LogsPanel = defineAsyncComponent(() => import('../components/LogsPanel.vue'))
 
 const { t } = useI18n()
-const message = useMessage()
+const route = useRoute()
 
 const settingsStore = useSettingsStore()
 const isDarkTheme = computed(() => settingsStore.settings.theme === 'dark')
@@ -144,11 +119,17 @@ const settings = computed(() => settingsStore.settings)
 
 const activeSection = ref('general')
 
-const sections = [
-  { key: 'general', icon: SettingsOutline },
-  { key: 'drivers', icon: HardwareChipOutline },
-  { key: 'logs', icon: ListOutline }
-]
+watch(
+  () => route.query.tab,
+  (tab) => {
+    if (tab === 'general' || tab === 'drivers' || tab === 'logs') {
+      activeSection.value = tab as string
+    } else {
+      activeSection.value = 'general'
+    }
+  },
+  { immediate: true }
+)
 
 const languageOptions = [
   { label: '简体中文', value: 'zh-CN' },
@@ -161,22 +142,22 @@ const accentColorOptions = computed(() => [
 ])
 
 const drivers = ref([
-  { id: 'mysql', name: 'MySQL', version: '8.0', installed: true, outdated: false, icon: ServerOutline },
-  { id: 'clickhouse', name: 'ClickHouse', version: '0.4.6', installed: true, outdated: false, icon: CloudDownloadOutline },
-  { id: 'mongodb', name: 'MongoDB', version: '7.1', installed: true, outdated: false, icon: ServerOutline },
-  { id: 'redis', name: 'Redis', version: '5.0', installed: true, outdated: false, icon: ServerOutline }
+  { id: 'mysql', name: 'MySQL', version: '8.0', installed: true, outdated: false },
+  { id: 'clickhouse', name: 'ClickHouse', version: '0.4.6', installed: true, outdated: false },
+  { id: 'mongodb', name: 'MongoDB', version: '7.1', installed: true, outdated: false },
+  { id: 'redis', name: 'Redis', version: '5.0', installed: true, outdated: false }
 ])
 
 const handleInstallDriver = (driver: any) => {
-  message.info(`Installing ${driver.name}...`)
+  console.log(`Installing ${driver.name}...`)
 }
 
 const handleUpdateDriver = (driver: any) => {
-  message.info(`Updating ${driver.name}...`)
+  console.log(`Updating ${driver.name}...`)
 }
 
 const handleRemoveDriver = (driver: any) => {
-  message.warning(`Removing ${driver.name}...`)
+  console.log(`Removing ${driver.name}...`)
 }
 </script>
 
@@ -185,75 +166,9 @@ const handleRemoveDriver = (driver: any) => {
   height: 100%;
   display: flex;
   flex-direction: column;
-  background: #12121a;
-  color: rgba(255, 255, 255, 0.9);
-  transition: background 0.3s ease, color 0.3s ease;
+  overflow: hidden;
 }
 
-.settings-layout {
-  display: flex;
-  flex: 1;
-}
-
-/* Sidebar */
-.settings-sidebar {
-  width: 240px;
-  background: #1e1e23;
-  border-right: 1px solid rgba(255, 255, 255, 0.06);
-  display: flex;
-  flex-direction: column;
-  transition: background 0.3s ease;
-}
-
-.sidebar-header {
-  padding: 16px 20px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-  display: flex;
-  align-items: center;
-}
-
-.sidebar-title {
-  font-size: 16px;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.9);
-  margin: 0;
-}
-
-.settings-nav {
-  flex: 1;
-  padding: 12px;
-}
-
-.nav-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 16px;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.15s ease;
-  margin-bottom: 4px;
-  color: rgba(255, 255, 255, 0.7);
-}
-
-.nav-item:hover {
-  background: rgba(255, 255, 255, 0.06);
-}
-
-.nav-item.is-active {
-  background: rgba(255, 107, 0, 0.15);
-  color: #FF6B00;
-}
-
-.nav-icon {
-  font-size: 18px;
-}
-
-.nav-label {
-  font-size: 14px;
-}
-
-/* Content */
 .settings-content {
   flex: 1;
   padding: 32px;
@@ -267,13 +182,13 @@ const handleRemoveDriver = (driver: any) => {
 .section-title {
   font-size: 20px;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.95);
+  color: var(--text-primary);
   margin: 0 0 8px;
 }
 
 .section-desc {
   font-size: 14px;
-  color: rgba(255, 255, 255, 0.5);
+  color: var(--text-quaternary);
   margin: 0 0 24px;
 }
 
@@ -289,9 +204,9 @@ const handleRemoveDriver = (driver: any) => {
   justify-content: space-between;
   gap: 24px;
   padding: 16px;
-  background: rgba(255, 255, 255, 0.02);
+  background: var(--bg-row-hover);
   border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--border-secondary);
   transition: all 0.2s ease;
 }
 
@@ -302,18 +217,17 @@ const handleRemoveDriver = (driver: any) => {
 .setting-label {
   font-size: 14px;
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.9);
+  color: var(--text-primary);
   display: block;
   margin-bottom: 4px;
 }
 
 .setting-desc {
   font-size: 12px;
-  color: rgba(255, 255, 255, 0.4);
+  color: var(--text-disabled);
   margin: 0;
 }
 
-/* Drivers */
 .drivers-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -323,8 +237,8 @@ const handleRemoveDriver = (driver: any) => {
 
 .driver-card {
   padding: 20px;
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: var(--bg-row-hover);
+  border: 1px solid var(--border-secondary);
   border-radius: 12px;
   transition: all 0.2s ease;
 }
@@ -337,23 +251,23 @@ const handleRemoveDriver = (driver: any) => {
 }
 
 .driver-icon {
-  color: #FF6B00;
+  color: var(--accent-primary);
 }
 
 .driver-info {
   flex: 1;
 }
 
-.driverName {
+.driver-name {
   font-size: 14px;
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.9);
+  color: var(--text-primary);
   margin: 0 0 2px;
 }
 
 .driver-version {
   font-size: 12px;
-  color: rgba(255, 255, 255, 0.4);
+  color: var(--text-disabled);
 }
 
 .driver-actions {

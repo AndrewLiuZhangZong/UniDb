@@ -309,12 +309,23 @@ export default {
   },
   nav: {
     home: 'Home',
+    back: 'Back',
     database: 'Database Navigator',
     newConnection: 'New Connection',
     refresh: 'Refresh',
     actions: 'Actions',
     noConnections: 'No connections',
     togglePanel: 'Toggle Navigator Panel',
+    // Help page breadcrumbs
+    settings: 'Settings',
+    settingsMenu: 'Settings',
+    general: 'General',
+    drivers: 'Drivers',
+    logs: 'Logs',
+    about: 'About',
+    docs: 'Docs',
+    report: 'Report Issue',
+    help: 'Help',
     type: {
       table: 'Table',
       view: 'View',

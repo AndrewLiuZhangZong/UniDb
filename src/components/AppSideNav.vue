@@ -59,23 +59,14 @@
         <n-icon :size="22"><SettingsOutline /></n-icon>
       </button>
 
-      <n-dropdown
-        v-model:show="helpMenuOpen"
-        trigger="click"
-        placement="right-start"
-        :options="helpOptions"
-        @select="onMenuSelect"
+      <button
+        type="button"
+        class="rail-item"
+        :class="{ active: isHelpPage }"
+        @click="router.push('/docs')"
       >
-        <div class="rail-dropdown-wrap">
-          <button
-            type="button"
-            class="rail-item"
-            :class="{ active: helpMenuOpen }"
-          >
-            <n-icon :size="22"><HelpCircleOutline /></n-icon>
-          </button>
-        </div>
-      </n-dropdown>
+        <n-icon :size="22"><HelpCircleOutline /></n-icon>
+      </button>
     </div>
   </aside>
 </template>
@@ -107,7 +98,6 @@ const isHome = computed(() => route.name === 'home' || route.path === '/' || rou
 const isSettings = computed(() => route.path.startsWith('/settings'))
 
 const fileMenuOpen = ref(false)
-const helpMenuOpen = ref(false)
 
 const fileOptions = computed<DropdownOption[]>(() => [
   { label: t('menu.newConnection'), key: 'newConnection' },
@@ -118,14 +108,6 @@ const fileOptions = computed<DropdownOption[]>(() => [
   { label: t('menu.exit'), key: 'exit' }
 ])
 
-const helpOptions = computed<DropdownOption[]>(() => [
-  { label: t('menu.documentation'), key: 'documentation' },
-  { label: t('menu.reportBug'), key: 'reportBug' },
-  { label: t('menu.checkUpdates'), key: 'checkUpdates' },
-  { type: 'divider', key: 'hd1' },
-  { label: t('menu.about'), key: 'about' }
-])
-
 function emitAction(action: string) {
   emit('menu-action', action)
 }
@@ -134,10 +116,16 @@ function goHome() {
   router.push('/')
 }
 
+const isHelpPage = computed(() =>
+  route.path.startsWith('/docs') ||
+  route.path.startsWith('/report') ||
+  route.path.startsWith('/about') ||
+  route.path.startsWith('/logs')
+)
+
 function onMenuSelect(key: string | number) {
   emit('menu-action', String(key))
   fileMenuOpen.value = false
-  helpMenuOpen.value = false
 }
 </script>
 

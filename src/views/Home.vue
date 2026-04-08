@@ -25,17 +25,6 @@
       <!-- Right: Main workspace content -->
       <n-layout class="content-layout">
 
-        <!-- Top: Breadcrumb navigation -->
-        <ContentTopNav
-          :active-connection="activeConnection"
-          :active-db="activeDb"
-          :selected-item="selectedItem"
-          :selected-item-type="selectedItemType"
-          @root-click="activeConnection = null"
-          @refresh="handleAction('refresh')"
-          @new-connection="showConnectionDialog = true"
-        />
-
         <!-- Welcome page: no connection selected -->
         <div v-if="!activeConnection" class="welcome-page">
           <div class="welcome-hero">
@@ -148,7 +137,6 @@ import {
 } from '@vicons/ionicons5'
 import ConnectionTree from '../components/ConnectionTree.vue'
 import ConnectionDialog from '../components/ConnectionDialog.vue'
-import ContentTopNav from '../components/ContentTopNav.vue'
 import DbTypeIcon from '../components/DbTypeIcon.vue'
 
 // Lazy-load DB-specific components

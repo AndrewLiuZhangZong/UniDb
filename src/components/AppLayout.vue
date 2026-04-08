@@ -6,6 +6,7 @@
     <div class="app-body">
       <AppSideNav @menu-action="handleMenuAction" />
       <div class="page-content">
+        <ContentTopNav />
         <router-view />
       </div>
     </div>
@@ -21,6 +22,7 @@ import { useRouter } from 'vue-router'
 import { useMessage } from 'naive-ui'
 import TitleBar from './TitleBar.vue'
 import AppSideNav from './AppSideNav.vue'
+import ContentTopNav from './ContentTopNav.vue'
 import HelpDialogs from './HelpDialogs.vue'
 import { useConnectionStore } from '../stores/connection'
 

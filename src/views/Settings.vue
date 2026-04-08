@@ -107,6 +107,7 @@ import { useI18n } from 'vue-i18n'
 import { NSelect, NButton, NTag, NIcon } from 'naive-ui'
 import { ServerOutline, CloudDownloadOutline } from '@vicons/ionicons5'
 import { useSettingsStore } from '../stores/settings'
+import { themeOptions } from '../styles/theme-config'
 
 const LogsPanel = defineAsyncComponent(() => import('../components/LogsPanel.vue'))
 
@@ -135,10 +136,7 @@ const languageOptions = [
   { label: 'English', value: 'en-US' }
 ]
 
-const accentColorOptions = computed(() => [
-  { label: t('settings.accentOrange'), value: 'orange' },
-  { label: t('settings.accentPurple'), value: 'purple' }
-])
+const accentColorOptions = themeOptions
 
 const drivers = ref([
   { id: 'mysql', name: 'MySQL', version: '8.0', installed: true, outdated: false },

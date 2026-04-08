@@ -5,6 +5,7 @@
 
 export interface ThemeConfig {
   name: string
+  label: string
   primaryColor: string
   primaryColorHover: string
   primaryColorPressed: string
@@ -15,419 +16,240 @@ export interface ThemeConfig {
   themeOverrides: Record<string, unknown>
 }
 
-// Orange 主题配置
-const orangeTheme: ThemeConfig = {
-  name: 'orange',
-  primaryColor: '#FF6B00',
-  primaryColorHover: '#FF8C42',
-  primaryColorPressed: '#CC5500',
-  primaryColorSuppl: '#FF8C42',
+// 创建主题的辅助函数
+function createTheme(
+  name: string,
+  label: string,
+  primary: string,
+  primaryHover: string,
+  primaryPressed: string
+): ThemeConfig {
+  const hex = primary.replace('#', '')
+  const r = parseInt(hex.substring(0, 2), 16)
+  const g = parseInt(hex.substring(2, 4), 16)
+  const b = parseInt(hex.substring(4, 6), 16)
 
-  cssVars: {
-    // ── 主题色 ──
-    '--accent-primary': '#FF6B00',
-    '--accent-primary-hover': '#FF8C42',
-    '--accent-primary-pressed': '#CC5500',
-    '--accent-primary-subtle': 'rgba(255, 107, 0, 0.10)',
-    '--accent-primary-subtle-hover': 'rgba(255, 107, 0, 0.18)',
+  const subtle = `rgba(${r}, ${g}, ${b}, 0.10)`
+  const subtleHover = `rgba(${r}, ${g}, ${b}, 0.18)`
+  const subtleLight = `rgba(${r}, ${g}, ${b}, 0.06)`
+  const subtleActive = `rgba(${r}, ${g}, ${b}, 0.08)`
+  const subtleSelected = `rgba(${r}, ${g}, ${b}, 0.04)`
 
-    // ── 背景色 ──
-    '--bg-primary': '#ffffff',
-    '--bg-secondary': '#ffffff',
-    '--bg-tertiary': 'rgba(255, 107, 0, 0.04)',
-    '--bg-elevated': '#ffffff',
-    '--bg-sidebar': '#fafbfc',
-    '--bg-menubar': '#f5f6fa',
-    '--bg-tabbar': 'rgba(255, 107, 0, 0.04)',
-    '--bg-hover': 'rgba(255, 107, 0, 0.06)',
-    '--bg-active': 'rgba(255, 107, 0, 0.08)',
-    '--bg-selected': 'rgba(255, 107, 0, 0.10)',
-    '--bg-row-hover': 'rgba(255, 107, 0, 0.04)',
+  return {
+    name,
+    label,
+    primaryColor: primary,
+    primaryColorHover: primaryHover,
+    primaryColorPressed: primaryPressed,
+    primaryColorSuppl: primaryHover,
 
-    // ── 文字色 ──
-    '--text-primary': '#1a1a2e',
-    '--text-secondary': '#4a4a6a',
-    '--text-tertiary': '#7a7a9a',
-    '--text-quaternary': '#9a9ab8',
-    '--text-disabled': '#b0b0c8',
-    '--text-placeholder': '#b0b0c8',
-    '--text-hint': '#b0b0c8',
+    cssVars: {
+      '--accent-primary': primary,
+      '--accent-primary-hover': primaryHover,
+      '--accent-primary-pressed': primaryPressed,
+      '--accent-primary-subtle': subtle,
+      '--accent-primary-subtle-hover': subtleHover,
 
-    // ── 边框色 ──
-    '--border-primary': 'rgba(0, 0, 0, 0.10)',
-    '--border-secondary': 'rgba(0, 0, 0, 0.06)',
-    '--border-hover': 'rgba(0, 0, 0, 0.14)',
-    '--border-strong': 'rgba(0, 0, 0, 0.18)',
+      '--bg-primary': '#ffffff',
+      '--bg-secondary': '#ffffff',
+      '--bg-tertiary': subtleSelected,
+      '--bg-elevated': '#ffffff',
+      '--bg-sidebar': '#fafbfc',
+      '--bg-menubar': '#f5f6fa',
+      '--bg-tabbar': subtleSelected,
+      '--bg-hover': subtleLight,
+      '--bg-active': subtleActive,
+      '--bg-selected': subtle,
+      '--bg-row-hover': subtleSelected,
 
-    // ── 阴影 ──
-    '--shadow-soft-sm': '0 2px 8px rgba(0, 0, 0, 0.08)',
-    '--shadow-soft': '0 4px 16px rgba(0, 0, 0, 0.10)',
-    '--shadow-rail': '4px 0 16px rgba(0, 0, 0, 0.06)',
+      '--text-primary': '#1a1a2e',
+      '--text-secondary': '#4a4a6a',
+      '--text-tertiary': '#7a7a9a',
+      '--text-quaternary': '#9a9ab8',
+      '--text-disabled': '#b0b0c8',
+      '--text-placeholder': '#b0b0c8',
+      '--text-hint': '#b0b0c8',
 
-    // ── 代码编辑器 ──
-    '--code-bg': '#f8f9fc',
-    '--code-comment': 'rgba(0, 0, 0, 0.35)',
-  },
+      '--border-primary': 'rgba(0, 0, 0, 0.10)',
+      '--border-secondary': 'rgba(0, 0, 0, 0.06)',
+      '--border-hover': 'rgba(0, 0, 0, 0.14)',
+      '--border-strong': 'rgba(0, 0, 0, 0.18)',
 
-  themeOverrides: {
-    common: {
-      primaryColor: '#FF6B00',
-      primaryColorHover: '#FF8C42',
-      primaryColorPressed: '#CC5500',
-      primaryColorSuppl: '#FF8C42',
+      '--shadow-soft-sm': '0 2px 8px rgba(0, 0, 0, 0.08)',
+      '--shadow-soft': '0 4px 16px rgba(0, 0, 0, 0.10)',
+      '--shadow-rail': '4px 0 16px rgba(0, 0, 0, 0.06)',
 
-      borderRadius: '6px',
-      borderRadiusSmall: '4px',
-
-      // 亮色主题背景（统一白色）
-      popoverColor: '#ffffff',
-      tableColor: '#ffffff',
-      cardColor: '#ffffff',
-      modalColor: '#ffffff',
-      bodyColor: '#ffffff',
-      tagColor: '#ffffff',
-      actionColor: '#ffffff',
-      tableHeaderColor: '#fafbfc',
-      hoverColor: 'rgba(255, 107, 0, 0.06)',
-      pressedColor: 'rgba(255, 107, 0, 0.10)',
-
-      // 文字颜色
-      textColorBase: '#1a1a2e',
-      textColor1: '#1a1a2e',
-      textColor2: '#4a4a6a',
-      textColor3: '#7a7a9a',
-      textColorDisabled: '#b0b0c8',
-
-      // 边框颜色
-      borderColor: 'rgba(0, 0, 0, 0.10)',
-      dividerColor: 'rgba(0, 0, 0, 0.06)',
-
-      // 输入框
-      inputColor: '#ffffff',
-      inputBorder: 'rgba(0, 0, 0, 0.12)',
-      inputBorderHover: 'rgba(0, 0, 0, 0.18)',
-      inputBorderFocus: '#FF6B00',
-      inputBoxShadowFocus: '0 0 0 2px rgba(255, 107, 0, 0.15)',
-
-      // 按钮
-      buttonColor: '#ffffff',
-      buttonBorder: 'rgba(0, 0, 0, 0.12)',
-      buttonColor2: '#ffffff',
-      buttonBorder2: 'rgba(0, 0, 0, 0.10)',
-      buttonColor2Hover: 'rgba(0, 0, 0, 0.04)',
-      buttonBorder2Hover: 'rgba(0, 0, 0, 0.16)',
-
-      // 滚动条
-      scrollbarColor: 'rgba(0, 0, 0, 0.15)',
-      scrollbarColorHover: 'rgba(0, 0, 0, 0.25)',
-
-      // 阴影
-      boxShadow1: '0 2px 8px rgba(0, 0, 0, 0.08)',
-      boxShadow2: '0 4px 16px rgba(0, 0, 0, 0.10)',
-      boxShadow3: '0 8px 32px rgba(0, 0, 0, 0.15)',
+      '--code-bg': '#f8f9fc',
+      '--code-comment': 'rgba(0, 0, 0, 0.35)',
     },
-    Button: {
-      colorPrimary: '#FF6B00',
-      colorHoverPrimary: '#FF8C42',
-      colorPressedPrimary: '#CC5500',
-      borderPrimary: '#FF6B00',
-      borderHoverPrimary: '#FF8C42',
-      borderPressedPrimary: '#CC5500',
-    },
-    Input: {
-      borderFocus: '#FF6B00',
-      boxShadowFocus: '0 0 0 2px rgba(255, 107, 0, 0.15)',
-    },
-    Select: {
-      peers: {
-        InternalSelection: {
-          borderFocus: '#FF6B00',
-          boxShadowFocus: '0 0 0 2px rgba(255, 107, 0, 0.15)',
-        },
-        InternalSelectMenu: {
-          optionColorActive: 'rgba(255, 107, 0, 0.10)',
-          optionTextColorActive: '#FF6B00',
+
+    themeOverrides: {
+      common: {
+        primaryColor: primary,
+        primaryColorHover: primaryHover,
+        primaryColorPressed: primaryPressed,
+        primaryColorSuppl: primaryHover,
+
+        borderRadius: '6px',
+        borderRadiusSmall: '4px',
+
+        popoverColor: '#ffffff',
+        tableColor: '#ffffff',
+        cardColor: '#ffffff',
+        modalColor: '#ffffff',
+        bodyColor: '#ffffff',
+        tagColor: '#ffffff',
+        actionColor: '#ffffff',
+        tableHeaderColor: '#fafbfc',
+        hoverColor: subtleLight,
+        pressedColor: subtle,
+
+        textColorBase: '#1a1a2e',
+        textColor1: '#1a1a2e',
+        textColor2: '#4a4a6a',
+        textColor3: '#7a7a9a',
+        textColorDisabled: '#b0b0c8',
+
+        borderColor: 'rgba(0, 0, 0, 0.10)',
+        dividerColor: 'rgba(0, 0, 0, 0.06)',
+
+        inputColor: '#ffffff',
+        inputBorder: 'rgba(0, 0, 0, 0.12)',
+        inputBorderHover: 'rgba(0, 0, 0, 0.18)',
+        inputBorderFocus: primary,
+        inputBoxShadowFocus: `0 0 0 2px ${subtle}`,
+
+        buttonColor: '#ffffff',
+        buttonBorder: 'rgba(0, 0, 0, 0.12)',
+        buttonColor2: '#ffffff',
+        buttonBorder2: 'rgba(0, 0, 0, 0.10)',
+        buttonColor2Hover: 'rgba(0, 0, 0, 0.04)',
+        buttonBorder2Hover: 'rgba(0, 0, 0, 0.16)',
+
+        scrollbarColor: 'rgba(0, 0, 0, 0.15)',
+        scrollbarColorHover: 'rgba(0, 0, 0, 0.25)',
+
+        boxShadow1: '0 2px 8px rgba(0, 0, 0, 0.08)',
+        boxShadow2: '0 4px 16px rgba(0, 0, 0, 0.10)',
+        boxShadow3: '0 8px 32px rgba(0, 0, 0, 0.15)',
+      },
+      Button: {
+        colorPrimary: primary,
+        colorHoverPrimary: primaryHover,
+        colorPressedPrimary: primaryPressed,
+        borderPrimary: primary,
+        borderHoverPrimary: primaryHover,
+        borderPressedPrimary: primaryPressed,
+      },
+      Input: {
+        borderFocus: primary,
+        boxShadowFocus: `0 0 0 2px ${subtle}`,
+      },
+      Select: {
+        peers: {
+          InternalSelection: {
+            borderFocus: primary,
+            boxShadowFocus: `0 0 0 2px ${subtle}`,
+          },
+          InternalSelectMenu: {
+            optionColorActive: subtle,
+            optionTextColorActive: primary,
+          },
         },
       },
-    },
-    DataTable: {
-      thColor: 'rgba(0, 0, 0, 0.02)',
-      tdColor: '#ffffff',
-      thTextColor: '#4a4a6a',
-      tdTextColor: '#1a1a2e',
-      borderColor: 'rgba(0, 0, 0, 0.08)',
-    },
-    Menu: {
-      itemTextColorActive: '#FF6B00',
-      itemColorActive: 'rgba(255, 107, 0, 0.10)',
-      itemTextColorActiveHover: '#FF6B00',
-      itemColorActiveHover: 'rgba(255, 107, 0, 0.15)',
-    },
-    Tabs: {
-      tabTextColorActive: '#FF6B00',
-      barColor: '#FF6B00',
-      tabTextColorActiveBar: '#FF6B00',
-      colorSegment: 'rgba(255, 107, 0, 0.10)',
-    },
-    Tag: {
-      color: 'rgba(0, 0, 0, 0.04)',
-      border: 'rgba(0, 0, 0, 0.10)',
-      textColor: '#4a4a6a',
-    },
-    Card: {
-      color: '#ffffff',
-      borderColor: 'rgba(0, 0, 0, 0.08)',
-    },
-    Dialog: {
-      color: '#ffffff',
-    },
-    Switch: {
-      railColorActive: '#FF6B00',
-    },
-    Checkbox: {
-      colorChecked: '#FF6B00',
-      borderChecked: '#FF6B00',
-    },
-    Radio: {
-      buttonColorActive: '#FF6B00',
-      buttonBorderActive: '#FF6B00',
-    },
-    Pagination: {
-      itemColorActive: '#FF6B00',
-      itemBorderActive: '#FF6B00',
-    },
-    Tree: {
-      nodeColorActive: 'rgba(255, 107, 0, 0.10)',
-      nodeTextColorActive: '#FF6B00',
-    },
-    Spin: {
-      color: '#FF6B00',
-    },
-    DatePicker: {
-      cellColorSelected: 'rgba(255, 107, 0, 0.10)',
-      cellTextColorSelected: '#FF6B00',
-      cellBorderCurrent: '#FF6B00',
-    },
-    Dropdown: {
-      color: '#ffffff',
-      optionColorActive: 'rgba(255, 107, 0, 0.10)',
-      optionTextColorActive: '#FF6B00',
-    },
-    Tooltip: {
-      color: '#1a1a2e',
-      textColor: '#ffffff',
-    },
-  },
-}
-
-// Purple 主题配置
-const purpleTheme: ThemeConfig = {
-  name: 'purple',
-  primaryColor: '#7c3aed',
-  primaryColorHover: '#8b5cf6',
-  primaryColorPressed: '#6d28d9',
-  primaryColorSuppl: '#8b5cf6',
-
-  cssVars: {
-    // ── 主题色 ──
-    '--accent-primary': '#7c3aed',
-    '--accent-primary-hover': '#8b5cf6',
-    '--accent-primary-pressed': '#6d28d9',
-    '--accent-primary-subtle': 'rgba(124, 58, 237, 0.10)',
-    '--accent-primary-subtle-hover': 'rgba(124, 58, 237, 0.18)',
-
-    // ── 背景色 ──
-    '--bg-primary': '#ffffff',
-    '--bg-secondary': '#ffffff',
-    '--bg-tertiary': 'rgba(124, 58, 237, 0.04)',
-    '--bg-elevated': '#ffffff',
-    '--bg-sidebar': '#fafbfc',
-    '--bg-menubar': '#f5f6fa',
-    '--bg-tabbar': 'rgba(124, 58, 237, 0.04)',
-    '--bg-hover': 'rgba(124, 58, 237, 0.06)',
-    '--bg-active': 'rgba(124, 58, 237, 0.08)',
-    '--bg-selected': 'rgba(124, 58, 237, 0.10)',
-    '--bg-row-hover': 'rgba(124, 58, 237, 0.04)',
-
-    // ── 文字色 ──
-    '--text-primary': '#1a1a2e',
-    '--text-secondary': '#4a4a6a',
-    '--text-tertiary': '#7a7a9a',
-    '--text-quaternary': '#9a9ab8',
-    '--text-disabled': '#b0b0c8',
-    '--text-placeholder': '#b0b0c8',
-    '--text-hint': '#b0b0c8',
-
-    // ── 边框色 ──
-    '--border-primary': 'rgba(0, 0, 0, 0.10)',
-    '--border-secondary': 'rgba(0, 0, 0, 0.06)',
-    '--border-hover': 'rgba(0, 0, 0, 0.14)',
-    '--border-strong': 'rgba(0, 0, 0, 0.18)',
-
-    // ── 阴影 ──
-    '--shadow-soft-sm': '0 2px 8px rgba(0, 0, 0, 0.08)',
-    '--shadow-soft': '0 4px 16px rgba(0, 0, 0, 0.10)',
-    '--shadow-rail': '4px 0 16px rgba(0, 0, 0, 0.06)',
-
-    // ── 代码编辑器 ──
-    '--code-bg': '#f8f9fc',
-    '--code-comment': 'rgba(0, 0, 0, 0.35)',
-  },
-
-  themeOverrides: {
-    common: {
-      primaryColor: '#7c3aed',
-      primaryColorHover: '#8b5cf6',
-      primaryColorPressed: '#6d28d9',
-      primaryColorSuppl: '#8b5cf6',
-
-      borderRadius: '6px',
-      borderRadiusSmall: '4px',
-
-      popoverColor: '#ffffff',
-      tableColor: '#ffffff',
-      cardColor: '#ffffff',
-      modalColor: '#ffffff',
-      bodyColor: '#ffffff',
-      tagColor: '#ffffff',
-      actionColor: '#ffffff',
-      tableHeaderColor: '#fafbfc',
-      hoverColor: 'rgba(124, 58, 237, 0.06)',
-      pressedColor: 'rgba(124, 58, 237, 0.10)',
-
-      textColorBase: '#1a1a2e',
-      textColor1: '#1a1a2e',
-      textColor2: '#4a4a6a',
-      textColor3: '#7a7a9a',
-      textColorDisabled: '#b0b0c8',
-
-      borderColor: 'rgba(0, 0, 0, 0.10)',
-      dividerColor: 'rgba(0, 0, 0, 0.06)',
-
-      inputColor: '#ffffff',
-      inputBorder: 'rgba(0, 0, 0, 0.12)',
-      inputBorderHover: 'rgba(0, 0, 0, 0.18)',
-      inputBorderFocus: '#7c3aed',
-      inputBoxShadowFocus: '0 0 0 2px rgba(124, 58, 237, 0.15)',
-
-      buttonColor: '#ffffff',
-      buttonBorder: 'rgba(0, 0, 0, 0.12)',
-      buttonColor2: '#ffffff',
-      buttonBorder2: 'rgba(0, 0, 0, 0.10)',
-      buttonColor2Hover: 'rgba(0, 0, 0, 0.04)',
-      buttonBorder2Hover: 'rgba(0, 0, 0, 0.16)',
-
-      scrollbarColor: 'rgba(0, 0, 0, 0.15)',
-      scrollbarColorHover: 'rgba(0, 0, 0, 0.25)',
-
-      boxShadow1: '0 2px 8px rgba(0, 0, 0, 0.08)',
-      boxShadow2: '0 4px 16px rgba(0, 0, 0, 0.10)',
-      boxShadow3: '0 8px 32px rgba(0, 0, 0, 0.15)',
-    },
-    Button: {
-      colorPrimary: '#7c3aed',
-      colorHoverPrimary: '#8b5cf6',
-      colorPressedPrimary: '#6d28d9',
-      borderPrimary: '#7c3aed',
-      borderHoverPrimary: '#8b5cf6',
-      borderPressedPrimary: '#6d28d9',
-    },
-    Input: {
-      borderFocus: '#7c3aed',
-      boxShadowFocus: '0 0 0 2px rgba(124, 58, 237, 0.15)',
-    },
-    Select: {
-      peers: {
-        InternalSelection: {
-          borderFocus: '#7c3aed',
-          boxShadowFocus: '0 0 0 2px rgba(124, 58, 237, 0.15)',
-        },
-        InternalSelectMenu: {
-          optionColorActive: 'rgba(124, 58, 237, 0.10)',
-          optionTextColorActive: '#7c3aed',
-        },
+      DataTable: {
+        thColor: 'rgba(0, 0, 0, 0.02)',
+        tdColor: '#ffffff',
+        thTextColor: '#4a4a6a',
+        tdTextColor: '#1a1a2e',
+        borderColor: 'rgba(0, 0, 0, 0.08)',
+      },
+      Menu: {
+        itemTextColorActive: primary,
+        itemColorActive: subtle,
+        itemTextColorActiveHover: primary,
+        itemColorActiveHover: subtleHover,
+      },
+      Tabs: {
+        tabTextColorActive: primary,
+        barColor: primary,
+        tabTextColorActiveBar: primary,
+        colorSegment: subtle,
+      },
+      Tag: {
+        color: 'rgba(0, 0, 0, 0.04)',
+        border: 'rgba(0, 0, 0, 0.10)',
+        textColor: '#4a4a6a',
+      },
+      Card: {
+        color: '#ffffff',
+        borderColor: 'rgba(0, 0, 0, 0.08)',
+      },
+      Dialog: {
+        color: '#ffffff',
+      },
+      Switch: {
+        railColorActive: primary,
+      },
+      Checkbox: {
+        colorChecked: primary,
+        borderChecked: primary,
+      },
+      Radio: {
+        buttonColorActive: primary,
+        buttonBorderActive: primary,
+      },
+      Pagination: {
+        itemColorActive: primary,
+        itemBorderActive: primary,
+      },
+      Tree: {
+        nodeColorActive: subtle,
+        nodeTextColorActive: primary,
+      },
+      Spin: {
+        color: primary,
+      },
+      DatePicker: {
+        cellColorSelected: subtle,
+        cellTextColorSelected: primary,
+        cellBorderCurrent: primary,
+      },
+      Dropdown: {
+        color: '#ffffff',
+        optionColorActive: subtle,
+        optionTextColorActive: primary,
+      },
+      Tooltip: {
+        color: '#1a1a2e',
+        textColor: '#ffffff',
       },
     },
-    DataTable: {
-      thColor: 'rgba(0, 0, 0, 0.02)',
-      tdColor: '#ffffff',
-      thTextColor: '#4a4a6a',
-      tdTextColor: '#1a1a2e',
-      borderColor: 'rgba(0, 0, 0, 0.08)',
-    },
-    Menu: {
-      itemTextColorActive: '#7c3aed',
-      itemColorActive: 'rgba(124, 58, 237, 0.10)',
-      itemTextColorActiveHover: '#7c3aed',
-      itemColorActiveHover: 'rgba(124, 58, 237, 0.15)',
-    },
-    Tabs: {
-      tabTextColorActive: '#7c3aed',
-      barColor: '#7c3aed',
-      tabTextColorActiveBar: '#7c3aed',
-      colorSegment: 'rgba(124, 58, 237, 0.10)',
-    },
-    Tag: {
-      color: 'rgba(0, 0, 0, 0.04)',
-      border: 'rgba(0, 0, 0, 0.10)',
-      textColor: '#4a4a6a',
-    },
-    Card: {
-      color: '#ffffff',
-      borderColor: 'rgba(0, 0, 0, 0.08)',
-    },
-    Dialog: {
-      color: '#ffffff',
-    },
-    Switch: {
-      railColorActive: '#7c3aed',
-    },
-    Checkbox: {
-      colorChecked: '#7c3aed',
-      borderChecked: '#7c3aed',
-    },
-    Radio: {
-      buttonColorActive: '#7c3aed',
-      buttonBorderActive: '#7c3aed',
-    },
-    Pagination: {
-      itemColorActive: '#7c3aed',
-      itemBorderActive: '#7c3aed',
-    },
-    Tree: {
-      nodeColorActive: 'rgba(124, 58, 237, 0.10)',
-      nodeTextColorActive: '#7c3aed',
-    },
-    Spin: {
-      color: '#7c3aed',
-    },
-    DatePicker: {
-      cellColorSelected: 'rgba(124, 58, 237, 0.10)',
-      cellTextColorSelected: '#7c3aed',
-      cellBorderCurrent: '#7c3aed',
-    },
-    Dropdown: {
-      color: '#ffffff',
-      optionColorActive: 'rgba(124, 58, 237, 0.10)',
-      optionTextColorActive: '#7c3aed',
-    },
-    Tooltip: {
-      color: '#1a1a2e',
-      textColor: '#ffffff',
-    },
-  },
+  }
 }
 
-// 导出所有主题
+// 预设主题
 export const themes: Record<string, ThemeConfig> = {
-  orange: orangeTheme,
-  purple: purpleTheme,
+  orange: createTheme('orange', '活力橙', '#FF6B00', '#FF8C42', '#CC5500'),
+  purple: createTheme('purple', '优雅紫', '#7c3aed', '#8b5cf6', '#6d28d9'),
+  starryPurple: createTheme('starryPurple', '星夜紫', '#6366f1', '#818cf8', '#4f46e5'),
+  titaniumSilver: createTheme('titaniumSilver', '钛空银', '#64748b', '#94a3b8', '#475569'),
+  flowTeal: createTheme('flowTeal', '流光青', '#14b8a6', '#2dd4bf', '#0d9488'),
+  pulseBlue: createTheme('pulseBlue', '脉冲蓝', '#0ea5e9', '#38bdf8', '#0284c7'),
+  obsidianBlack: createTheme('obsidianBlack', '曜石黑', '#374151', '#6b7280', '#1f2937'),
+  warmWhite: createTheme('warmWhite', '暖云白', '#f97316', '#fb923c', '#ea580c'),
+  islandBlue: createTheme('islandBlue', '海岛蓝', '#0891b2', '#06b6d4', '#0e7490'),
+  pastoralGreen: createTheme('pastoralGreen', '牧野绿', '#22c55e', '#4ade80', '#16a34a'),
+  gildedBlack: createTheme('gildedBlack', '鎏金黑', '#ca8a04', '#eab308', '#a16207'),
 }
 
 // 根据名称获取主题
 export function getTheme(name: string): ThemeConfig {
-  return themes[name] || orangeTheme
+  return themes[name] || themes.orange
 }
 
-// 导出单个主题供直接使用
-export { orangeTheme, purpleTheme }
+// 导出所有主题名称（用于设置选项）
+export const themeOptions = Object.entries(themes).map(([value, theme]) => ({
+  value,
+  label: theme.label,
+}))

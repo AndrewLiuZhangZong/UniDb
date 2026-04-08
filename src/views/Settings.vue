@@ -42,19 +42,6 @@
 
             <div class="setting-item">
               <div class="setting-info">
-                <label class="setting-label">{{ t('settings.theme') }}</label>
-                <p class="setting-desc">{{ t('settings.themeDesc') }}</p>
-              </div>
-              <n-select
-                :value="settings.theme"
-                :options="themeOptions"
-                style="width: 200px;"
-                @update:value="(val) => settingsStore.updateSetting('theme', val)"
-              />
-            </div>
-
-            <div class="setting-item">
-              <div class="setting-info">
                 <label class="setting-label">{{ t('settings.accentColor') }}</label>
                 <p class="setting-desc">{{ t('settings.accentColorDesc') }}</p>
               </div>
@@ -166,11 +153,6 @@ const sections = [
 const languageOptions = [
   { label: '简体中文', value: 'zh-CN' },
   { label: 'English', value: 'en-US' }
-]
-
-const themeOptions = [
-  { label: 'Dark', value: 'dark' },
-  { label: 'Light', value: 'light' }
 ]
 
 const accentColorOptions = computed(() => [

@@ -25,11 +25,15 @@
       <!-- Right: Main workspace content -->
       <n-layout class="content-layout">
 
-        <!-- Top: Secondary nav bar (connection pills + explorer) -->
+        <!-- Top: Breadcrumb navigation -->
         <ContentTopNav
-          @select="handleNavSelect"
-          @connection-select="handleConnSelect"
-          @db-change="handleNavDbChange"
+          :active-connection="activeConnection"
+          :active-db="activeDb"
+          :selected-item="selectedItem"
+          :selected-item-type="selectedItemType"
+          @root-click="activeConnection = null"
+          @refresh="handleAction('refresh')"
+          @new-connection="showConnectionDialog = true"
         />
 
         <!-- Welcome page: no connection selected -->

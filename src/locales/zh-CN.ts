@@ -308,11 +308,20 @@ export default {
     disconnected: '未连接'
   },
   nav: {
+    home: '主页',
     database: '数据库导航',
     newConnection: '新建连接',
     refresh: '刷新',
     actions: '操作',
     noConnections: '暂无连接',
-    togglePanel: '展开/收起导航面板'
+    togglePanel: '展开/收起导航面板',
+    type: {
+      table: '表',
+      view: '视图',
+      collection: '集合',
+      key: 'Key',
+      function: '函数',
+      index: '索引'
+    }
   }
 }

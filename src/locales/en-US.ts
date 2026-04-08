@@ -308,11 +308,20 @@ export default {
     disconnected: 'Disconnected'
   },
   nav: {
+    home: 'Home',
     database: 'Database Navigator',
     newConnection: 'New Connection',
     refresh: 'Refresh',
     actions: 'Actions',
     noConnections: 'No connections',
-    togglePanel: 'Toggle Navigator Panel'
+    togglePanel: 'Toggle Navigator Panel',
+    type: {
+      table: 'Table',
+      view: 'View',
+      collection: 'Collection',
+      key: 'Key',
+      function: 'Function',
+      index: 'Index'
+    }
   }
 }

@@ -1,0 +1,81 @@
+/* ============================================================
+   CSS Design Tokens - 所有主题色的源头
+   所有颜色/尺寸/阴影等均通过 CSS 变量引用
+   ============================================================ */
+
+:root {
+  /* ── 背景色 ── */
+  --bg-primary: #111118;
+  --bg-secondary: #1a1a24;
+  --bg-tertiary: rgba(30, 30, 35, 0.95);
+  --bg-elevated: rgba(40, 40, 45, 0.98);
+  --bg-sidebar: rgba(28, 28, 32, 0.98);
+  --bg-menubar: rgba(40, 40, 45, 0.98);
+  --bg-tabbar: rgba(0, 0, 0, 0.25);
+  --bg-hover: rgba(255, 255, 255, 0.06);
+  --bg-active: rgba(255, 255, 255, 0.08);
+  --bg-selected: rgba(255, 255, 255, 0.08);
+  --bg-row-hover: rgba(255, 255, 255, 0.03);
+
+  /* ── 文字色 ── */
+  --text-primary: rgba(255, 255, 255, 0.95);
+  --text-secondary: rgba(255, 255, 255, 0.85);
+  --text-tertiary: rgba(255, 255, 255, 0.7);
+  --text-quaternary: rgba(255, 255, 255, 0.5);
+  --text-disabled: rgba(255, 255, 255, 0.38);
+  --text-placeholder: rgba(255, 255, 255, 0.38);
+  --text-hint: rgba(255, 255, 255, 0.35);
+
+  /* ── 边框色 ── */
+  --border-primary: rgba(255, 255, 255, 0.08);
+  --border-secondary: rgba(255, 255, 255, 0.06);
+  --border-hover: rgba(255, 255, 255, 0.1);
+  --border-strong: rgba(255, 255, 255, 0.12);
+
+  /* ── 主题色（默认橙色）─ */
+  --accent-primary: #FF6B00;
+  --accent-primary-hover: #FF8C42;
+  --accent-primary-pressed: #CC5500;
+  --accent-primary-subtle: rgba(255, 107, 0, 0.15);
+  --accent-primary-subtle-hover: rgba(255, 107, 0, 0.25);
+
+  /* ── 阴影 ── */
+  --shadow-soft-sm: 0 4px 20px rgba(0, 0, 0, 0.28);
+  --shadow-soft: 0 8px 32px rgba(0, 0, 0, 0.35);
+  --shadow-rail: 4px 0 24px rgba(0, 0, 0, 0.18);
+
+  /* ── 状态色 ── */
+  --status-error: #d03050;
+  --status-warning: #f0a020;
+  --status-info: #2080f0;
+  --status-success: #18a058;
+
+  /* ── 数据类型颜色 ── */
+  --type-string: #4db8ff;
+  --type-string-bg: rgba(77, 184, 255, 0.12);
+  --type-number: #FF6B00;
+  --type-number-bg: rgba(255, 107, 0, 0.12);
+  --type-boolean: #fb923c;
+  --type-boolean-bg: rgba(251, 146, 60, 0.12);
+  --type-date: #a78bfa;
+  --type-date-bg: rgba(167, 139, 250, 0.12);
+  --type-object: #34d399;
+  --type-object-bg: rgba(52, 211, 153, 0.12);
+  --type-array: #60a5fa;
+  --type-array-bg: rgba(96, 165, 250, 0.12);
+  --type-null: rgba(255, 255, 255, 0.35);
+  --type-binary: #f59e0b;
+  --type-binary-bg: rgba(245, 158, 11, 0.12);
+
+  /* ── 代码编辑器 ── */
+  --code-bg: #1a1a24;
+  --code-comment: rgba(255, 255, 255, 0.35);
+
+  /* ── 布局尺寸 ── */
+  --sidebar-width: 260px;
+  --sidebar-collapsed-width: 0;
+  --menu-bar-height: 36px;
+  --title-bar-height: 36px;
+  --tab-bar-height: 38px;
+  --status-bar-height: 28px;
+}

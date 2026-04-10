@@ -20,18 +20,26 @@
       <stop offset="0%" stop-color="#FF6B00" stop-opacity="0.2"/>
       <stop offset="100%" stop-color="#FF6B00" stop-opacity="0"/>
     </radialGradient>
+    <!-- Drop shadow for main cylinder -->
+    <filter id="mainShadow" x="-20%" y="-10%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#000000" flood-opacity="0.3"/>
+    </filter>
+    <!-- Drop shadow for secondary cylinder -->
+    <filter id="secShadow" x="-20%" y="-10%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#000000" flood-opacity="0.25"/>
+    </filter>
   </defs>
 
   <!-- Background -->
   <rect width="512" height="512" rx="96" fill="url(#bgGrad)"/>
 
   <!-- Soft glow behind icon -->
-  <circle cx="256" cy="220" r="160" fill="url(#glowRad)"/>
+  <circle cx="256" cy="220" r="170" fill="url(#glowRad)"/>
 
   <!-- ── Main database cylinder ── -->
-  <g transform="translate(156, 80)">
+  <g transform="translate(156, 80)" filter="url(#mainShadow)">
     <!-- Cylinder body -->
-    <rect x="0" y="60" width="200" height="170" rx="0" fill="url(#orangeGrad)" opacity="0.9"/>
+    <rect x="0" y="60" width="200" height="170" rx="0" fill="url(#orangeGrad)" opacity="0.92"/>
 
     <!-- Top ellipse -->
     <ellipse cx="100" cy="60" rx="100" ry="36" fill="#FF6B00"/>
@@ -50,17 +58,17 @@
     <line x1="0" y1="145" x2="200" y2="145" stroke="rgba(0,0,0,0.15)" stroke-width="1"/>
 
     <!-- Data rows in middle section -->
-    <rect x="24" y="120" width="80" height="8" rx="4" fill="rgba(255,255,255,0.18)"/>
-    <rect x="24" y="136" width="60" height="8" rx="4" fill="rgba(255,255,255,0.12)"/>
-    <rect x="24" y="152" width="100" height="8" rx="4" fill="rgba(255,255,255,0.18)"/>
-    <rect x="24" y="168" width="50" height="8" rx="4" fill="rgba(255,255,255,0.10)"/>
-    <rect x="24" y="184" width="75" height="8" rx="4" fill="rgba(255,255,255,0.15)"/>
+    <rect x="24" y="120" width="80" height="8" rx="4" fill="rgba(255,255,255,0.2)"/>
+    <rect x="24" y="136" width="60" height="8" rx="4" fill="rgba(255,255,255,0.14)"/>
+    <rect x="24" y="152" width="100" height="8" rx="4" fill="rgba(255,255,255,0.2)"/>
+    <rect x="24" y="168" width="50" height="8" rx="4" fill="rgba(255,255,255,0.11)"/>
+    <rect x="24" y="184" width="75" height="8" rx="4" fill="rgba(255,255,255,0.16)"/>
   </g>
 
   <!-- ── Small secondary cylinder (right) ── -->
-  <g transform="translate(300, 180)">
+  <g transform="translate(300, 180)" filter="url(#secShadow)">
     <!-- Body -->
-    <rect x="0" y="24" width="96" height="110" fill="url(#yellowGrad)" opacity="0.75"/>
+    <rect x="0" y="24" width="96" height="110" fill="url(#yellowGrad)" opacity="0.8"/>
     <!-- Top ellipse -->
     <ellipse cx="48" cy="24" rx="48" ry="17" fill="#FFB800"/>
     <!-- Bottom ellipse -->
@@ -68,13 +76,13 @@
     <!-- Section line -->
     <ellipse cx="48" cy="78" rx="48" ry="17" fill="none" stroke="rgba(0,0,0,0.2)" stroke-width="1"/>
     <!-- Data rows -->
-    <rect x="14" y="55" width="46" height="6" rx="3" fill="rgba(255,255,255,0.2)"/>
-    <rect x="14" y="66" width="32" height="6" rx="3" fill="rgba(255,255,255,0.13)"/>
-    <rect x="14" y="77" width="52" height="6" rx="3" fill="rgba(255,255,255,0.2)"/>
+    <rect x="14" y="55" width="46" height="6" rx="3" fill="rgba(255,255,255,0.22)"/>
+    <rect x="14" y="66" width="32" height="6" rx="3" fill="rgba(255,255,255,0.14)"/>
+    <rect x="14" y="77" width="52" height="6" rx="3" fill="rgba(255,255,255,0.22)"/>
   </g>
 
   <!-- Connection line between cylinders -->
-  <path d="M 260 200 Q 280 200 290 225" stroke="url(#yellowGrad)" stroke-width="2.5" stroke-dasharray="5 3" fill="none" opacity="0.7"/>
+  <path d="M 260 200 Q 280 200 290 225" stroke="url(#yellowGrad)" stroke-width="2.5" stroke-dasharray="5 3" fill="none" opacity="0.8"/>
 
   <!-- ── "Uni" text ── -->
   <text x="256" y="388" text-anchor="middle"
@@ -89,8 +97,8 @@
     fill="url(#orangeGrad)">Db</text>
 
   <!-- Decorative corner accents -->
-  <circle cx="72" cy="72" r="5" fill="url(#orangeGrad)" opacity="0.5"/>
-  <circle cx="440" cy="72" r="5" fill="url(#yellowGrad)" opacity="0.5"/>
-  <circle cx="72" cy="440" r="5" fill="url(#yellowGrad)" opacity="0.5"/>
-  <circle cx="440" cy="440" r="5" fill="url(#orangeGrad)" opacity="0.5"/>
+  <circle cx="72" cy="72" r="5" fill="url(#orangeGrad)" opacity="0.7"/>
+  <circle cx="440" cy="72" r="5" fill="url(#yellowGrad)" opacity="0.7"/>
+  <circle cx="72" cy="440" r="5" fill="url(#yellowGrad)" opacity="0.7"/>
+  <circle cx="440" cy="440" r="5" fill="url(#orangeGrad)" opacity="0.7"/>
 </svg>

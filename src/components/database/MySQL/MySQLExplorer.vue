@@ -110,19 +110,98 @@
       @clickoutside="ctx.show = false"
     />
 
-    <!-- Create Table modal -->
+    <!-- Create Table modal (可视化建表) -->
     <n-modal v-model:show="showCreateTable">
-      <n-card title="新建表" style="width:600px" :bordered="false" size="small">
+      <n-card title="新建表" style="width:720px;max-width:95vw" :bordered="false" size="small">
         <template #header-extra>
           <n-button text @click="showCreateTable = false">
             <template #icon><n-icon><CloseOutline /></n-icon></template>
           </n-button>
         </template>
-        <p style="font-size:12px;color:var(--text-tertiary);margin:0 0 8px">编辑 CREATE TABLE 语句：</p>
-        <n-input v-model:value="createTableSQL" type="textarea" :autosize="{ minRows: 8, maxRows: 16 }" style="font-family:monospace;font-size:12px" />
-        <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:12px">
+
+        <div class="create-table-form">
+          <!-- 表名输入 -->
+          <div class="form-row">
+            <label class="form-label">表名</label>
+            <n-input v-model:value="createTableName" placeholder="请输入表名" style="flex:1" />
+          </div>
+
+          <!-- 字段列表 -->
+          <div class="fields-section">
+            <div class="fields-header">
+              <span class="fields-title">字段定义</span>
+              <n-button size="tiny" type="primary" @click="addColumn">
+                <template #icon><n-icon><AddOutline /></n-icon></template>
+                添加字段
+              </n-button>
+            </div>
+
+            <div class="fields-table">
+              <div class="field-row header">
+                <span class="col-pk">主键</span>
+                <span class="col-name">字段名</span>
+                <span class="col-type">类型</span>
+                <span class="col-length">长度</span>
+                <span class="col-nn">非空</span>
+                <span class="col-ai">自增</span>
+                <span class="col-default">默认值</span>
+                <span class="col-comment">注释</span>
+                <span class="col-action"></span>
+              </div>
+
+              <div v-for="(col, idx) in createTableColumns" :key="idx" class="field-row">
+                <span class="col-pk">
+                  <n-checkbox v-model:checked="col.isPrimary" @update:checked="handlePrimaryChange(idx)" />
+                </span>
+                <span class="col-name">
+                  <n-input v-model:value="col.name" size="tiny" placeholder="字段名" />
+                </span>
+                <span class="col-type">
+                  <n-select v-model:value="col.type" :options="columnTypeOptions" size="tiny" filterable />
+                </span>
+                <span class="col-length">
+                  <n-input-number v-model:value="col.length" size="tiny" min="1" max="10000" placeholder="长度" />
+                </span>
+                <span class="col-nn">
+                  <n-checkbox v-model:checked="col.notNull" />
+                </span>
+                <span class="col-ai">
+                  <n-checkbox v-model:checked="col.autoIncrement" :disabled="!col.isPrimary && col.type !== 'INT'" />
+                </span>
+                <span class="col-default">
+                  <n-input v-model:value="col.defaultValue" size="tiny" placeholder="默认" />
+                </span>
+                <span class="col-comment">
+                  <n-input v-model:value="col.comment" size="tiny" placeholder="注释" />
+                </span>
+                <span class="col-action">
+                  <n-button text size="tiny" type="error" @click="removeColumn(idx)" :disabled="createTableColumns.length <= 1">
+                    <template #icon><n-icon><TrashOutline /></n-icon></template>
+                  </n-button>
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 表选项 -->
+          <div class="form-row">
+            <label class="form-label">存储引擎</label>
+            <n-select v-model:value="createTableEngine" :options="engineOptions" style="width:160px" />
+            <label class="form-label" style="margin-left:16px">字符集</label>
+            <n-select v-model:value="createTableCharset" :options="charsetOptions" style="width:160px" />
+          </div>
+
+          <!-- SQL 预览 -->
+          <div class="sql-preview">
+            <div class="sql-preview-header">SQL 预览</div>
+            <pre class="sql-preview-content">{{ previewCreateTableSQL }}</pre>
+          </div>
+        </div>
+
+        <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:16px">
           <n-button @click="showCreateTable = false">取消</n-button>
-          <n-button type="primary" :loading="createTableSaving" @click="executeCreateTable">执行</n-button>
+          <n-button @click="regenerateSQL">刷新预览</n-button>
+          <n-button type="primary" :loading="createTableSaving" @click="executeCreateTable">创建表</n-button>
         </div>
       </n-card>
     </n-modal>
@@ -187,10 +266,11 @@
 <script setup lang="ts">
 import { ref, reactive, computed, watch, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { NIcon, NButton, NInput, NDropdown, NModal, NCard, NSpin, useMessage, useDialog } from 'naive-ui'
+import { NIcon, NButton, NInput, NDropdown, NModal, NCard, NSpin, NCheckbox, NSelect, NInputNumber, useMessage, useDialog } from 'naive-ui'
 import {
   RefreshOutline, ChevronForwardOutline, GridOutline, EyeOutline,
-  AddOutline, SearchOutline, WarningOutline, CloseOutline, ServerOutline
+  AddOutline, SearchOutline, WarningOutline, CloseOutline, ServerOutline,
+  TrashOutline
 } from '@vicons/ionicons5'
 import { useSettingsStore } from '../../../stores/settings'
 import { mysqlMeta } from '../../../api/meta'
@@ -222,11 +302,141 @@ const secExp = reactive<Record<string, { tables: boolean; views: boolean }>>({})
 // context menu
 const ctx = ref({ show: false, x: 0, y: 0, db: '', item: null as any, type: '' })
 
-// create table
+// create table (可视化)
 const showCreateTable = ref(false)
-const createTableSQL = ref('')
+const createTableName = ref('new_table')
+const createTableEngine = ref('InnoDB')
+const createTableCharset = ref('utf8mb4')
 const createTableTargetDb = ref('')
 const createTableSaving = ref(false)
+const createTableColumns = ref([
+  { name: 'id', type: 'INT', length: null, notNull: true, autoIncrement: true, isPrimary: true, defaultValue: '', comment: '' },
+  { name: 'name', type: 'VARCHAR', length: 255, notNull: true, autoIncrement: false, isPrimary: false, defaultValue: '', comment: '' },
+])
+
+// 字段类型选项
+const columnTypeOptions = [
+  { label: 'INT', value: 'INT' },
+  { label: 'BIGINT', value: 'BIGINT' },
+  { label: 'TINYINT', value: 'TINYINT' },
+  { label: 'SMALLINT', value: 'SMALLINT' },
+  { label: 'FLOAT', value: 'FLOAT' },
+  { label: 'DOUBLE', value: 'DOUBLE' },
+  { label: 'DECIMAL', value: 'DECIMAL' },
+  { label: 'VARCHAR', value: 'VARCHAR' },
+  { label: 'CHAR', value: 'CHAR' },
+  { label: 'TEXT', value: 'TEXT' },
+  { label: 'LONGTEXT', value: 'LONGTEXT' },
+  { label: 'DATE', value: 'DATE' },
+  { label: 'DATETIME', value: 'DATETIME' },
+  { label: 'TIMESTAMP', value: 'TIMESTAMP' },
+  { label: 'BOOLEAN', value: 'BOOLEAN' },
+  { label: 'JSON', value: 'JSON' },
+]
+
+// 引擎选项
+const engineOptions = [
+  { label: 'InnoDB', value: 'InnoDB' },
+  { label: 'MyISAM', value: 'MyISAM' },
+  { label: 'MEMORY', value: 'MEMORY' },
+]
+
+// 字符集选项
+const charsetOptions = [
+  { label: 'utf8mb4', value: 'utf8mb4' },
+  { label: 'utf8', value: 'utf8' },
+  { label: 'latin1', value: 'latin1' },
+  { label: 'gbk', value: 'gbk' },
+  { label: 'ascii', value: 'ascii' },
+]
+
+// SQL 预览计算属性
+const previewCreateTableSQL = computed(() => {
+  const db = createTableTargetDb.value
+  const tbl = createTableName.value || 'new_table'
+  const fq = db ? `\`${db}\`.\`${tbl}\`` : `\`${tbl}\``
+
+  const colDefs = createTableColumns.value
+    .filter(c => c.name.trim())
+    .map(c => {
+      let def = `  \`${c.name}\` ${c.type}`
+      if (c.type === 'DECIMAL' || c.type === 'VARCHAR' || c.type === 'CHAR') {
+        def += c.length ? `(${c.length})` : '(255)'
+      }
+      if (c.autoIncrement) def += ' AUTO_INCREMENT'
+      else if (c.notNull) def += ' NOT NULL'
+      if (c.defaultValue) def += ` DEFAULT '${c.defaultValue}'`
+      if (c.comment) def += ` COMMENT '${c.comment}'`
+      return def
+    })
+
+  const pkCols = createTableColumns.value.filter(c => c.isPrimary && c.name.trim()).map(c => `\`${c.name}\``)
+  if (pkCols.length) {
+    colDefs.push(`  PRIMARY KEY (${pkCols.join(', ')})`)
+  }
+
+  return `CREATE TABLE ${fq} (\n${colDefs.join(',\n')}\n) ENGINE=${createTableEngine.value} DEFAULT CHARSET=${createTableCharset.value};`
+})
+
+// 添加字段
+const addColumn = () => {
+  createTableColumns.value.push({
+    name: '', type: 'VARCHAR', length: 255, notNull: false,
+    autoIncrement: false, isPrimary: false, defaultValue: '', comment: ''
+  })
+}
+
+// 删除字段
+const removeColumn = (idx: number) => {
+  createTableColumns.value.splice(idx, 1)
+}
+
+// 处理主键变更
+const handlePrimaryChange = (idx: number) => {
+  const col = createTableColumns.value[idx]
+  if (col.isPrimary && col.type === 'INT') {
+    col.autoIncrement = true
+  }
+}
+
+// 生成 SQL
+const regenerateSQL = () => {
+  // SQL 会通过 computed 自动更新
+}
+
+// 执行建表
+const executeCreateTable = async () => {
+  if (!createTableName.value.trim()) {
+    message.warning('请输入表名')
+    return
+  }
+  const validCols = createTableColumns.value.filter(c => c.name.trim())
+  if (!validCols.length) {
+    message.warning('请至少添加一个字段')
+    return
+  }
+  createTableSaving.value = true
+  try {
+    const res = await mysqlMeta.execute(props.connection.id, previewCreateTableSQL.value)
+    if ((res as any).error) throw new Error((res as any).error)
+    showCreateTable.value = false
+    message.success('表创建成功')
+    loadTablesAndViews(createTableTargetDb.value)
+    // 重置表单
+    createTableName.value = 'new_table'
+    createTableColumns.value = [
+      { name: 'id', type: 'INT', length: null, notNull: true, autoIncrement: true, isPrimary: true, defaultValue: '', comment: '' },
+      { name: 'name', type: 'VARCHAR', length: 255, notNull: true, autoIncrement: false, isPrimary: false, defaultValue: '', comment: '' },
+    ]
+  } catch (e: any) {
+    message.error('创建失败: ' + (e?.response?.data?.error || e.message))
+  } finally {
+    createTableSaving.value = false
+  }
+}
+
+// ─── 旧的建表方式（保留用于参考）──────────────────
+const createTableSQL = ref('')
 
 const renameModal = reactive({
   show: false,
@@ -552,21 +762,14 @@ const truncateTable = (db: string, tbl: any) => {
 // ─── Create Table ────────────────────────────────────────────────────────────
 const openCreateTable = (db: string) => {
   createTableTargetDb.value = db
-  createTableSQL.value = `CREATE TABLE \`${db}\`.\`new_table\` (\n  \`id\` INT NOT NULL AUTO_INCREMENT,\n  \`name\` VARCHAR(255) NOT NULL,\n  \`created_at\` DATETIME DEFAULT CURRENT_TIMESTAMP,\n  PRIMARY KEY (\`id\`)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`
+  createTableName.value = 'new_table'
+  createTableEngine.value = 'InnoDB'
+  createTableCharset.value = 'utf8mb4'
+  createTableColumns.value = [
+    { name: 'id', type: 'INT', length: null, notNull: true, autoIncrement: true, isPrimary: true, defaultValue: '', comment: '' },
+    { name: 'name', type: 'VARCHAR', length: 255, notNull: true, autoIncrement: false, isPrimary: false, defaultValue: '', comment: '' },
+  ]
   showCreateTable.value = true
-}
-
-const executeCreateTable = async () => {
-  if (!createTableSQL.value.trim()) return
-  createTableSaving.value = true
-  try {
-    const res = await mysqlMeta.execute(props.connection.id, createTableSQL.value)
-    if ((res as any).error) throw new Error((res as any).error)
-    showCreateTable.value = false
-    message.success('表创建成功')
-    loadTablesAndViews(createTableTargetDb.value)
-  } catch (e: any) { message.error('创建失败: ' + (e?.response?.data?.error || e.message)) }
-  finally { createTableSaving.value = false }
 }
 
 // ─── Data loading ────────────────────────────────────────────────────────────
@@ -615,7 +818,14 @@ watch(() => props.connection?.id, () => {
 </script>
 
 <style scoped>
-.mysql-explorer { display: flex; flex-direction: column; height: 100%; overflow: hidden; font-size: 12px; }
+.mysql-explorer {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  font-size: 12px;
+  background: var(--bg-primary);
+}
 
 .explorer-toolbar { display: flex; align-items: center; gap: 4px; padding: 6px 8px; flex-shrink: 0; border-bottom: 1px solid var(--border-secondary); }
 .search-input { flex: 1; }
@@ -682,4 +892,32 @@ watch(() => props.connection?.id, () => {
 /* ── Row action (add button) ── */
 .row-action { opacity: 0; transition: opacity 0.1s; }
 .db-row:hover .row-action { opacity: 1; }
+
+/* ── Create Table Form (可视化建表) ── */
+.create-table-form { display: flex; flex-direction: column; gap: 16px; }
+.create-table-form .form-row { display: flex; align-items: center; gap: 8px; }
+.create-table-form .form-label { font-size: 12px; color: var(--text-tertiary); min-width: 60px; flex-shrink: 0; }
+
+.fields-section { display: flex; flex-direction: column; gap: 8px; }
+.fields-header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 8px; }
+.fields-title { font-size: 12px; font-weight: 600; color: var(--text-secondary); }
+
+.fields-table { display: flex; flex-direction: column; border: 1px solid var(--border-secondary); border-radius: 6px; overflow: hidden; }
+.field-row { display: grid; grid-template-columns: 50px 140px 120px 80px 50px 50px 120px 1fr 40px; gap: 4px; padding: 6px 8px; align-items: center; border-bottom: 1px solid var(--border-secondary); }
+.field-row:last-child { border-bottom: none; }
+.field-row.header { background: var(--bg-row-hover); font-size: 10px; font-weight: 700; color: var(--text-disabled); text-transform: uppercase; }
+.field-row:not(.header):hover { background: var(--bg-row-hover); }
+.col-pk { display: flex; justify-content: center; }
+.col-name { }
+.col-type { }
+.col-length { }
+.col-nn { display: flex; justify-content: center; }
+.col-ai { display: flex; justify-content: center; }
+.col-default { }
+.col-comment { }
+.col-action { display: flex; justify-content: center; }
+
+.sql-preview { background: var(--code-bg); border-radius: 6px; overflow: hidden; }
+.sql-preview-header { font-size: 11px; font-weight: 600; color: var(--text-disabled); padding: 8px 12px; background: var(--bg-row-hover); border-bottom: 1px solid var(--border-secondary); }
+.sql-preview-content { font-family: 'SF Mono', 'Monaco', 'Consolas', monospace; font-size: 11px; color: var(--text-secondary); padding: 12px; margin: 0; white-space: pre-wrap; word-break: break-all; max-height: 120px; overflow-y: auto; }
 </style>

@@ -5,12 +5,16 @@ import { getDriverManager } from '../server/drivers/DriverManager'
 
 let mainWindow: BrowserWindow | null = null
 let serverPort: number = 3000
+// macOS Dock 图标路径（在函数外部定义，确保在 app.whenReady 中可用）
+const dockIconPath = process.platform === 'darwin'
+  ? join(__dirname, '../resources/icon.png')  // 使用 png 格式作为 Dock 图标
+  : ''
 
 const VITE_DEV_SERVER_URL = process.env.VITE_DEV_SERVER_URL || 'http://localhost:5173'
 
 const createWindow = () => {
-  // macOS 应用图标（窗口内图标 + Dock 图标均使用 png）
-  const iconPath = join(__dirname, '../resources/icon.png')
+  // macOS 窗口图标使用 png 格式
+  const pngIconPath = join(__dirname, '../resources/icon.png')
 
   mainWindow = new BrowserWindow({
     width: 1400,
@@ -18,7 +22,7 @@ const createWindow = () => {
     minWidth: 1200,
     minHeight: 700,
     frame: false, // 完全自定义标题栏
-    icon: iconPath,
+    icon: pngIconPath,
     webPreferences: {
       preload: join(__dirname, 'preload.js'),
       nodeIntegration: false,
@@ -26,7 +30,11 @@ const createWindow = () => {
       sandbox: false
     },
     show: false,
-    title: 'UniDb'
+    title: 'UniDb',
+    // macOS 圆角窗口
+    ...(process.platform === 'darwin' ? {
+      roundedCorners: true
+    } : {})
   })
 
   mainWindow.loadURL(VITE_DEV_SERVER_URL)
@@ -73,7 +81,7 @@ app.whenReady().then(async () => {
   createWindow()
 
   if (process.platform === 'darwin') {
-    app.dock.setIcon(join(__dirname, '../resources/icon.png'))
+    app.dock.setIcon(dockIconPath)
   }
 
   app.on('activate', () => {

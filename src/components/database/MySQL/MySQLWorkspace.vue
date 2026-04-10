@@ -8,44 +8,6 @@
 
     <!-- Table / view selected: DBeaver-style tabbed workspace -->
     <template v-else-if="selectedItemType === 'table' || selectedItemType === 'view'">
-      <!-- Physical table metadata from information_schema -->
-      <div v-if="selectedItemType === 'table'" class="table-meta-bar">
-        <n-spin v-if="metaLoading" size="small" class="meta-spin" />
-        <template v-else-if="tableMeta">
-          <div class="meta-chips">
-            <div class="meta-chip" :title="t('mysqlTable.rowsHint')">
-              <span class="meta-k">{{ t('mysqlTable.rows') }}</span>
-              <span class="meta-v">{{ formatRows(tableMeta.tableRows) }}</span>
-            </div>
-            <div class="meta-sep" />
-            <div class="meta-chip">
-              <span class="meta-k">{{ t('mysqlTable.dataLength') }}</span>
-              <span class="meta-v">{{ formatBytes(tableMeta.dataLength) }}</span>
-            </div>
-            <div class="meta-sep" />
-            <div class="meta-chip">
-              <span class="meta-k">{{ t('mysqlTable.indexLength') }}</span>
-              <span class="meta-v">{{ formatBytes(tableMeta.indexLength) }}</span>
-            </div>
-            <div class="meta-sep" />
-            <div class="meta-chip">
-              <span class="meta-k">{{ t('mysqlTable.engine') }}</span>
-              <span class="meta-v">{{ tableMeta.engine || '—' }}</span>
-            </div>
-            <div class="meta-sep" />
-            <div class="meta-chip">
-              <span class="meta-k">{{ t('mysqlTable.createTime') }}</span>
-              <span class="meta-v">{{ formatMetaTime(tableMeta.createTime) }}</span>
-            </div>
-            <div class="meta-sep" />
-            <div class="meta-chip">
-              <span class="meta-k">{{ t('mysqlTable.collation') }}</span>
-              <span class="meta-v">{{ tableMeta.collation || '—' }}</span>
-            </div>
-          </div>
-        </template>
-        <div v-else class="meta-unavailable">{{ t('mysqlTable.metaUnavailable') }}</div>
-      </div>
       <!-- Tab bar -->
       <div class="tab-bar">
         <div
@@ -59,7 +21,8 @@
       </div>
       <!-- Tab content -->
       <div class="tab-content">
-        <TableBrowse v-if="activeTab === 'browse'" :table="selectedItem" :connection="connection" />
+        <TableProperties v-if="activeTab === 'properties'" :table="selectedItem" :connection="connection" />
+        <TableBrowse v-else-if="activeTab === 'browse'" :table="selectedItem" :connection="connection" />
         <TableSchema v-else-if="activeTab === 'schema'" :table="selectedItem" :connection="connection" />
         <SqlEditor v-else-if="activeTab === 'sql'"
           :connection="connection" :db-type="'mysql'" :active-db="activeDb"
@@ -78,7 +41,8 @@ import { NIcon, NButton, NInput, NSelect, NDataTable, NEmpty, NSpin, NAlert, NMo
 import {
   GridOutline, ListOutline, CodeSlashOutline, CreateOutline, TrashOutline,
   AddOutline, RefreshOutline, DownloadOutline, ChevronBackOutline,
-  ChevronForwardOutline, FilterOutline, CloseOutline, PlayCircleOutline
+  ChevronForwardOutline, FilterOutline, CloseOutline, PlayCircleOutline,
+  InformationCircleOutline
 } from '@vicons/ionicons5'
 import { mysqlMeta } from '../../../api/meta'
 import { format } from 'sql-formatter'
@@ -99,25 +63,15 @@ const props = defineProps<{
   activeDb: string
 }>()
 
-const activeTab = ref('browse')
+const activeTab = ref('properties')
 
 const tabs = [
+  { key: 'properties', label: '表属性', icon: InformationCircleOutline },
   { key: 'browse', label: '数据浏览', icon: GridOutline },
   { key: 'schema', label: '表结构', icon: ListOutline },
   { key: 'sql', label: 'SQL 查询', icon: CodeSlashOutline },
   { key: 'indexes', label: '索引', icon: FilterOutline }
 ]
-
-const tableMeta = ref<{
-  name: string
-  engine: string | null
-  tableRows: number | null
-  dataLength: number | null
-  indexLength: number | null
-  collation: string | null
-  createTime: string | null
-} | null>(null)
-const metaLoading = ref(false)
 
 const lastTableSelKey = ref('')
 
@@ -165,33 +119,9 @@ function formatMetaTime(v: string | Date | null | undefined) {
   return s.replace('T', ' ').slice(0, 19)
 }
 
-async function loadTableMeta() {
-  tableMeta.value = null
-  if (props.selectedItemType !== 'table' || !props.selectedItem?.name || !props.connection?.id) return
-  const db = props.selectedItem._db || props.activeDb
-  if (!db) return
-  metaLoading.value = true
-  try {
-    const res = await mysqlMeta.tableInfo(props.connection.id, props.selectedItem.name, db)
-    tableMeta.value = res.table
-  } catch {
-    tableMeta.value = null
-  } finally {
-    metaLoading.value = false
-  }
-}
-
-watch(
-  () => [props.connection?.id, props.selectedItem?.name, props.selectedItem?._db, props.selectedItemType, props.activeDb] as const,
-  () => {
-    loadTableMeta()
-  },
-  { immediate: true }
-)
-
 function onMysqlWorkspaceTab(e: Event) {
   const tab = (e as CustomEvent<{ tab?: string }>).detail?.tab
-  if (tab && ['browse', 'schema', 'sql', 'indexes'].includes(tab)) activeTab.value = tab
+  if (tab && ['properties', 'browse', 'schema', 'sql', 'indexes'].includes(tab)) activeTab.value = tab
 }
 
 onMounted(() => window.addEventListener('mysql-workspace-tab', onMysqlWorkspaceTab as EventListener))
@@ -856,6 +786,119 @@ const TableIndexes = defineComponent({
     ])
   }
 })
+
+// Table Properties - 显示表属性信息
+const TableProperties = defineComponent({
+  props: { table: Object, connection: Object },
+  setup(p) {
+    const meta = ref<any>(null)
+    const loading = ref(false)
+    const error = ref('')
+
+    const dbName = () => p.table?._db || p.connection?.config?.database
+
+    const loadMeta = async () => {
+      if (!p.table || !p.connection?.id) return
+      loading.value = true
+      error.value = ''
+      meta.value = null
+      try {
+        const res = await mysqlMeta.tableInfo(p.connection.id, p.table.name, dbName())
+        meta.value = res.table
+      } catch (e: any) {
+        error.value = e?.response?.data?.error || e.message || '加载失败'
+        message.error('加载表属性失败: ' + error.value)
+      } finally {
+        loading.value = false
+      }
+    }
+
+    function formatBytes(n: number | null | undefined) {
+      if (n == null || Number.isNaN(n)) return '—'
+      if (n === 0) return '0 B'
+      const u = ['B', 'KB', 'MB', 'GB', 'TB']
+      let i = 0
+      let v = n
+      while (v >= 1024 && i < u.length - 1) { v /= 1024; i++ }
+      return `${v < 10 && i > 0 ? v.toFixed(1) : Math.round(v)} ${u[i]}`
+    }
+
+    function formatTime(v: string | Date | null | undefined) {
+      if (!v) return '—'
+      const s = typeof v === 'string' ? v : (v as Date).toISOString?.() || String(v)
+      return s.replace('T', ' ').slice(0, 19)
+    }
+
+    watch(() => [p.table?.name, p.table?._db], loadMeta, { immediate: true })
+
+    return () => h('div', { class: 'table-properties' }, [
+      h('div', { class: 'prop-toolbar' }, [
+        h('span', { class: 'prop-title' }, loading.value ? '加载中...' : `${p.table?.name || ''} · 表属性`),
+        h('div', { style: 'flex:1' }),
+        h(NButton, { size: 'small', onClick: loadMeta, loading: loading.value },
+          { default: () => '刷新', icon: () => h(NIcon, null, { default: () => h(RefreshOutline) }) }),
+      ]),
+      error.value
+        ? h(NAlert, { type: 'error', title: '加载失败', style: 'margin:8px 12px;font-size:12px' }, { default: () => error.value })
+        : null,
+      loading.value
+        ? h('div', { style: 'display:flex;align-items:center;justify-content:center;height:200px' }, [h(NSpin, { size: 'medium' })])
+        : meta.value
+          ? h('div', { class: 'prop-content' }, [
+              h('div', { class: 'prop-section' }, [
+                h('div', { class: 'prop-section-title' }, '基本信息'),
+                h('div', { class: 'prop-row' }, [
+                  h('span', { class: 'prop-k' }, '表名'),
+                  h('span', { class: 'prop-v' }, p.table?.name || '—')
+                ]),
+                h('div', { class: 'prop-row' }, [
+                  h('span', { class: 'prop-k' }, '数据库'),
+                  h('span', { class: 'prop-v' }, dbName() || '—')
+                ]),
+                h('div', { class: 'prop-row' }, [
+                  h('span', { class: 'prop-k' }, '存储引擎'),
+                  h('span', { class: 'prop-v engine-badge' }, meta.value.engine || '—')
+                ]),
+                h('div', { class: 'prop-row' }, [
+                  h('span', { class: 'prop-k' }, '排序规则'),
+                  h('span', { class: 'prop-v' }, meta.value.collation || '—')
+                ]),
+                h('div', { class: 'prop-row' }, [
+                  h('span', { class: 'prop-k' }, '创建时间'),
+                  h('span', { class: 'prop-v' }, formatTime(meta.value.createTime))
+                ]),
+              ]),
+              h('div', { class: 'prop-section' }, [
+                h('div', { class: 'prop-section-title' }, '存储信息'),
+                h('div', { class: 'prop-row' }, [
+                  h('span', { class: 'prop-k' }, '行数'),
+                  h('span', { class: 'prop-v' }, (meta.value.tableRows != null ? Number(meta.value.tableRows).toLocaleString() : '—'))
+                ]),
+                h('div', { class: 'prop-row' }, [
+                  h('span', { class: 'prop-k' }, '数据长度'),
+                  h('span', { class: 'prop-v' }, formatBytes(meta.value.dataLength))
+                ]),
+                h('div', { class: 'prop-row' }, [
+                  h('span', { class: 'prop-k' }, '索引长度'),
+                  h('span', { class: 'prop-v' }, formatBytes(meta.value.indexLength))
+                ]),
+                h('div', { class: 'prop-row' }, [
+                  h('span', { class: 'prop-k' }, '总大小'),
+                  h('span', { class: 'prop-v total-size' },
+                    formatBytes((meta.value.dataLength || 0) + (meta.value.indexLength || 0)))
+                ]),
+              ]),
+              meta.value.comment
+                ? h('div', { class: 'prop-section' }, [
+                    h('div', { class: 'prop-section-title' }, '注释'),
+                    h('div', { class: 'prop-comment' }, meta.value.comment)
+                  ])
+                : null
+            ])
+          : h('div', { style: 'display:flex;align-items:center;justify-content:center;height:200px;color:var(--text-disabled)' }, '选择表查看属性')
+    ])
+  }
+})
 </script>
 
 <style>
@@ -863,6 +906,7 @@ const TableIndexes = defineComponent({
 .mysql-workspace {
   flex: 1; display: flex; flex-direction: column; overflow: hidden;
   background: var(--bg-primary); color: var(--text-secondary);
+  height: 100%;
 }
 
 .table-meta-bar {
@@ -872,7 +916,7 @@ const TableIndexes = defineComponent({
   align-items: center;
   padding: 6px 12px;
   gap: 10px;
-  background: var(--bg-tertiary);
+  background: var(--bg-primary);
   border-bottom: 1px solid var(--border-secondary);
   font-size: 11px;
 }
@@ -1030,4 +1074,27 @@ const TableIndexes = defineComponent({
 .pk-badge { color: var(--status-warning); font-weight: 700; font-size: 11px; }
 .type-sm { font-size: 11px; color: var(--text-quaternary); background: var(--bg-active); padding: 1px 5px; border-radius: 3px; }
 .col-badge { font-size: 11px; color: var(--type-date); background: var(--type-date-bg); padding: 1px 6px; border-radius: 3px; font-family: monospace; }
+
+/* ── Table Properties ── */
+.table-properties { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+.prop-toolbar {
+  display: flex; align-items: center; gap: 8px; padding: 10px 14px; flex-shrink: 0;
+  border-bottom: 1px solid var(--border-secondary);
+}
+.prop-title { font-size: 13px; font-weight: 600; color: var(--text-secondary); }
+.prop-content { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 16px; }
+.prop-section { display: flex; flex-direction: column; gap: 0; }
+.prop-section-title {
+  font-size: 11px; font-weight: 700; color: var(--text-disabled);
+  text-transform: uppercase; letter-spacing: 0.5px;
+  padding: 0 8px 8px; margin-bottom: 4px;
+  border-bottom: 1px solid var(--border-secondary);
+}
+.prop-row { display: flex; align-items: baseline; padding: 6px 8px; }
+.prop-row:nth-child(even) { background: var(--bg-row-hover); }
+.prop-k { width: 90px; flex-shrink: 0; font-size: 12px; color: var(--text-tertiary); }
+.prop-v { font-size: 12px; color: var(--text-secondary); font-family: ui-monospace, monospace; }
+.engine-badge { background: var(--type-string-bg); color: var(--type-string); padding: 1px 8px; border-radius: 4px; font-size: 11px; }
+.total-size { color: var(--accent-primary); font-weight: 600; }
+.prop-comment { font-size: 12px; color: var(--text-secondary); padding: 8px; background: var(--bg-row-hover); border-radius: 4px; line-height: 1.6; }
 </style>

@@ -6,28 +6,95 @@
       <SqlEditor :connection="connection" :db-type="'mysql'" :active-db="activeDb" />
     </template>
 
-    <!-- Table / view selected: DBeaver-style tabbed workspace -->
-    <template v-else-if="selectedItemType === 'table' || selectedItemType === 'view'">
-      <!-- Tab bar -->
+    <!-- Table selected: 简洁布局 - 数据预览为主 -->
+    <template v-else-if="selectedItemType === 'table'">
+      <!-- 简化的 Tab bar -->
       <div class="tab-bar">
-        <div
-          v-for="tab in tabs" :key="tab.key"
-          class="tab-btn" :class="{ active: activeTab === tab.key }"
-          @click="activeTab = tab.key"
-        >
-          <n-icon :size="13"><component :is="tab.icon" /></n-icon>
-          {{ tab.label }}
+        <div class="tab-bar-left">
+          <div
+            v-for="tab in mainTabs" :key="tab.key"
+            class="tab-btn" :class="{ active: activeTab === tab.key }"
+            @click="activeTab = tab.key"
+          >
+            <n-icon :size="13"><component :is="tab.icon" /></n-icon>
+            {{ tab.label }}
+          </div>
+        </div>
+        <div class="tab-bar-right">
+          <n-button text size="tiny" @click="activeTab = 'design'" :title="'设计表'">
+            <n-icon :size="14"><CreateOutline /></n-icon>
+          </n-button>
         </div>
       </div>
+
       <!-- Tab content -->
       <div class="tab-content">
-        <TableProperties v-if="activeTab === 'properties'" :table="selectedItem" :connection="connection" />
-        <TableBrowse v-else-if="activeTab === 'browse'" :table="selectedItem" :connection="connection" />
-        <TableSchema v-else-if="activeTab === 'schema'" :table="selectedItem" :connection="connection" />
+        <!-- 数据浏览（默认/主要视图） -->
+        <TableBrowse v-if="activeTab === 'browse'" :table="selectedItem" :connection="connection" />
+
+        <!-- SQL 查询 -->
         <SqlEditor v-else-if="activeTab === 'sql'"
           :connection="connection" :db-type="'mysql'" :active-db="activeDb"
           :initial-sql="`SELECT * FROM \`${selectedItem?.name}\` LIMIT 100;`" />
-        <TableIndexes v-else-if="activeTab === 'indexes'" :table="selectedItem" :connection="connection" />
+
+        <!-- 设计视图（结构/索引/外键/触发器） -->
+        <TableDesign v-else-if="activeTab === 'design'" :table="selectedItem" :connection="connection" />
+      </div>
+    </template>
+
+    <!-- View selected -->
+    <template v-else-if="selectedItemType === 'view'">
+      <div class="tab-bar">
+        <div class="tab-bar-left">
+          <div class="tab-btn active">
+            <n-icon :size="13"><EyeOutline /></n-icon>
+            数据浏览
+          </div>
+        </div>
+        <div class="tab-bar-right">
+          <n-button text size="tiny" @click="activeTab = 'view-design'" :title="'设计视图'">
+            <n-icon :size="14"><CreateOutline /></n-icon>
+          </n-button>
+        </div>
+      </div>
+      <div class="tab-content">
+        <SqlEditor
+          :connection="connection" :db-type="'mysql'" :active-db="activeDb"
+          :initial-sql="`SELECT * FROM \`${selectedItem?.name}\` LIMIT 100;`" />
+      </div>
+    </template>
+
+    <!-- Function selected -->
+    <template v-else-if="selectedItemType === 'function'">
+      <div class="tab-bar">
+        <div class="tab-bar-left">
+          <div class="tab-btn active">
+            <n-icon :size="13"><CodeSlashOutline /></n-icon>
+            {{ selectedItem?.type || '函数' }}
+          </div>
+        </div>
+      </div>
+      <div class="tab-content">
+        <SqlEditor
+          :connection="connection" :db-type="'mysql'" :active-db="activeDb"
+          :initial-sql="`SHOW CREATE ${selectedItem?.type || 'FUNCTION'} \`${selectedItem?.name}\`;`" />
+      </div>
+    </template>
+
+    <!-- Event selected -->
+    <template v-else-if="selectedItemType === 'event'">
+      <div class="tab-bar">
+        <div class="tab-bar-left">
+          <div class="tab-btn active">
+            <n-icon :size="13"><TimeOutline /></n-icon>
+            事件
+          </div>
+        </div>
+      </div>
+      <div class="tab-content">
+        <SqlEditor
+          :connection="connection" :db-type="'mysql'" :active-db="activeDb"
+          :initial-sql="`SHOW CREATE EVENT \`${selectedItem?.name}\`;`" />
       </div>
     </template>
 
@@ -35,14 +102,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, defineComponent, h, onMounted, onUnmounted } from 'vue'
+import { ref, computed, watch, defineComponent, h, onMounted, onUnmounted, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { NIcon, NButton, NInput, NSelect, NDataTable, NEmpty, NSpin, NAlert, NModal, NCard, useMessage, useDialog } from 'naive-ui'
 import {
   GridOutline, ListOutline, CodeSlashOutline, CreateOutline, TrashOutline,
   AddOutline, RefreshOutline, DownloadOutline, ChevronBackOutline,
   ChevronForwardOutline, FilterOutline, CloseOutline, PlayCircleOutline,
-  InformationCircleOutline
+  InformationCircleOutline, EyeOutline, TimeOutline
 } from '@vicons/ionicons5'
 import { mysqlMeta } from '../../../api/meta'
 import { format } from 'sql-formatter'
@@ -63,14 +130,11 @@ const props = defineProps<{
   activeDb: string
 }>()
 
-const activeTab = ref('properties')
+const activeTab = ref('browse')
 
-const tabs = [
-  { key: 'properties', label: '表属性', icon: InformationCircleOutline },
+const mainTabs = [
   { key: 'browse', label: '数据浏览', icon: GridOutline },
-  { key: 'schema', label: '表结构', icon: ListOutline },
   { key: 'sql', label: 'SQL 查询', icon: CodeSlashOutline },
-  { key: 'indexes', label: '索引', icon: FilterOutline }
 ]
 
 const lastTableSelKey = ref('')
@@ -83,7 +147,7 @@ watch(
       props.selectedItemType
     ] as const,
   ([name, db, typ]) => {
-    if (!name || (typ !== 'table' && typ !== 'view')) {
+    if (!name) {
       lastTableSelKey.value = ''
       return
     }
@@ -293,12 +357,24 @@ const TableBrowse = defineComponent({
       loading.value = true; error.value = ''
       isAddingRow.value = false; newRowData.value = {}
       try {
-        const res = await mysqlMeta.tableData(p.connection.id, p.table.name, dbName(), page.value, pageSize.value)
+        const db = dbName()
+        console.log('[TableBrowse] Loading rows:', {
+          table: p.table.name,
+          db: db,
+          connectionId: p.connection.id,
+          page: page.value,
+          pageSize: pageSize.value
+        })
+        const res = await mysqlMeta.tableData(p.connection.id, p.table.name, db, page.value, pageSize.value)
+        console.log('[TableBrowse] Response:', res)
         total.value = res.total || 0
         rows.value = res.rows || []
         fields.value = res.fields || []
-        buildCols(res.fields || [])
+        // 如果没有 fields 但有 rows，从 rows 构建 fields
+        const colSource = (res.fields && res.fields.length) ? res.fields : (res.rows && res.rows.length ? Object.keys(res.rows[0]).map(k => ({ name: k })) : [])
+        buildCols(colSource)
       } catch (e: any) {
+        console.error('[TableBrowse] Error:', e)
         error.value = e?.response?.data?.error || e.message
         message.error('加载失败: ' + error.value)
       } finally { loading.value = false }
@@ -310,7 +386,7 @@ const TableBrowse = defineComponent({
         title: f.name, key: f.name,
         width: f.name === 'id' ? 70 : 140,
         ellipsis: { tooltip: true },
-        render: (row: any) => {
+        render: (row: any, _index: number) => {
           if (row.__isNew) {
             return h('input', {
               class: 'inline-cell-input',
@@ -460,17 +536,19 @@ const TableBrowse = defineComponent({
 
     watch(() => [p.table?.name, p.table?._db], () => { page.value = 1; loadRows() }, { immediate: true })
 
+    onMounted(() => {
+      nextTick(() => loadRows())
+    })
+
     const modalFields = computed(() => fields.value.length ? fields.value : (rows.value.length ? Object.keys(rows.value[0]).map(k => ({ name: k })) : []))
 
     const children: any[] = [
-      // Toolbar
+      // Toolbar - 简化版
       h('div', { class: 'browse-toolbar' }, [
         h('span', { class: 'browse-title' }, `${p.table?.name || ''}  ·  ${total.value.toLocaleString()} 行`),
         h('div', { style: 'flex:1' }),
         h(NButton, { size: 'small', type: 'primary', disabled: isAddingRow.value, onClick: openInsert },
           { default: () => '新增行', icon: () => h(NIcon, null, { default: () => h(AddOutline) }) }),
-        h(NButton, { size: 'small', onClick: loadRows, loading: loading.value },
-          { default: () => '刷新', icon: () => h(NIcon, null, { default: () => h(RefreshOutline) }) }),
         h(NButton, { size: 'small', onClick: exportCSV },
           { default: () => '导出 CSV', icon: () => h(NIcon, null, { default: () => h(DownloadOutline) }) }),
       ]),
@@ -899,6 +977,45 @@ const TableProperties = defineComponent({
     ])
   }
 })
+
+// Table Design - 设计视图（字段/索引/外键/触发器）
+const TableDesign = defineComponent({
+  props: { table: Object, connection: Object },
+  setup(p) {
+    const designTab = ref('columns')
+    const dbName = () => p.table?._db || p.connection?.config?.database
+
+    return () => h('div', { class: 'table-design' }, [
+      // 设计子 Tab bar
+      h('div', { class: 'design-tabs' }, [
+        h('div', {
+          class: ['design-tab', designTab.value === 'columns' && 'active'],
+          onClick: () => { designTab.value = 'columns' }
+        }, '字段'),
+        h('div', {
+          class: ['design-tab', designTab.value === 'indexes' && 'active'],
+          onClick: () => { designTab.value = 'indexes' }
+        }, '索引'),
+        h('div', {
+          class: ['design-tab', designTab.value === 'foreignkeys' && 'active'],
+          onClick: () => { designTab.value = 'foreignkeys' }
+        }, '外键'),
+        h('div', {
+          class: ['design-tab', designTab.value === 'triggers' && 'active'],
+          onClick: () => { designTab.value = 'triggers' }
+        }, '触发器'),
+      ]),
+      // 设计内容
+      h('div', { class: 'design-content' },
+        designTab.value === 'columns'
+          ? h(TableSchema, { table: p.table, connection: p.connection })
+          : designTab.value === 'indexes'
+            ? h(TableIndexes, { table: p.table, connection: p.connection })
+            : h('div', { class: 'design-placeholder' }, `暂未实现 ${designTab.value} 管理功能`)
+      )
+    ])
+  }
+})
 </script>
 
 <style>
@@ -929,20 +1046,6 @@ const TableProperties = defineComponent({
   width: 1px; height: 14px; background: var(--border-secondary); margin: 0 4px; flex-shrink: 0;
 }
 .meta-unavailable { color: var(--text-disabled); font-size: 11px; }
-
-.tab-bar {
-  display: flex; align-items: center; height: 38px; flex-shrink: 0;
-  background: var(--bg-tabbar); border-bottom: 1px solid var(--border-secondary);
-  padding: 0 12px; gap: 2px;
-}
-
-.tab-btn {
-  display: flex; align-items: center; gap: 5px; padding: 0 12px; height: 100%;
-  font-size: 12px; cursor: pointer; border-bottom: 2px solid transparent;
-  color: var(--text-quaternary); transition: all 0.15s; white-space: nowrap;
-}
-.tab-btn:hover { color: var(--text-secondary); background: var(--bg-row-hover); }
-.tab-btn.active { color: var(--type-string); border-bottom-color: var(--type-string); }
 
 .tab-content { flex: 1; overflow: hidden; display: flex; flex-direction: column; min-height: 0; }
 
@@ -1097,4 +1200,18 @@ const TableProperties = defineComponent({
 .engine-badge { background: var(--type-string-bg); color: var(--type-string); padding: 1px 8px; border-radius: 4px; font-size: 11px; }
 .total-size { color: var(--accent-primary); font-weight: 600; }
 .prop-comment { font-size: 12px; color: var(--text-secondary); padding: 8px; background: var(--bg-row-hover); border-radius: 4px; line-height: 1.6; }
+
+/* ── Table Design ── */
+.table-design { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+.design-tabs { display: flex; align-items: center; height: 34px; flex-shrink: 0; background: var(--bg-secondary); border-bottom: 1px solid var(--border-secondary); padding: 0 8px; gap: 2px; }
+.design-tab { padding: 0 12px; height: 100%; display: flex; align-items: center; font-size: 12px; color: var(--text-quaternary); cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.15s; }
+.design-tab:hover { color: var(--text-secondary); }
+.design-tab.active { color: var(--accent-primary); border-bottom-color: var(--accent-primary); }
+.design-content { flex: 1; overflow: hidden; display: flex; flex-direction: column; }
+.design-placeholder { flex: 1; display: flex; align-items: center; justify-content: center; color: var(--text-disabled); }
+
+/* Tab bar layout */
+.tab-bar { display: flex; align-items: center; height: 38px; flex-shrink: 0; background: var(--bg-tabbar); border-bottom: 1px solid var(--border-secondary); padding: 0 12px; gap: 2px; }
+.tab-bar-left { display: flex; align-items: center; gap: 2px; flex: 1; }
+.tab-bar-right { display: flex; align-items: center; gap: 4px; }
 </style>

@@ -40,7 +40,7 @@
           </n-button>
         </div>
 
-        <!-- Expanded: Tables / Views / Indexes / SQL -->
+        <!-- Expanded: Tables / Views / Functions / Events -->
         <div v-if="exp[db]" class="db-children">
 
           <!-- Tables -->
@@ -90,6 +90,56 @@
                 <span class="row-name" :title="v.name">{{ v.name }}</span>
               </div>
               <div v-if="!filteredViews(db).length" class="empty-row">无视图</div>
+            </div>
+          </div>
+
+          <!-- Functions -->
+          <div class="section-node">
+            <div class="tree-row sec-row" @click="toggleSec(db, 'functions')">
+              <n-icon class="row-arrow" :class="{ open: secExp[db]?.functions }">
+                <ChevronForwardOutline />
+              </n-icon>
+              <n-icon class="row-icon func-icon"><CodeSlashOutline /></n-icon>
+              <span class="row-name sec-label">{{ t('explorer.functions') || '函数' }}</span>
+              <span class="badge">{{ filteredFunctions(db).length }}</span>
+            </div>
+            <div v-if="secExp[db]?.functions" class="sec-children">
+              <div
+                v-for="fn in filteredFunctions(db)" :key="fn.name"
+                class="tree-row item-row"
+                :class="{ active: sel?._db === db && sel?.name === fn.name && selType === 'function' }"
+                @click="selectItem(db, fn, 'function')"
+              >
+                <n-icon class="row-icon item-icon func-icon"><CodeSlashOutline /></n-icon>
+                <span class="row-name" :title="fn.name">{{ fn.name }}</span>
+                <span class="item-meta">{{ fn.type }}</span>
+              </div>
+              <div v-if="!filteredFunctions(db).length" class="empty-row">无函数</div>
+            </div>
+          </div>
+
+          <!-- Events -->
+          <div class="section-node">
+            <div class="tree-row sec-row" @click="toggleSec(db, 'events')">
+              <n-icon class="row-arrow" :class="{ open: secExp[db]?.events }">
+                <ChevronForwardOutline />
+              </n-icon>
+              <n-icon class="row-icon event-icon"><TimeOutline /></n-icon>
+              <span class="row-name sec-label">{{ t('explorer.events') || '事件' }}</span>
+              <span class="badge">{{ filteredEvents(db).length }}</span>
+            </div>
+            <div v-if="secExp[db]?.events" class="sec-children">
+              <div
+                v-for="ev in filteredEvents(db)" :key="ev.name"
+                class="tree-row item-row"
+                :class="{ active: sel?._db === db && sel?.name === ev.name && selType === 'event' }"
+                @click="selectItem(db, ev, 'event')"
+              >
+                <n-icon class="row-icon item-icon event-icon"><TimeOutline /></n-icon>
+                <span class="row-name" :title="ev.name">{{ ev.name }}</span>
+                <span class="item-meta">{{ ev.status }}</span>
+              </div>
+              <div v-if="!filteredEvents(db).length" class="empty-row">无事件</div>
             </div>
           </div>
 
@@ -270,7 +320,7 @@ import { NIcon, NButton, NInput, NDropdown, NModal, NCard, NSpin, NCheckbox, NSe
 import {
   RefreshOutline, ChevronForwardOutline, GridOutline, EyeOutline,
   AddOutline, SearchOutline, WarningOutline, CloseOutline, ServerOutline,
-  TrashOutline
+  TrashOutline, CodeSlashOutline, TimeOutline
 } from '@vicons/ionicons5'
 import { useSettingsStore } from '../../../stores/settings'
 import { mysqlMeta } from '../../../api/meta'
@@ -293,11 +343,13 @@ const selType = ref('')
 const databases = ref<string[]>([])
 const tables = ref<Record<string, any[]>>({})
 const views = ref<Record<string, any[]>>({})
+const functions = ref<Record<string, any[]>>({})
+const events = ref<Record<string, any[]>>({})
 const error = ref('')
 
-// expanded state: exp[db] = boolean, secExp[db] = { tables: bool, views: bool }
+// expanded state
 const exp = reactive<Record<string, boolean>>({})
-const secExp = reactive<Record<string, { tables: boolean; views: boolean }>>({})
+const secExp = reactive<Record<string, { tables: boolean; views: boolean; functions: boolean; events: boolean }>>({})
 
 // context menu
 const ctx = ref({ show: false, x: 0, y: 0, db: '', item: null as any, type: '' })
@@ -473,11 +525,21 @@ const filteredViews = (db: string) => {
   return (views.value[db] || []).filter(v => v.name.toLowerCase().includes(searchText.value.toLowerCase()))
 }
 
+const filteredFunctions = (db: string) => {
+  if (!searchText.value) return functions.value[db] || []
+  return (functions.value[db] || []).filter(f => f.name.toLowerCase().includes(searchText.value.toLowerCase()))
+}
+
+const filteredEvents = (db: string) => {
+  if (!searchText.value) return events.value[db] || []
+  return (events.value[db] || []).filter(e => e.name.toLowerCase().includes(searchText.value.toLowerCase()))
+}
+
 // ─── Toggle ─────────────────────────────────────────────────────────────────
 const toggleDb = (db: string) => {
   exp[db] = !exp[db]
   if (exp[db] && !secExp[db]) {
-    secExp[db] = { tables: true, views: false }
+    secExp[db] = { tables: true, views: false, functions: false, events: false }
   }
   if (exp[db]) {
     emit('db-change', db)
@@ -485,10 +547,16 @@ const toggleDb = (db: string) => {
   }
 }
 
-const toggleSec = (_db: string, key: 'tables' | 'views') => {
+const toggleSec = (_db: string, key: 'tables' | 'views' | 'functions' | 'events') => {
   const db = _db
-  if (!secExp[db]) secExp[db] = { tables: false, views: false }
+  if (!secExp[db]) secExp[db] = { tables: false, views: false, functions: false, events: false }
   secExp[db][key] = !secExp[db][key]
+  // 加载对应的数据
+  if (secExp[db][key] && key === 'functions') {
+    loadFunctions(db)
+  } else if (secExp[db][key] && key === 'events') {
+    loadEvents(db)
+  }
 }
 
 // ─── Select ─────────────────────────────────────────────────────────────────
@@ -806,6 +874,24 @@ const loadTablesAndViews = async (db: string) => {
   } catch (e: any) { /* silently fail per-db */ }
 }
 
+const loadFunctions = async (db: string) => {
+  if (!props.connection?.id) return
+  if (functions.value[db]) return // 已经加载过
+  try {
+    const res = await mysqlMeta.functions(props.connection.id, db)
+    functions.value[db] = res.functions || []
+  } catch (e: any) { /* silently fail */ }
+}
+
+const loadEvents = async (db: string) => {
+  if (!props.connection?.id) return
+  if (events.value[db]) return // 已经加载过
+  try {
+    const res = await mysqlMeta.events(props.connection.id, db)
+    events.value[db] = res.events || []
+  } catch (e: any) { /* silently fail */ }
+}
+
 watch(() => props.connection?.id, () => {
   sel.value = null
   databases.value = []
@@ -872,6 +958,8 @@ watch(() => props.connection?.id, () => {
 .db-icon { color: var(--status-warning); }
 .tbl-icon { color: var(--type-string); }
 .view-icon { color: var(--type-date); }
+.func-icon { color: var(--type-number); }
+.event-icon { color: var(--accent-primary); }
 .query-icon { color: var(--accent-primary); }
 
 /* ── Text ── */

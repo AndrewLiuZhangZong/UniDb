@@ -75,6 +75,71 @@ router.get('/mysql/:connectionId/views', async (req, res) => {
   }
 })
 
+// GET /api/meta/mysql/:connectionId/functions?database=xxx
+router.get('/mysql/:connectionId/functions', async (req, res) => {
+  const { database } = req.query as { database?: string }
+  try {
+    const adapter = await DatabaseAdapterFactory.createAdapter(req.params.connectionId) as any
+    await adapter.connect()
+    const dbName = database || adapter.connection?.config?.database
+    const result = await adapter.query(
+      `SELECT ROUTINE_NAME, ROUTINE_TYPE, DATA_TYPE, DTD_IDENTIFIER, SECURITY_TYPE, DEFINER, CREATED, LAST_ALTERED
+       FROM information_schema.ROUTINES
+       WHERE ROUTINE_SCHEMA = ${dbName ? `'${dbName}'` : 'DATABASE()'}
+       AND ROUTINE_TYPE IN ('FUNCTION', 'PROCEDURE')
+       ORDER BY ROUTINE_NAME`
+    )
+    await adapter.disconnect()
+    const functions = (result.rows || []).map((r: any) => ({
+      name: r.ROUTINE_NAME,
+      type: r.ROUTINE_TYPE,
+      dataType: r.DATA_TYPE,
+      dtdIdentifier: r.DTD_IDENTIFIER,
+      securityType: r.SECURITY_TYPE,
+      definer: r.DEFINER,
+      created: r.CREATED,
+      lastAltered: r.LAST_ALTERED
+    }))
+    res.json({ functions })
+  } catch (e) {
+    res.status(500).json({ error: (e as Error).message })
+  }
+})
+
+// GET /api/meta/mysql/:connectionId/events?database=xxx
+router.get('/mysql/:connectionId/events', async (req, res) => {
+  const { database } = req.query as { database?: string }
+  try {
+    const adapter = await DatabaseAdapterFactory.createAdapter(req.params.connectionId) as any
+    await adapter.connect()
+    const dbName = database || adapter.connection?.config?.database
+    const result = await adapter.query(
+      `SELECT EVENT_NAME, DEFINER, TIME_ZONE, EVENT_TYPE, execute_at, INTERVAL_VALUE, INTERVAL_FIELD,
+       STARTS, ENDS, STATUS, ORIGINATOR, SQL_MODE, BODY
+       FROM information_schema.EVENTS
+       WHERE EVENT_SCHEMA = ${dbName ? `'${dbName}'` : 'DATABASE()'}
+       ORDER BY EVENT_NAME`
+    )
+    await adapter.disconnect()
+    const events = (result.rows || []).map((r: any) => ({
+      name: r.EVENT_NAME,
+      definer: r.DEFINER,
+      timeZone: r.TIME_ZONE,
+      eventType: r.EVENT_TYPE,
+      executeAt: r.execute_at,
+      intervalValue: r.INTERVAL_VALUE,
+      intervalField: r.INTERVAL_FIELD,
+      starts: r.STARTS,
+      ends: r.ENDS,
+      status: r.STATUS,
+      originator: r.ORIGINATOR
+    }))
+    res.json({ events })
+  } catch (e) {
+    res.status(500).json({ error: (e as Error).message })
+  }
+})
+
 // GET /api/meta/mysql/:connectionId/tableinfo?database=xxx&table=yyy
 router.get('/mysql/:connectionId/tableinfo', async (req, res) => {
   const { database, table } = req.query as { database?: string; table: string }
@@ -180,8 +245,11 @@ router.get('/mysql/:connectionId/tabledata', async (req, res) => {
     await adapter.connect()
     const offset = (parseInt(page) - 1) * parseInt(pageSize)
     const dbPrefix = database ? `\`${database}\`.` : ''
+    console.log(`[tabledata] Query: SELECT * FROM ${dbPrefix}\`${table}\` LIMIT ${pageSize} OFFSET ${offset}`)
     const result = await adapter.query(`SELECT * FROM ${dbPrefix}\`${table}\` LIMIT ${pageSize} OFFSET ${offset}`)
+    console.log(`[tabledata] Result rows: ${result.rows?.length}, fields: ${result.fields?.length}`)
     const countResult = await adapter.query(`SELECT COUNT(*) as total FROM ${dbPrefix}\`${table}\``)
+    console.log(`[tabledata] Count result:`, countResult.rows)
     await adapter.disconnect()
     res.json({
       rows: result.rows || [],
@@ -189,6 +257,7 @@ router.get('/mysql/:connectionId/tabledata', async (req, res) => {
       total: (countResult.rows?.[0] as any)?.total || 0
     })
   } catch (e) {
+    console.error('[tabledata] Error:', e)
     res.status(500).json({ error: (e as Error).message })
   }
 })
